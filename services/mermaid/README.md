@@ -1,7 +1,7 @@
 # Mermaid Service (Backend)
 
 ![versions](https://img.shields.io/badge/python-3.13-blue?logo=python)
-[![codecov](https://codecov.io/gh/justmeloic/from-first-principles/graph/badge.svg?token=4GYOJ42J2C)](https://codecov.io/gh/justmeloic/from-first-principles)
+[![codecov](https://codecov.io/gh/justmeloic/flowgen/graph/badge.svg?token=XZYQXJOMFV)](https://codecov.io/gh/justmeloic/flowgen)
 ![Static Badge](https://img.shields.io/badge/build-passing-brightgreen)
 [![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](https://opensource.org/licenses/Apache-2.0)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/justmeloic/From-First-Principles/issues)
