@@ -151,6 +151,9 @@ async def handle_mermaid(
         # logger.info(f"[data][input] Conversation ID: {mermaid_request.message}")
         # logger.info(f"[data][output] Conversation ID: {response.text}")
 
+        logger.info(f"USER REQUEST: {mermaid_request.message}")
+        logger.info(f"SYSTEM RESPONSE: {response.text}")
+
         return MermaidResponse(response=response.text, conversation_id=conversation_id)
 
     except Exception as e:
