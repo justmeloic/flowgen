@@ -52,7 +52,7 @@ export default function ChatPage() {
     }
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     if (isResponding) {
       const intervalId = setInterval(() => {
         setLoadingText((prevText) =>
@@ -211,8 +211,16 @@ export default function ChatPage() {
                         <ReactMarkdown
                           rehypePlugins={[rehypeRaw]}
                           components={{
-                            code({ node, inline, className, children, ...props }) {
-                              const match = /language-(\w+)/.exec(className || "");
+                            code({
+                              node,
+                              inline,
+                              className,
+                              children,
+                              ...props
+                            }) {
+                              const match = /language-(\w+)/.exec(
+                                className || ""
+                              );
                               return !inline && match ? (
                                 <SyntaxHighlighter
                                   children={String(children).replace(/\n$/, "")}
@@ -251,12 +259,15 @@ export default function ChatPage() {
                     )}
                 </div>
               ))}
-               {isResponding && <p className="text-blue-500/70">{loadingText}</p>}
+              {isResponding && (
+                <p className="text-blue-500/70">{loadingText}</p>
+              )}
             </div>
           )}
         </div>
         <div className="w-full max-w-[880px] mx-auto mb-8 px-4 py-4 absolute bottom-8">
-          <ChatInput ref={chatInputRef} onSend={handleSend} /> {/* Use the ref here */}
+          <ChatInput ref={chatInputRef} onSend={handleSend} />{" "}
+          {/* Use the ref here */}
         </div>
       </main>
     </div>

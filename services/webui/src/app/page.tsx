@@ -6,15 +6,16 @@ import {
   ThumbsUp,
   ThumbsDown,
   MoreHorizontal,
-  ArrowRight,
   Volume2,
   PauseCircle,
+  RotateCcw,
+  Download,
 } from "lucide-react";
 import { SearchBar } from "@/components/search-bar";
-import { SearchResults } from "@/components/search-results";
 import { useToastHandlers } from "@/hooks/toast";
+import { EngineSelector, Engine } from "@/components/engine-selector";
 import { UserNav } from "@/components/user-nav";
-import { sendSearchQuery, SearchResponse, SearchResultDocument } from "@/lib/api";
+import { sendMermaidQuery, MermaidResponse } from "@/lib/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,38 +34,77 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import Mermaid from "@/components/mermaid";
+import { cn } from "@/lib/utils";
+import { saveAs } from "file-saver";
+import { useUser } from "@/context/UserContext";
 
 interface MessageBubbleProps {
   message: string;
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
+  const { handleCopyToast } = useToastHandlers();
+
+  const handleCopyCode = async (code: string) => {
+    await handleCopyToast(code);
+  };
+
   return (
-    <div className="p-4 rounded-3xl bg-gray-50 text-gray-600">
-      <ReactMarkdown
-        rehypePlugins={[rehypeRaw]}
-        components={{
-          code({ node, inline, className, children, ...props }) {
-            const match = /language-(\w+)/.exec(className || "");
-            return !inline && match ? (
-              <SyntaxHighlighter
-                children={String(children).replace(/\n$/, "")}
-                style={oneDark}
-                language={match[1]}
-                PreTag="div"
-                {...props}
-              />
-            ) : (
-              <code className={className} {...props}>
-                {children}
-              </code>
+    <ReactMarkdown
+      rehypePlugins={[rehypeRaw]}
+      components={{
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || "");
+          const codeString = String(children).replace(/\n$/, ""); // Ensure it's a string
+
+          if (!inline && match) {
+            return (
+              <div className="relative rounded-[2rem] bg-[#282c34] p-4 group">
+                <div
+                  className={cn(
+                    "absolute top-2 right-2 transition-opacity duration-200 rounded-full"
+                  )}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleCopyCode(codeString)}
+                          className="rounded-full"
+                        >
+                          <Copy className="h-5 w-5 text-gray-600 " />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Copy Code</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <SyntaxHighlighter
+                  children={codeString}
+                  style={oneDark}
+                  language={match[1]}
+                  PreTag="div"
+                  {...props}
+                />
+              </div>
             );
-          },
-        }}
-      >
-        {message}
-      </ReactMarkdown>
-    </div>
+          }
+
+          return (
+            <code className={className} {...props}>
+              {children}
+            </code>
+          );
+        },
+      }}
+    >
+      {message}
+    </ReactMarkdown>
   );
 };
 
@@ -74,6 +114,8 @@ interface FeedbackActionsProps {
   isPlaying: boolean;
   onListen: () => void;
   onPause: () => void;
+  onRegenerate: () => void;
+  onDownload: () => void;
 }
 
 const FeedbackActions: React.FC<FeedbackActionsProps> = ({
@@ -82,6 +124,8 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
   isPlaying,
   onListen,
   onPause,
+  onRegenerate,
+  onDownload,
 }) => {
   return (
     <div className="flex items-center gap-2">
@@ -93,7 +137,7 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Copy Summary</p>
+            <p>Copy Mermaid Code</p>
           </TooltipContent>
         </Tooltip>
 
@@ -142,7 +186,29 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isPlaying ? "Pause Audio" : "Listen to Summary"}</p>
+            <p>{isPlaying ? "Pause Audio" : "Listen to Mermaid Code"}</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={onRegenerate}>
+              <RotateCcw className="h-5 w-5 text-gray-600" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Regenerate</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={onDownload}>
+              <Download className="h-5 w-5 text-gray-600" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Download</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -167,8 +233,9 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [summary, setSummary] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResultDocument[]>([]);
+  const { user, loading } = useUser();
+  const [mermaidCode, setMermaidCode] = useState("");
+  const [isFirstPrompt, setIsFirstPrompt] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioRef, setAudioRef] = useState<SpeechSynthesisUtterance | null>(
     null
@@ -177,42 +244,54 @@ export default function SearchPage() {
   const { handleCopyToast, handleAudioToast, handleFeedbackToast } =
     useToastHandlers();
   const [loadingText, setLoadingText] = useState("Search...");
+  // New State to Store Selected Engine
+  const [selectedEngine, setSelectedEngine] = useState<Engine>("mermaid"); // Default to mermaid
 
   useEffect(() => {
     if (isSearching) {
       const intervalId = setInterval(() => {
         setLoadingText((prevText) =>
-          prevText === "Search..." ? "Thinking..." : "Search..."
+          prevText === "Generating..." ? "Thinking..." : "Generating..."
         );
-      }, 1000); // Change every 1 second
+      }, 1000);
 
-      return () => clearInterval(intervalId); // Cleanup on unmount or when isSearching changes
+      return () => clearInterval(intervalId);
     } else {
-        setLoadingText("Search...")
+      setLoadingText("Generating...");
     }
   }, [isSearching]);
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
     setIsSearching(true);
-    setSummary("");
-    setSearchResults([]);
+    setMermaidCode("");
+    setIsFirstPrompt(false);
 
     try {
-      const searchResponse: SearchResponse = await sendSearchQuery(query);
-      setSummary(searchResponse.summary || "No summary available.");
-      setSearchResults(searchResponse.results);
+      // Pass the selected engine to the API call
+      const mermaidResponse: MermaidResponse = await sendMermaidQuery(
+        query,
+        undefined,
+        selectedEngine
+      );
+      setMermaidCode(mermaidResponse.response || "No mermaid code available.");
     } catch (error) {
       console.error("Search error:", error);
-      setSummary("Error occurred while fetching summary.");
-      setSearchResults([]);
+      setMermaidCode("Error occurred while fetching generated mermaid code.");
     } finally {
       setIsSearching(false);
     }
   };
 
   const handleCopy = async () => {
-    await handleCopyToast(summary);
+    await handleCopyToast(mermaidCode);
+  };
+  const handleRegenerate = async () => {
+    await handleSearch(searchQuery);
+  };
+  const handleDownload = () => {
+    const blob = new Blob([mermaidCode], { type: "text/markdown" });
+    saveAs(blob, "mermaid.md");
   };
 
   const handleListen = () => {
@@ -230,7 +309,7 @@ export default function SearchPage() {
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(summary);
+    const utterance = new SpeechSynthesisUtterance(mermaidCode);
     setAudioRef(utterance);
     utterance.onend = () => {
       setIsPlaying(false);
@@ -256,17 +335,33 @@ export default function SearchPage() {
     handleFeedbackToast(type);
   };
 
-  const handleFollowUpClick = (question: string) => {
-    setSearchQuery(question);
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-      handleSearch(question);
-    }
+  const isMermaidCode = (text: string) => {
+    return text.trimStart().startsWith("```mermaid");
   };
 
+  const extractMermaidCode = (text: string): string | null => {
+    if (!isMermaidCode(text)) {
+      return null;
+    }
+    const start = text.indexOf("```mermaid") + "```mermaid".length;
+    const end = text.indexOf("```", start);
+    if (start === -1 || end === -1) {
+      return null;
+    }
+    return text.substring(start, end).trim();
+  };
+  // Function to handle engine change
+  const handleEngineChange = (engine: Engine) => {
+    setSelectedEngine(engine);
+  };
   return (
     <main className="flex-1 mt-0 max-w-3xl mx-auto w-full">
-      <div className="flex justify-end  py-6">
+      <div className="flex items-center justify-between p-4">
+        {/* Pass the handleEngineChange function as a prop */}
+        <EngineSelector
+          onEngineChange={handleEngineChange}
+          selectedEngine={selectedEngine}
+        />
         <UserNav />
       </div>
       <div className="bg-white px-8 py-6">
@@ -277,25 +372,47 @@ export default function SearchPage() {
         />
       </div>
       <div className="px-8 py-6">
-        {searchQuery && !isSearching && (
-          <div className="mb-6">
-          <div className="bg-gray-50 rounded-3xl py-4">
-            <div className="max-w-4xl mx-auto px-8">
-              <div className="flex items-center gap-2 mb-2"> {/* NEW: Flex container */}
-               <Avatar className="w-5 h-5">
-                <AvatarImage
-                  src="/gemini-logo.png"
-                  alt="Bot Avatar"
-                  fallback="AI"
-                />
-              </Avatar>
-                <h2 className="text-[12px] text-gray-600"> {/* NEW: Moved here */}
-                  Generative AI may display inaccurate information, including
-                  about people, so double-check its responses.
-                </h2>
-              </div> {/* NEW: Flex container */}
-              <MessageBubble message={summary} />
+        {isFirstPrompt && (
+          <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
+            {" "}
+            {/* Added flex-col here */}
+            <h1 className="text-center text-5xl font-bold">
+              <span className="bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent">
+                Hello, {user?.firstName}
+              </span>
+            </h1>
+            <h3 className="text-center text-sm font-bold w-[450px]">
+              <span className="bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent ">
+                I can help create diagrams from your descriptions. Tell me about
+                your system's architecture. Describe the parts and how they
+                connect, and I'll generate a diagram.
+              </span>
+            </h3>
+          </div>
+        )}
 
+        {searchQuery && !isSearching && !isFirstPrompt && (
+          <div className="mb-6">
+            <div className="bg-gray-50 rounded-3xl py-4">
+              <div className="max-w-4xl mx-auto px-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <Avatar className="w-5 h-5">
+                    <AvatarImage
+                      src="/gemini-logo.png"
+                      alt="Bot Avatar"
+                      fallback="AI"
+                    />
+                  </Avatar>
+                  <h2 className="text-[12px] text-gray-600">
+                    Generative AI may display inaccurate information, including
+                    about people, so double-check its responses.
+                  </h2>
+                </div>
+                {isMermaidCode(mermaidCode) && (
+                  <div className="mb-4">
+                    <Mermaid chart={extractMermaidCode(mermaidCode) || ""} />
+                  </div>
+                )}
                 <div className="space-y-4">
                   <FeedbackActions
                     onCopy={handleCopy}
@@ -303,37 +420,21 @@ export default function SearchPage() {
                     isPlaying={isPlaying}
                     onListen={handleListen}
                     onPause={handlePause}
+                    onRegenerate={handleRegenerate}
+                    onDownload={handleDownload}
                   />
-
-                  <div className="flex flex-wrap gap-3 ">
-                    {[
-                      "Follow-up suggestion 1",
-                      "Follow-up suggestion 2",
-                    ].map((question, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2  border-blue-100 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-3xl"
-                        onClick={() => handleFollowUpClick(question)}
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                        {question}
-                      </Button>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
-         {isSearching && <p className="text-blue-500/70">{loadingText}</p>}
-        <SearchResults
-          query={searchQuery}
-          isSearching={isSearching}
-          searchResults={searchResults}
-        />
+        {isSearching && <p className="text-blue-500/70">{loadingText}</p>}
       </div>
+      {!isSearching && !isFirstPrompt && (
+        <div className="p-4 mx-8 rounded-[2rem] bg-white text-gray-600">
+          <MessageBubble message={mermaidCode} />
+        </div>
+      )}
     </main>
   );
 }

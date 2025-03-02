@@ -1,58 +1,31 @@
-interface ChatRequest {
+interface MermaidRequest {
   message: string;
+  conversation_id?: string; 
 }
 
-interface ChatResponse {
+interface MermaidResponse {
   response: string;
+  conversation_id: string;
 }
 
-
-interface SearchRequest {
-  query: string;
-}
-
-interface SearchResultDocument {
-  name: string;
-  uri: string;
-  snippets: string[];
-}
-
-interface SearchResponse {
-  results: SearchResultDocument[];
-  summary: string | null;
-}
-
-export const sendChatMessage = async (message: string): Promise<string> => {
-  const response = await fetch('http://0.0.0.0:8080/api/v1/chat', {
+export const sendMermaidQuery = async (
+  message: string,
+  conversation_id?: string 
+): Promise<MermaidResponse> => {
+  const requestBody: MermaidRequest = { message, conversation_id };
+  const response = await fetch('http://0.0.0.0:8080/api/v1/mermaid', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      accept: 'application/json',
     },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to send chat message');
+    throw new Error(`Failed to send mermaid query: ${response.statusText}`);
   }
 
-  const data: ChatResponse = await response.json();
-  return data.response;
-};
-
-
-export const sendSearchQuery = async (query: string): Promise<SearchResponse> => {
-  const response = await fetch('http://0.0.0.0:8080/api/v1/search', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to send search query');
-  }
-
-  const data: SearchResponse = await response.json();
+  const data: MermaidResponse = await response.json();
   return data;
 };

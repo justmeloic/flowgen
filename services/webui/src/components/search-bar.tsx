@@ -1,12 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Search, SendHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FileChip } from "./file-chip";
 import { SearchSuggestions } from "./search-suggestions";
+import Image from "next/image"; // Import the Image component
 
 interface SearchBarProps extends React.HTMLAttributes<HTMLFormElement> {
   onSearch: (query: string) => void;
@@ -17,16 +18,19 @@ interface SearchBarProps extends React.HTMLAttributes<HTMLFormElement> {
 interface UploadedFile {
   id: string;
   file: File;
+  content?: string; // Add a content property to store file text
 }
 
-// Example suggestions - in a real app, these might come from props or an API
+// Example suggestions - in prod, these might come from props or an API
 const defaultSuggestions = [
-  { text: "Chat with files", icon: "plus" as const },
   {
-    text: "How does equity compensation work?",
-    icon: "none" as const,
+    text: "Basic client-server-database interaction",
+    icon: "plus" as const,
   },
-  { text: "What are the company values?", icon: "none" as const },
+  {
+    text: "Generate an API gateway pattern with a cache",
+    icon: "plus" as const,
+  },
 ];
 
 export function SearchBar({
@@ -42,6 +46,7 @@ export function SearchBar({
   const [showSuggestions, setShowSuggestions] = React.useState(true);
   const [hasSearched, setHasSearched] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isReadingFile, setIsReadingFile] = useState(false);
 
   useEffect(() => {
     setQuery(externalQuery || "");
@@ -50,24 +55,39 @@ export function SearchBar({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (query && query.trim()) {
-      onSearch(query);
+      let fullQuery = query;
+      uploadedFiles.forEach((uploadedFile) => {
+        if (uploadedFile.content) {
+          fullQuery += `\nFile content: \n${uploadedFile.content}\n`;
+        }
+      });
+      onSearch(fullQuery);
       setHasSearched(true);
       setShowSuggestions(false);
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsReadingFile(true);
     const files = event.target.files;
     if (files) {
-      const newFiles = Array.from(files).map((file) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        file,
-      }));
+      const newFilesPromises = Array.from(files).map(async (file) => {
+        const content = await readFileContent(file);
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          file,
+          content, // Store the file content here
+        };
+      });
+      const newFiles = await Promise.all(newFilesPromises);
       setUploadedFiles((prev) => [...prev, ...newFiles]);
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    setIsReadingFile(false);
   };
 
   const handleRemoveFile = (fileId: string) => {
@@ -78,26 +98,37 @@ export function SearchBar({
     setQuery(suggestion);
   };
 
+  // Helper function to read file content
+  const readFileContent = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target && event.target.result) {
+          resolve(event.target.result as string);
+        } else {
+          reject(new Error("Failed to read file"));
+        }
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsText(file);
+    });
+  };
+
   return (
     <div className="space-y-10">
-      <Link
-        href="/"
-        className="mx-auto mb-6 flex h-8 w-8 items-center justify-center"
-      >
-        <svg
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          stroke="black"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-6 w-6 text-gray-900"
-        >
-          <path d="M3 10L12 3L21 10V20H14V14H10V20H3V10Z" />
-        </svg>
+      <Link href="/" className="mx-auto mb-16 flex items-center justify-center">
+        <div className="h-[35px] w-[35px]">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={35}
+            height={35}
+            sizes="100vw"
+            style={{ objectFit: "contain" }}
+          />
+        </div>
       </Link>
       <form
         onSubmit={handleSubmit}
@@ -116,12 +147,12 @@ export function SearchBar({
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search content or ask questions"
+            placeholder="Describe your system architecture"
             value={query || ""}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="h-12 w-full rounded-full bg-transparent pl-12 pr-20 text-base outline-none placeholder:text-muted-foreground"
+            className="h-12 w-full rounded-full bg-transparent pl-12 pr-20 text-base  outline-none placeholder:text-gray-500/60"
           />
           <div className="absolute right-2 flex items-center gap-2">
             <input
@@ -139,7 +170,13 @@ export function SearchBar({
                 "hover:bg-primary/30 focus:bg-gray-100 focus:outline-none"
               )}
             >
-              <Plus className="h-5 w-5 text-gray-600" />
+              {isReadingFile ? (
+                <div className="animate-pulse">
+                  <Plus className="h-5 w-5 text-gray-600" />
+                </div>
+              ) : (
+                <Plus className="h-5 w-5 text-gray-600" />
+              )}
               <span className="sr-only">Upload files</span>
             </label>
             {query && query.trim() && (

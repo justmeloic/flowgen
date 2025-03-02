@@ -24,7 +24,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
 
   const sidebarLinks = [
     {
-      title: "HR and Onboarding",
+      title: "Terraform",
       icon: MessageSquare,
       variant: "default",
       href: "/chat",
@@ -56,7 +56,9 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
         {/* **New Title Added Here** */}
-        <div className="mb-2 mt-[300px] font-semibold text-gray-700 text-sm ">Agents</div>
+        <div className="mb-2 mt-[300px] font-semibold text-gray-700 text-sm ">
+          Agents
+        </div>
         <nav className="grid gap-1">
           {sidebarLinks.map((link, index) => {
             const Icon = link.icon;

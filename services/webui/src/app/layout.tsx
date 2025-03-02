@@ -3,14 +3,12 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import type React from "react";
-import { Header } from "@/components/header";
 import { Sidebar } from "@/components/ui/sidebar";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import type { Metadata } from "next";
+import { UserProvider } from "@/context/UserContext"; // Import UserProvider
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
 
 export default function RootLayout({
   children,
@@ -23,30 +21,27 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${inter.variable} font-sans antialiased`}>
-        <div className="relative flex min-h-screen flex-col">
-
-
-          <div className="flex-1">
-            <div className="border-t">
-              <div className="bg-background">
-                <div className="flex">
-                  <Sidebar
-                    isCollapsed={isCollapsed}
-                    onToggle={() => setIsCollapsed(!isCollapsed)}
-                  />
-                  <main className="flex-1 p-8">{children}</main>
+        <UserProvider>
+          {" "}
+          {/* Wrap your app with UserProvider */}
+          <div className="relative flex min-h-screen flex-col">
+            <div className="flex-1">
+              <div className="border-t">
+                <div className="bg-background">
+                  <div className="flex">
+                    <Sidebar
+                      isCollapsed={isCollapsed}
+                      onToggle={() => setIsCollapsed(!isCollapsed)}
+                    />
+                    <main className="flex-1 p-8">{children}</main>
+                  </div>
                 </div>
               </div>
             </div>
+            <Toaster />
           </div>
-          <Toaster /> {/* Add the Toaster component here */}
-        </div>
+        </UserProvider>
       </body>
     </html>
   );
 }
-
-
-
-
-
