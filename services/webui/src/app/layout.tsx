@@ -2,11 +2,10 @@
 
 import { Inter } from "next/font/google";
 import "./globals.css";
-import type React from "react";
 import { Sidebar } from "@/components/ui/sidebar";
 import { useState } from "react";
 import { Toaster } from "sonner";
-import { UserProvider } from "@/context/UserContext"; // Import UserProvider
+import { UserProvider } from "@/context/UserContext";
 import { EngineProvider } from "@/context/EngineContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -20,7 +19,6 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
       <body className={`${inter.variable} font-sans antialiased`}>
         <UserProvider>
           <EngineProvider>

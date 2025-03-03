@@ -47,10 +47,6 @@ interface MessageBubbleProps {
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const { handleCopyToast } = useToastHandlers();
 
-  const handleCopyCode = async (code: string) => {
-    await handleCopyToast(code);
-  };
-
   return (
     <ReactMarkdown
       rehypePlugins={[rehypeRaw]}
@@ -73,7 +69,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleCopyCode(codeString)}
+                          onClick={() => handleCopyToast(codeString)}
                           className="rounded-full"
                         >
                           <Copy className="h-5 w-5 text-gray-600 " />
