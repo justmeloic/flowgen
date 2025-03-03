@@ -1,8 +1,8 @@
-import * as React from "react";
-import Link from "next/link";
-import Image from "next/image";
+import * as React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -10,9 +10,9 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { UserNav } from "@/components/user-nav";
-import { allComponents } from "@/lib/components";
+} from '@/components/ui/navigation-menu'
+import { UserNav } from '@/components/user-nav'
+import { allComponents } from '@/lib/components'
 
 export function Header() {
   return (
@@ -87,12 +87,12 @@ export function Header() {
         </div>
       </div>
     </header>
-  );
+  )
 }
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
+  React.ElementRef<'a'>,
+  React.ComponentPropsWithoutRef<'a'>
 >(({ className, title, children, ...props }, ref) => {
   return (
     <li>
@@ -101,7 +101,7 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
             className
           )}
           {...props}
@@ -113,6 +113,6 @@ const ListItem = React.forwardRef<
         </a>
       </NavigationMenuLink>
     </li>
-  );
-});
-ListItem.displayName = "ListItem";
+  )
+})
+ListItem.displayName = 'ListItem'

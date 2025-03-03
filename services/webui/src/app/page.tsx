@@ -371,12 +371,12 @@ export default function SearchPage() {
         {isFirstPrompt && (
           <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
             <h1 className="text-center text-5xl font-bold">
-              <span className="bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-primary-gradient from-primary-start to-primary-end bg-clip-text text-transparent">
                 Hello, {user?.firstName}
               </span>
             </h1>
             <h3 className="text-center text-sm font-bold w-[450px]">
-              <span className="bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent ">
+              <span className="bg-primary-gradient from-primary-start to-primary-end bg-clip-text text-transparent ">
                 I can help create diagrams from your descriptions. Tell me about
                 your system's architecture. Describe the parts and how they
                 connect, and I'll generate a diagram.

@@ -1,9 +1,9 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import { Check, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import * as React from 'react'
+import { Check, ChevronDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -11,25 +11,25 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { useEngine } from "@/context/EngineContext";
+} from '@/components/ui/popover'
+import { useEngine } from '@/context/EngineContext'
 
 const engines = [
   {
-    value: "mermaid",
-    label: "Mermaid",
-    description: "11.4.1",
+    value: 'mermaid',
+    label: 'Mermaid',
+    description: '11.4.1',
   },
-];
+]
 
 export function EngineSelector() {
-  const [open, setOpen] = React.useState(false);
-  const { selectedEngine, setSelectedEngine } = useEngine();
+  const [open, setOpen] = React.useState(false)
+  const { selectedEngine, setSelectedEngine } = useEngine()
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -65,16 +65,16 @@ export function EngineSelector() {
                   key={engine.value}
                   value={engine.value}
                   onSelect={(currentValue) => {
-                    setSelectedEngine(currentValue);
-                    setOpen(false);
+                    setSelectedEngine(currentValue)
+                    setOpen(false)
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      'mr-2 h-4 w-4',
                       selectedEngine === engine.value
-                        ? "opacity-70"
-                        : "opacity-0"
+                        ? 'opacity-70'
+                        : 'opacity-0'
                     )}
                   />
                   <div className="flex flex-col items-start">
@@ -90,5 +90,5 @@ export function EngineSelector() {
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 }

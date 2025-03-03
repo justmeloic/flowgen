@@ -1,5 +1,5 @@
-import type { ToastActionElement, ToastProps } from "@/components/ui/toast"
-import { ReactNode } from "react"
+import type { ToastActionElement, ToastProps } from '@/components/ui/toast'
+import { ReactNode } from 'react'
 
 export type ToasterToast = ToastProps & {
   id: string
@@ -8,4 +8,4 @@ export type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
-export type ToastType = "success" | "error" | "info" | "warning"
+export type ToastType = 'success' | 'error' | 'info' | 'warning'

@@ -1,30 +1,30 @@
-import React, { useEffect, useRef } from "react";
-import mermaid from "mermaid";
+import React, { useEffect, useRef } from 'react'
+import mermaid from 'mermaid'
 
 interface MermaidProps {
-  chart: string;
+  chart: string
 }
 
 const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
-  const mermaidRef = useRef<HTMLDivElement>(null);
+  const mermaidRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: false,
-      theme: "base",
-    });
+      theme: 'base',
+    })
 
     if (mermaidRef.current && chart) {
-      const element = mermaidRef.current;
-      element.removeAttribute("data-processed");
+      const element = mermaidRef.current
+      element.removeAttribute('data-processed')
 
-      mermaid.run({ nodes: [element] });
-      element.innerHTML = chart;
-      mermaid.contentLoaded();
+      mermaid.run({ nodes: [element] })
+      element.innerHTML = chart
+      mermaid.contentLoaded()
     }
-  }, [chart]);
+  }, [chart])
 
-  return <div ref={mermaidRef} className="mermaid" />;
-};
+  return <div ref={mermaidRef} className="mermaid" />
+}
 
-export default Mermaid;
+export default Mermaid

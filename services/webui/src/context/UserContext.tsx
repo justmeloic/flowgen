@@ -4,20 +4,20 @@ import React, {
   useContext,
   useEffect,
   ReactNode,
-} from "react";
+} from 'react'
 
 interface User {
-  firstName: string;
-  lastName: string;
-  email: string;
-  avatarURL: string;
+  firstName: string
+  lastName: string
+  email: string
+  avatarURL: string
 }
 
 // Define the context value type (includes user data and update function)
 interface UserContextValue {
-  user: User | null;
-  updateUser: (newUser: User | null) => void; // Allow setting to null for logout
-  loading: boolean; // Add a loading state
+  user: User | null
+  updateUser: (newUser: User | null) => void // Allow setting to null for logout
+  loading: boolean // Add a loading state
 }
 
 // Create the context with a default value (no user, and a no-op update function)
@@ -25,48 +25,48 @@ const UserContext = createContext<UserContextValue>({
   user: null,
   updateUser: () => {},
   loading: true,
-});
+})
 
 // Custom hook for easy access to the context
-export const useUser = () => useContext(UserContext);
+export const useUser = () => useContext(UserContext)
 
 // UserProvider component
 interface UserProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchmockUser = async () => {
       try {
-        const response = await fetch("/data/mockUser.json");
+        const response = await fetch('/data/mockUser.json')
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`)
         }
-        const userData: User = await response.json();
-        setUser(userData);
+        const userData: User = await response.json()
+        setUser(userData)
       } catch (error) {
-        console.error("Error fetching initial user data:", error);
+        console.error('Error fetching initial user data:', error)
         // Handle the error - maybe set a default user or show an error message
-        setUser(null); // Or a default user if you have one
+        setUser(null) // Or a default user if you have one
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchmockUser();
-  }, []);
+    fetchmockUser()
+  }, [])
 
   const updateUser = (newUser: User | null) => {
-    setUser(newUser);
-  };
+    setUser(newUser)
+  }
 
   return (
     <UserContext.Provider value={{ user, updateUser, loading }}>
       {children}
     </UserContext.Provider>
-  );
-};
+  )
+}

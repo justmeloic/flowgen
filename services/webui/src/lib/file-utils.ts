@@ -5,16 +5,16 @@ export const SUPPORTED_FILE_EXTENSIONS = [
   '.md',
   '.json',
   '.yaml',
-  '.yml'
-];
+  '.yml',
+]
 
 export const getSupportedFileTypesText = (): string => {
-  return SUPPORTED_FILE_EXTENSIONS
-    .map(ext => ext.toUpperCase().replace('.', ''))
-    .join(', ');
-};
+  return SUPPORTED_FILE_EXTENSIONS.map((ext) =>
+    ext.toUpperCase().replace('.', '')
+  ).join(', ')
+}
 
 export const isFileTypeSupported = (filename: string): boolean => {
-  const extension = filename.toLowerCase().split('.').pop();
-  return extension ? SUPPORTED_FILE_EXTENSIONS.includes(`.${extension}`) : false;
-};
+  const extension = filename.toLowerCase().split('.').pop()
+  return extension ? SUPPORTED_FILE_EXTENSIONS.includes(`.${extension}`) : false
+}

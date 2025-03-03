@@ -1,41 +1,41 @@
-import { notFound } from "next/navigation";
-import type { Metadata } from "next";
-import { allComponents } from "@/lib/components";
-import { CodeBlock } from "@/components/ui/code-block";
+import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
+import { allComponents } from '@/lib/components'
+import { CodeBlock } from '@/components/ui/code-block'
 
-export const dynamicParams = false;
+export const dynamicParams = false
 
 export async function generateStaticParams() {
   return allComponents.map((component) => ({
     slug: component.slug,
-  }));
+  }))
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string }
 }): Promise<Metadata> {
-  const component = allComponents.find((c) => c.slug === params.slug);
+  const component = allComponents.find((c) => c.slug === params.slug)
   if (!component) {
-    return {};
+    return {}
   }
 
   return {
     title: `${component.name} - GenAI Component`,
     description: component.description,
-  };
+  }
 }
 
 export default function ComponentPage({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string }
 }) {
-  const component = allComponents.find((c) => c.slug === params.slug);
+  const component = allComponents.find((c) => c.slug === params.slug)
 
   if (!component) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -73,7 +73,7 @@ export default function ComponentPage({
                   <td className="border p-2 font-mono text-sm">{prop.name}</td>
                   <td className="border p-2 font-mono text-sm">{prop.type}</td>
                   <td className="border p-2 font-mono text-sm">
-                    {prop.default || "-"}
+                    {prop.default || '-'}
                   </td>
                   <td className="border p-2">{prop.description}</td>
                 </tr>
@@ -85,5 +85,5 @@ export default function ComponentPage({
         )}
       </section>
     </div>
-  );
+  )
 }

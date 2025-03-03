@@ -1,9 +1,9 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import * as React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { ArrowRight } from 'lucide-react'
 
 export default function ChatPage() {
   return (
@@ -31,7 +31,7 @@ export default function ChatPage() {
       <main className="flex-1 flex flex-col items-center w-full relative">
         <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
           <h1 className="text-center text-5xl font-bold">
-            <span className="bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-primary-gradient from-primary-start to-primary-end bg-clip-text text-transparent">
               Terraform Agent
             </span>
           </h1>
@@ -75,12 +75,12 @@ export default function ChatPage() {
             </div>
           </div>
           <h3 className="text-center text-sm font-bold w-[450px]">
-            <span className="bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent ">
+            <span className="bg-primary-gradient from-primary-start to-primary-end bg-clip-text text-transparent">
               Coming soon...
             </span>
           </h3>
         </div>
       </main>
     </div>
-  );
+  )
 }

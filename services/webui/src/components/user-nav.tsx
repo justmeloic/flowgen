@@ -1,6 +1,6 @@
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User } from 'lucide-react'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,12 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUser } from "@/context/UserContext";
+} from '@/components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useUser } from '@/context/UserContext'
 
 export function UserNav() {
-  const { user, loading } = useUser();
+  const { user, loading } = useUser()
 
   return (
     <DropdownMenu>
@@ -90,5 +90,5 @@ export function UserNav() {
         )}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

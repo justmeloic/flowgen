@@ -27,7 +27,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
       title: 'Terraform',
       icon: MessageSquare,
       variant: 'default',
-      href: '/chat',
+      href: '/terraform-agent',
     },
   ] as const
 

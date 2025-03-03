@@ -1,21 +1,21 @@
-"use client";
+'use client'
 
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Sidebar } from "@/components/ui/sidebar";
-import { useState } from "react";
-import { Toaster } from "sonner";
-import { UserProvider } from "@/context/UserContext";
-import { EngineProvider } from "@/context/EngineContext";
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Sidebar } from '@/components/sidebar'
+import { useState } from 'react'
+import { Toaster } from 'sonner'
+import { UserProvider } from '@/context/UserContext'
+import { EngineProvider } from '@/context/EngineContext'
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -42,5 +42,5 @@ export default function RootLayout({
         </UserProvider>
       </body>
     </html>
-  );
+  )
 }
