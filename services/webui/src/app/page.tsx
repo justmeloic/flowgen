@@ -38,6 +38,7 @@ import Mermaid from "@/components/mermaid";
 import { cn } from "@/lib/utils";
 import { saveAs } from "file-saver";
 import { useUser } from "@/context/UserContext";
+import { useEngine } from "@/context/EngineContext";
 
 interface MessageBubbleProps {
   message: string;
@@ -244,7 +245,7 @@ export default function SearchPage() {
   const { handleCopyToast, handleAudioToast, handleFeedbackToast } =
     useToastHandlers();
   const [loadingText, setLoadingText] = useState("Search...");
-  const [selectedEngine, setSelectedEngine] = useState<Engine>("mermaid");
+  const { selectedEngine } = useEngine();
 
   useEffect(() => {
     if (isSearching) {
@@ -269,6 +270,7 @@ export default function SearchPage() {
     try {
       const mermaidResponse: MermaidResponse = await sendMermaidQuery(
         query,
+        selectedEngine,
         undefined,
         files
       );

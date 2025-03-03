@@ -20,17 +20,25 @@ from models.system_instructions import SYSTEM_INSTRUCTIONS
 load_dotenv()
 
 
-def create_gemini_prompt(user_description: str) -> str:
+def create_gemini_prompt(message: str, engine: str = "mermaid") -> str:
     """
-    Generates a complete prompt for the Gemini LLM, optimized for Mermaid.js.
+    Creates a prompt for the Gemini model with specific instructions based on the engine.
 
-    Includes system instructions as a prefix to the user's input.
+    Args:
+        message: The user's message.
+        engine: The diagram engine to use.
+
+    Returns:
+        str: The formatted prompt for the model.
     """
-    prompt = f"""{SYSTEM_INSTRUCTIONS}
+    base_prompt = f"""Please help create a {engine} diagram based on the following description.
+    Use {engine} syntax and wrap the response in a markdown code block with the {engine} language identifier.
+    Only respond with the diagram code, no explanations or additional text.
 
-{user_description}
-    """.strip()
-    return prompt
+    Description:
+    {message}
+    """
+    return base_prompt
 
 
 def get_model(api_key, model_name="gemini-2.0-flash", safety_settings=None):

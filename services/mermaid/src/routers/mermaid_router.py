@@ -99,6 +99,7 @@ class MermaidResponse(BaseModel):
 @router.post("/mermaid", response_model=MermaidResponse)
 async def handle_mermaid(
     message: str = Form(...),
+    engine: str = Form(...),
     conversation_id: Optional[str] = Form(None),
     files: Optional[List[UploadFile]] = File(None),
     # redis_client: redis.StrictRedis = Depends(get_redis_client),
@@ -108,6 +109,7 @@ async def handle_mermaid(
 
     Args:
         message: The message sent by the user.
+        engine: The diagram engine to use (e.g., "mermaid").
         conversation_id: An optional unique ID to track the conversation.
         files: Optional list of uploaded files.
         redis_client: Redis client instance (dependency injected).
@@ -122,7 +124,7 @@ async def handle_mermaid(
     try:
         # Get or create conversation ID
         conversation_id = conversation_id or str(uuid.uuid4())
-        logger.debug(f"Using conversation ID: {conversation_id}")
+        logger.debug(f"Using conversation ID: {conversation_id} with engine: {engine}")
 
         # Process the uploaded files if any
         file_contents = []
@@ -135,8 +137,9 @@ async def handle_mermaid(
             files_message = "\n".join(file_contents)
             message = f"{message}\nAdditional information from uploaded files:\n{files_message}"
 
-        full_prompt = create_gemini_prompt(message)
-        logger.debug(f"Prepared full prompt for model: {full_prompt}")
+        # Add engine information to the prompt
+        full_prompt = create_gemini_prompt(message, engine)  # Update create_gemini_prompt to accept engine parameter
+        logger.debug(f"Prepared full prompt for model using {engine} engine")
 
         response = _model.generate_content(full_prompt)
         logger.debug("Generated response from model.")

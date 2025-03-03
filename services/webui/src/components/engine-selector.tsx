@@ -17,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useEngine } from "@/context/EngineContext";
 
 const engines = [
   {
@@ -28,7 +29,7 @@ const engines = [
 
 export function EngineSelector() {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("mermaid");
+  const { selectedEngine, setSelectedEngine } = useEngine();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -41,10 +42,13 @@ export function EngineSelector() {
         >
           <div className="flex flex-col items-start truncate">
             <span className="text-base font-medium">
-              {engines.find((engine) => engine.value === value)?.label}
+              {engines.find((engine) => engine.value === selectedEngine)?.label}
             </span>
             <span className="text-xs text-muted-foreground">
-              {engines.find((engine) => engine.value === value)?.description}
+              {
+                engines.find((engine) => engine.value === selectedEngine)
+                  ?.description
+              }
             </span>
           </div>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -61,14 +65,16 @@ export function EngineSelector() {
                   key={engine.value}
                   value={engine.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue);
+                    setSelectedEngine(currentValue);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === engine.value ? "opacity-70" : "opacity-0"
+                      selectedEngine === engine.value
+                        ? "opacity-70"
+                        : "opacity-0"
                     )}
                   />
                   <div className="flex flex-col items-start">

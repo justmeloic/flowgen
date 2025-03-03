@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/ui/sidebar";
 import { useState } from "react";
 import { Toaster } from "sonner";
 import { UserProvider } from "@/context/UserContext"; // Import UserProvider
+import { EngineProvider } from "@/context/EngineContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -22,24 +23,24 @@ export default function RootLayout({
       <head />
       <body className={`${inter.variable} font-sans antialiased`}>
         <UserProvider>
-          {" "}
-          {/* Wrap your app with UserProvider */}
-          <div className="relative flex min-h-screen flex-col">
-            <div className="flex-1">
-              <div className="border-t">
-                <div className="bg-background">
-                  <div className="flex">
-                    <Sidebar
-                      isCollapsed={isCollapsed}
-                      onToggle={() => setIsCollapsed(!isCollapsed)}
-                    />
-                    <main className="flex-1 p-8">{children}</main>
+          <EngineProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <div className="flex-1">
+                <div className="border-t">
+                  <div className="bg-background">
+                    <div className="flex">
+                      <Sidebar
+                        isCollapsed={isCollapsed}
+                        onToggle={() => setIsCollapsed(!isCollapsed)}
+                      />
+                      <main className="flex-1 p-8">{children}</main>
+                    </div>
                   </div>
                 </div>
               </div>
+              <Toaster position="bottom-center" />
             </div>
-            <Toaster position="bottom-center" />
-          </div>
+          </EngineProvider>
         </UserProvider>
       </body>
     </html>

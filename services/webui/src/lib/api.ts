@@ -1,5 +1,6 @@
 interface MermaidRequest {
   message: string;
+  engine: string;
   conversation_id?: string;
   files?: File[];
 }
@@ -11,11 +12,13 @@ interface MermaidResponse {
 
 export const sendMermaidQuery = async (
   message: string,
+  engine: string,
   conversation_id?: string,
   files?: File[],
 ): Promise<MermaidResponse> => {
   const formData = new FormData();
   formData.append("message", message);
+  formData.append("engine", engine);
   if (conversation_id) {
     formData.append("conversation_id", conversation_id);
   }
