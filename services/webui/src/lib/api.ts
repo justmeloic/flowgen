@@ -1,6 +1,7 @@
 interface MermaidRequest {
   message: string;
-  conversation_id?: string; 
+  conversation_id?: string;
+  files?: File[];
 }
 
 interface MermaidResponse {
@@ -10,16 +11,24 @@ interface MermaidResponse {
 
 export const sendMermaidQuery = async (
   message: string,
-  conversation_id?: string 
+  conversation_id?: string,
+  files?: File[],
 ): Promise<MermaidResponse> => {
-  const requestBody: MermaidRequest = { message, conversation_id };
+  const formData = new FormData();
+  formData.append("message", message);
+  if (conversation_id) {
+    formData.append("conversation_id", conversation_id);
+  }
+
+  if (files) {
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+  }
+
   const response = await fetch('http://0.0.0.0:8080/api/v1/mermaid', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      accept: 'application/json',
-    },
-    body: JSON.stringify(requestBody),
+    body: formData,
   });
 
   if (!response.ok) {

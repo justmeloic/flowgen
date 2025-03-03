@@ -8,9 +8,10 @@ It uses a pre-initialized Gemini model to generate responses to user messages.
 import logging
 import os
 import uuid
+from typing import List, Optional
 
 import redis
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from models.mermaid_model import get_model, create_gemini_prompt
 
@@ -74,7 +75,7 @@ class MermaidRequest(BaseModel):
         min_length=1,
         json_schema_extra={"example": "Hello, how are you?"},
     )
-    conversation_id: str = Field(
+    conversation_id: Optional[str] = Field(
         None,
         description="Unique identifier for the conversation. If not provided, a new conversation is started.",
         json_schema_extra={"example": "conv-1234-abcd-5678-efgh"},
@@ -97,14 +98,18 @@ class MermaidResponse(BaseModel):
 
 @router.post("/mermaid", response_model=MermaidResponse)
 async def handle_mermaid(
-    mermaid_request: MermaidRequest,
+    message: str = Form(...),
+    conversation_id: Optional[str] = Form(None),
+    files: Optional[List[UploadFile]] = File(None),
     # redis_client: redis.StrictRedis = Depends(get_redis_client),
 ) -> MermaidResponse:
     """
     Handles mermaid requests by generating responses using a Gemini model and maintains conversation history.
 
     Args:
-        mermaid_request: The incoming mermaid request containing the user's message and optional conversation ID.
+        message: The message sent by the user.
+        conversation_id: An optional unique ID to track the conversation.
+        files: Optional list of uploaded files.
         redis_client: Redis client instance (dependency injected).
 
     Raises:
@@ -116,10 +121,26 @@ async def handle_mermaid(
 
     try:
         # Get or create conversation ID
-        conversation_id = mermaid_request.conversation_id or str(uuid.uuid4())
+        conversation_id = conversation_id or str(uuid.uuid4())
         logger.debug(f"Using conversation ID: {conversation_id}")
 
-        full_prompt = create_gemini_prompt(mermaid_request.message)
+        # Process the uploaded files if any
+        file_contents = []
+        if files:
+            for file in files:
+                logger.info(f"Received file: {file.filename}")
+                try:
+                    contents = await file.read()
+                    file_contents.append(contents.decode())
+                except Exception as e:
+                    logger.error(f"Error reading file {file.filename}: {e}")
+                    raise HTTPException(status_code=500, detail=f"Error reading file {file.filename}") from e
+
+        if file_contents:
+            files_message = "\n".join(file_contents)
+            message = f"{message}\nAdditional information from uploaded files:\n{files_message}"
+
+        full_prompt = create_gemini_prompt(message)
         logger.debug(f"Prepared full prompt for model: {full_prompt}")
 
         response = _model.generate_content(full_prompt)
@@ -151,7 +172,7 @@ async def handle_mermaid(
         # logger.info(f"[data][input] Conversation ID: {mermaid_request.message}")
         # logger.info(f"[data][output] Conversation ID: {response.text}")
 
-        logger.info(f"USER REQUEST: {mermaid_request.message}")
+        logger.info(f"USER REQUEST: {message}")
         logger.info(f"SYSTEM RESPONSE: {response.text}")
 
         return MermaidResponse(response=response.text, conversation_id=conversation_id)

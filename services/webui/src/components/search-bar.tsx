@@ -1,16 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Plus, Search, SendHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FileChip } from "./file-chip";
 import { SearchSuggestions } from "./search-suggestions";
-import Image from "next/image"; // Import the Image component
+import Image from "next/image";
 
 interface SearchBarProps extends React.HTMLAttributes<HTMLFormElement> {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, files?: File[]) => void;
   inputRef: React.RefObject<HTMLInputElement>;
   externalQuery: string;
 }
@@ -18,10 +18,8 @@ interface SearchBarProps extends React.HTMLAttributes<HTMLFormElement> {
 interface UploadedFile {
   id: string;
   file: File;
-  content?: string; // Add a content property to store file text
 }
 
-// Example suggestions - in prod, these might come from props or an API
 const defaultSuggestions = [
   {
     text: "Basic client-server-database interaction",
@@ -40,48 +38,45 @@ export function SearchBar({
   externalQuery,
   ...props
 }: SearchBarProps) {
-  const [query, setQuery] = React.useState(externalQuery || "");
-  const [isFocused, setIsFocused] = React.useState(false);
-  const [uploadedFiles, setUploadedFiles] = React.useState<UploadedFile[]>([]);
-  const [showSuggestions, setShowSuggestions] = React.useState(true);
-  const [hasSearched, setHasSearched] = React.useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [hasSearched, setHasSearched] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isReadingFile, setIsReadingFile] = useState(false);
+  const [internalQuery, setInternalQuery] = useState(externalQuery || "");
 
   useEffect(() => {
-    setQuery(externalQuery || "");
+    setInternalQuery(externalQuery || "");
   }, [externalQuery]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (query && query.trim()) {
-      let fullQuery = query;
-      uploadedFiles.forEach((uploadedFile) => {
-        if (uploadedFile.content) {
-          fullQuery += `\nFile content: \n${uploadedFile.content}\n`;
-        }
-      });
-      onSearch(fullQuery);
+    if (internalQuery && internalQuery.trim()) {
+      console.log(
+        "files",
+        uploadedFiles.map((file) => file.file)
+      );
+      console.log("Sending query to search:", internalQuery);
+      onSearch(
+        internalQuery,
+        uploadedFiles.map((uploadedFile) => uploadedFile.file)
+      );
       setHasSearched(true);
       setShowSuggestions(false);
+      setUploadedFiles([]);
     }
   };
 
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsReadingFile(true);
+    setShowSuggestions(false);
     const files = event.target.files;
     if (files) {
-      const newFilesPromises = Array.from(files).map(async (file) => {
-        const content = await readFileContent(file);
-        return {
-          id: Math.random().toString(36).substr(2, 9),
-          file,
-          content, // Store the file content here
-        };
-      });
-      const newFiles = await Promise.all(newFilesPromises);
+      const newFiles = Array.from(files).map((file) => ({
+        id: Math.random().toString(36).substr(2, 9),
+        file,
+      }));
       setUploadedFiles((prev) => [...prev, ...newFiles]);
     }
     if (fileInputRef.current) {
@@ -91,29 +86,14 @@ export function SearchBar({
   };
 
   const handleRemoveFile = (fileId: string) => {
+    if (uploadedFiles.length === 1) {
+      setShowSuggestions(true);
+    }
     setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    setQuery(suggestion);
-  };
-
-  // Helper function to read file content
-  const readFileContent = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target && event.target.result) {
-          resolve(event.target.result as string);
-        } else {
-          reject(new Error("Failed to read file"));
-        }
-      };
-      reader.onerror = (error) => {
-        reject(error);
-      };
-      reader.readAsText(file);
-    });
+    setInternalQuery(suggestion);
   };
 
   return (
@@ -148,8 +128,8 @@ export function SearchBar({
             ref={inputRef}
             type="text"
             placeholder="Describe your system architecture"
-            value={query || ""}
-            onChange={(e) => setQuery(e.target.value)}
+            value={internalQuery || ""}
+            onChange={(e) => setInternalQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className="h-12 w-full rounded-full bg-transparent pl-12 pr-20 text-base  outline-none placeholder:text-gray-500/60"
@@ -179,7 +159,7 @@ export function SearchBar({
               )}
               <span className="sr-only">Upload files</span>
             </label>
-            {query && query.trim() && (
+            {internalQuery && internalQuery.trim() && (
               <button
                 type="submit"
                 className={cn(
@@ -197,8 +177,8 @@ export function SearchBar({
           <SearchSuggestions
             suggestions={defaultSuggestions}
             onSuggestionClick={handleSuggestionClick}
-            onSearch={(query) => {
-              onSearch(query);
+            onSearch={(query, files) => {
+              onSearch(query, files);
               setHasSearched(true);
               setShowSuggestions(false);
             }}

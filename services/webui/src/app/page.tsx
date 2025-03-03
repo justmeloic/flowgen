@@ -56,7 +56,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       components={{
         code({ node, inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
-          const codeString = String(children).replace(/\n$/, ""); // Ensure it's a string
+          const codeString = String(children).replace(/\n$/, "");
 
           if (!inline && match) {
             return (
@@ -244,8 +244,7 @@ export default function SearchPage() {
   const { handleCopyToast, handleAudioToast, handleFeedbackToast } =
     useToastHandlers();
   const [loadingText, setLoadingText] = useState("Search...");
-  // New State to Store Selected Engine
-  const [selectedEngine, setSelectedEngine] = useState<Engine>("mermaid"); // Default to mermaid
+  const [selectedEngine, setSelectedEngine] = useState<Engine>("mermaid");
 
   useEffect(() => {
     if (isSearching) {
@@ -261,18 +260,17 @@ export default function SearchPage() {
     }
   }, [isSearching]);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, files?: File[]) => {
     setSearchQuery(query);
     setIsSearching(true);
     setMermaidCode("");
     setIsFirstPrompt(false);
 
     try {
-      // Pass the selected engine to the API call
       const mermaidResponse: MermaidResponse = await sendMermaidQuery(
         query,
         undefined,
-        selectedEngine
+        files
       );
       setMermaidCode(mermaidResponse.response || "No mermaid code available.");
     } catch (error) {
@@ -350,14 +348,14 @@ export default function SearchPage() {
     }
     return text.substring(start, end).trim();
   };
-  // Function to handle engine change
+
   const handleEngineChange = (engine: Engine) => {
     setSelectedEngine(engine);
   };
+
   return (
     <main className="flex-1 mt-0 max-w-3xl mx-auto w-full">
       <div className="flex items-center justify-between p-4">
-        {/* Pass the handleEngineChange function as a prop */}
         <EngineSelector
           onEngineChange={handleEngineChange}
           selectedEngine={selectedEngine}
@@ -374,8 +372,6 @@ export default function SearchPage() {
       <div className="px-8 py-6">
         {isFirstPrompt && (
           <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
-            {" "}
-            {/* Added flex-col here */}
             <h1 className="text-center text-5xl font-bold">
               <span className="bg-gradient-to-r from-blue-400 to-pink-400 bg-clip-text text-transparent">
                 Hello, {user?.firstName}
