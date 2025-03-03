@@ -5,34 +5,33 @@ import {
   MoreHorizontal,
   Volume2,
   PauseCircle,
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+} from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
-import React from "react";
+} from '@/components/ui/tooltip'
+import { Button } from '@/components/ui/button'
+import React from 'react'
 
 interface MessageActionsProps {
-  message: string;
-  onCopy: () => Promise<void>;
-  onFeedback: (type: "up" | "down") => void;
-  onListen: () => void;
-  onPause: () => void;
-  isPlaying: boolean;
+  message: string
+  onCopy: () => Promise<void>
+  onFeedback: (type: 'up' | 'down') => void
+  onListen: () => void
+  onPause: () => void
+  isPlaying: boolean
 }
 
 export function MessageActions({
-  message,
+  _message, // prefix unused message with underscore
   onCopy,
   onFeedback,
   onListen,
@@ -58,7 +57,7 @@ export function MessageActions({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onFeedback("up")}
+              onClick={() => onFeedback('up')}
             >
               <ThumbsUp className="h-4 w-4 text-gray-600" />
             </Button>
@@ -73,7 +72,7 @@ export function MessageActions({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onFeedback("down")}
+              onClick={() => onFeedback('down')}
             >
               <ThumbsDown className="h-4 w-4 text-gray-600" />
             </Button>
@@ -98,7 +97,7 @@ export function MessageActions({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isPlaying ? "Pause" : "Listen"}</p>
+            <p>{isPlaying ? 'Pause' : 'Listen'}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -117,5 +116,5 @@ export function MessageActions({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Copy,
   ThumbsUp,
@@ -10,57 +10,57 @@ import {
   PauseCircle,
   RotateCcw,
   Download,
-} from "lucide-react";
-import { SearchBar } from "@/components/search-bar";
-import { useToastHandlers } from "@/hooks/toast";
-import { EngineSelector, Engine } from "@/components/engine-selector";
-import { UserNav } from "@/components/user-nav";
-import { sendMermaidQuery, MermaidResponse } from "@/lib/api";
+} from 'lucide-react'
+import { SearchBar } from '@/components/search-bar'
+import { useToastHandlers } from '@/hooks/toast'
+import { EngineSelector, Engine } from '@/components/engine-selector'
+import { UserNav } from '@/components/user-nav'
+import { sendMermaidQuery, MermaidResponse } from '@/lib/api'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import Mermaid from "@/components/mermaid";
-import { cn } from "@/lib/utils";
-import { saveAs } from "file-saver";
-import { useUser } from "@/context/UserContext";
-import { useEngine } from "@/context/EngineContext";
+} from '@/components/ui/tooltip'
+import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import Mermaid from '@/components/mermaid'
+import { cn } from '@/lib/utils'
+import { saveAs } from 'file-saver'
+import { useUser } from '@/context/UserContext'
+import { useEngine } from '@/context/EngineContext'
 
 interface MessageBubbleProps {
-  message: string;
+  message: string
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
-  const { handleCopyToast } = useToastHandlers();
+  const { handleCopyToast } = useToastHandlers()
 
   return (
     <ReactMarkdown
       rehypePlugins={[rehypeRaw]}
       components={{
-        code({ node, inline, className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || "");
-          const codeString = String(children).replace(/\n$/, "");
+        code({ _node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || '')
+          const codeString = String(children).replace(/\n$/, '')
 
           if (!inline && match) {
             return (
               <div className="relative rounded-[2rem] bg-[#282c34] p-4 group">
                 <div
                   className={cn(
-                    "absolute top-2 right-2 transition-opacity duration-200 rounded-full"
+                    'absolute top-2 right-2 transition-opacity duration-200 rounded-full'
                   )}
                 >
                   <TooltipProvider>
@@ -89,30 +89,30 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                   {...props}
                 />
               </div>
-            );
+            )
           }
 
           return (
             <code className={className} {...props}>
               {children}
             </code>
-          );
+          )
         },
       }}
     >
       {message}
     </ReactMarkdown>
-  );
-};
+  )
+}
 
 interface FeedbackActionsProps {
-  onCopy: () => void;
-  onFeedback: (type: "up" | "down") => void;
-  isPlaying: boolean;
-  onListen: () => void;
-  onPause: () => void;
-  onRegenerate: () => void;
-  onDownload: () => void;
+  onCopy: () => void
+  onFeedback: (type: 'up' | 'down') => void
+  isPlaying: boolean
+  onListen: () => void
+  onPause: () => void
+  onRegenerate: () => void
+  onDownload: () => void
 }
 
 const FeedbackActions: React.FC<FeedbackActionsProps> = ({
@@ -143,7 +143,7 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onFeedback("up")}
+              onClick={() => onFeedback('up')}
             >
               <ThumbsUp className="h-5 w-5 text-gray-600" />
             </Button>
@@ -158,7 +158,7 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onFeedback("down")}
+              onClick={() => onFeedback('down')}
             >
               <ThumbsDown className="h-5 w-5 text-gray-600" />
             </Button>
@@ -183,7 +183,7 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{isPlaying ? "Pause Audio" : "Listen to Mermaid Code"}</p>
+            <p>{isPlaying ? 'Pause Audio' : 'Listen to Mermaid Code'}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -224,44 +224,44 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  );
-};
+  )
+}
 
 export default function SearchPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const { user, loading } = useUser();
-  const [mermaidCode, setMermaidCode] = useState("");
-  const [isFirstPrompt, setIsFirstPrompt] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const { user, _loading } = useUser()
+  const [mermaidCode, setMermaidCode] = useState('')
+  const [isFirstPrompt, setIsFirstPrompt] = useState(true)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [audioRef, setAudioRef] = useState<SpeechSynthesisUtterance | null>(
     null
-  );
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  )
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const { handleCopyToast, handleAudioToast, handleFeedbackToast } =
-    useToastHandlers();
-  const [loadingText, setLoadingText] = useState("Search...");
-  const { selectedEngine } = useEngine();
+    useToastHandlers()
+  const [loadingText, setLoadingText] = useState('Search...')
+  const { selectedEngine } = useEngine()
 
   useEffect(() => {
     if (isSearching) {
       const intervalId = setInterval(() => {
         setLoadingText((prevText) =>
-          prevText === "Generating..." ? "Thinking..." : "Generating..."
-        );
-      }, 1000);
+          prevText === 'Generating...' ? 'Thinking...' : 'Generating...'
+        )
+      }, 1000)
 
-      return () => clearInterval(intervalId);
+      return () => clearInterval(intervalId)
     } else {
-      setLoadingText("Generating...");
+      setLoadingText('Generating...')
     }
-  }, [isSearching]);
+  }, [isSearching])
 
   const handleSearch = async (query: string, files?: File[]) => {
-    setSearchQuery(query);
-    setIsSearching(true);
-    setMermaidCode("");
-    setIsFirstPrompt(false);
+    setSearchQuery(query)
+    setIsSearching(true)
+    setMermaidCode('')
+    setIsFirstPrompt(false)
 
     try {
       const mermaidResponse: MermaidResponse = await sendMermaidQuery(
@@ -269,87 +269,87 @@ export default function SearchPage() {
         selectedEngine,
         undefined,
         files
-      );
-      setMermaidCode(mermaidResponse.response || "No mermaid code available.");
+      )
+      setMermaidCode(mermaidResponse.response || 'No mermaid code available.')
     } catch (error) {
-      console.error("Search error:", error);
-      setMermaidCode("Error occurred while fetching generated mermaid code.");
+      console.error('Search error:', error)
+      setMermaidCode('Error occurred while fetching generated mermaid code.')
     } finally {
-      setIsSearching(false);
+      setIsSearching(false)
     }
-  };
+  }
 
   const handleCopy = async () => {
-    await handleCopyToast(mermaidCode);
-  };
+    await handleCopyToast(mermaidCode)
+  }
   const handleRegenerate = async () => {
-    await handleSearch(searchQuery);
-  };
+    await handleSearch(searchQuery)
+  }
   const handleDownload = () => {
-    const blob = new Blob([mermaidCode], { type: "text/markdown" });
-    saveAs(blob, "mermaid.md");
-  };
+    const blob = new Blob([mermaidCode], { type: 'text/markdown' })
+    saveAs(blob, 'mermaid.md')
+  }
 
   const handleListen = () => {
-    const synth = window.speechSynthesis;
+    const synth = window.speechSynthesis
 
     if (isPlaying) {
-      synth.resume();
-      handleAudioToast.onResume();
-      return;
+      synth.resume()
+      handleAudioToast.onResume()
+      return
     }
     if (audioRef && synth.paused) {
-      synth.resume();
-      setIsPlaying(true);
-      handleAudioToast.onResume();
-      return;
+      synth.resume()
+      setIsPlaying(true)
+      handleAudioToast.onResume()
+      return
     }
 
-    const utterance = new SpeechSynthesisUtterance(mermaidCode);
-    setAudioRef(utterance);
+    const utterance = new SpeechSynthesisUtterance(mermaidCode)
+    setAudioRef(utterance)
     utterance.onend = () => {
-      setIsPlaying(false);
-    };
+      setIsPlaying(false)
+    }
     utterance.onpause = () => {
-      setIsPlaying(false);
-    };
-    synth.speak(utterance);
-    setIsPlaying(true);
-    handleAudioToast.onPlay();
-  };
+      setIsPlaying(false)
+    }
+    synth.speak(utterance)
+    setIsPlaying(true)
+    handleAudioToast.onPlay()
+  }
 
   const handlePause = () => {
     if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.pause();
-      handleAudioToast.onPause();
-      setIsPlaying(false);
+      window.speechSynthesis.pause()
+      handleAudioToast.onPause()
+      setIsPlaying(false)
     }
-  };
+  }
 
-  const handleFeedback = (type: "up" | "down") => {
-    console.log(`Feedback: ${type}`);
-    handleFeedbackToast(type);
-  };
+  const handleFeedback = (type: 'up' | 'down') => {
+    console.log(`Feedback: ${type}`)
+    handleFeedbackToast(type)
+  }
 
   const isMermaidCode = (text: string) => {
-    return text.trimStart().startsWith("```mermaid");
-  };
+    return text.trimStart().startsWith('```mermaid')
+  }
 
   const extractMermaidCode = (text: string): string | null => {
     if (!isMermaidCode(text)) {
-      return null;
+      return null
     }
-    const start = text.indexOf("```mermaid") + "```mermaid".length;
-    const end = text.indexOf("```", start);
+    const start = text.indexOf('```mermaid') + '```mermaid'.length
+    const end = text.indexOf('```', start)
     if (start === -1 || end === -1) {
-      return null;
+      return null
     }
-    return text.substring(start, end).trim();
-  };
+    return text.substring(start, end).trim()
+  }
 
   const handleEngineChange = (engine: Engine) => {
-    setSelectedEngine(engine);
-  };
+    setSelectedEngine(engine)
+  }
 
   return (
     <main className="flex-1 mt-0 max-w-3xl mx-auto w-full">
@@ -404,7 +404,7 @@ export default function SearchPage() {
                 </div>
                 {isMermaidCode(mermaidCode) && (
                   <div className="mb-4">
-                    <Mermaid chart={extractMermaidCode(mermaidCode) || ""} />
+                    <Mermaid chart={extractMermaidCode(mermaidCode) || ''} />
                   </div>
                 )}
                 <div className="space-y-4">
@@ -430,5 +430,5 @@ export default function SearchPage() {
         </div>
       )}
     </main>
-  );
+  )
 }

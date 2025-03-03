@@ -1,40 +1,40 @@
-"use client";
+'use client'
 
-import * as React from "react";
-import { useEffect, useState, useCallback, useRef } from "react";
-import Link from "next/link";
-import { Plus, Search, SendHorizontal } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { FileChip } from "./file-chip";
-import { SearchSuggestions } from "./search-suggestions";
-import Image from "next/image";
+import * as React from 'react'
+import { useEffect, useState, useRef } from 'react'
+import Link from 'next/link'
+import { Plus, Search, SendHorizontal } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { FileChip } from './file-chip'
+import { SearchSuggestions } from './search-suggestions'
+import Image from 'next/image'
 import {
   isFileTypeSupported,
   getSupportedFileTypesText,
-} from "@/lib/file-utils";
-import { toast } from "sonner";
+} from '@/lib/file-utils'
+import { toast } from 'sonner'
 
 interface SearchBarProps extends React.HTMLAttributes<HTMLFormElement> {
-  onSearch: (query: string, files?: File[]) => void;
-  inputRef: React.RefObject<HTMLInputElement>;
-  externalQuery: string;
+  onSearch: (query: string, files?: File[]) => void
+  inputRef: React.RefObject<HTMLInputElement>
+  externalQuery: string
 }
 
 interface UploadedFile {
-  id: string;
-  file: File;
+  id: string
+  file: File
 }
 
 const defaultSuggestions = [
   {
-    text: "Basic client-server-database interaction",
-    icon: "plus" as const,
+    text: 'Basic client-server-database interaction',
+    icon: 'plus' as const,
   },
   {
-    text: "Generate an API gateway pattern with a cache",
-    icon: "plus" as const,
+    text: 'Generate an API gateway pattern with a cache',
+    icon: 'plus' as const,
   },
-];
+]
 
 export function SearchBar({
   className,
@@ -43,54 +43,54 @@ export function SearchBar({
   externalQuery,
   ...props
 }: SearchBarProps) {
-  const [isFocused, setIsFocused] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(true);
-  const [hasSearched, setHasSearched] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isReadingFile, setIsReadingFile] = useState(false);
-  const [internalQuery, setInternalQuery] = useState(externalQuery || "");
+  const [isFocused, setIsFocused] = useState(false)
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(true)
+  const [hasSearched, setHasSearched] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isReadingFile, setIsReadingFile] = useState(false)
+  const [internalQuery, setInternalQuery] = useState(externalQuery || '')
 
   useEffect(() => {
-    setInternalQuery(externalQuery || "");
-  }, [externalQuery]);
+    setInternalQuery(externalQuery || '')
+  }, [externalQuery])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault()
     if (internalQuery && internalQuery.trim()) {
       console.log(
-        "files",
+        'files',
         uploadedFiles.map((file) => file.file)
-      );
-      console.log("Sending query to search:", internalQuery);
+      )
+      console.log('Sending query to search:', internalQuery)
       onSearch(
         internalQuery,
         uploadedFiles.map((uploadedFile) => uploadedFile.file)
-      );
-      setHasSearched(true);
-      setShowSuggestions(false);
-      setUploadedFiles([]);
+      )
+      setHasSearched(true)
+      setShowSuggestions(false)
+      setUploadedFiles([])
     }
-  };
+  }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsReadingFile(true);
-    setShowSuggestions(false);
-    const files = event.target.files;
+    setIsReadingFile(true)
+    setShowSuggestions(false)
+    const files = event.target.files
     if (files) {
       const unsupportedFiles = Array.from(files).filter(
         (file) => !isFileTypeSupported(file.name)
-      );
+      )
 
       if (unsupportedFiles.length > 0) {
-        const fileNames = unsupportedFiles.map((f) => f.name).join(", ");
+        const fileNames = unsupportedFiles.map((f) => f.name).join(', ')
         toast.error(
           `You tried uploading an unsupported file type: ${fileNames}. Only ${getSupportedFileTypesText()} files are supported.`,
           {
             duration: 6000,
-            className: "bg-red-100 border border-none text-red-800 rounded-3xl",
+            className: 'bg-red-100 border border-none text-red-800 rounded-3xl',
           }
-        );
+        )
 
         // Filter out unsupported files
         const supportedFiles = Array.from(files)
@@ -98,33 +98,33 @@ export function SearchBar({
           .map((file) => ({
             id: Math.random().toString(36).substr(2, 9),
             file,
-          }));
+          }))
 
-        setUploadedFiles((prev) => [...prev, ...supportedFiles]);
+        setUploadedFiles((prev) => [...prev, ...supportedFiles])
       } else {
         const newFiles = Array.from(files).map((file) => ({
           id: Math.random().toString(36).substr(2, 9),
           file,
-        }));
-        setUploadedFiles((prev) => [...prev, ...newFiles]);
+        }))
+        setUploadedFiles((prev) => [...prev, ...newFiles])
       }
     }
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = ''
     }
-    setIsReadingFile(false);
-  };
+    setIsReadingFile(false)
+  }
 
   const handleRemoveFile = (fileId: string) => {
     if (uploadedFiles.length === 1) {
-      setShowSuggestions(true);
+      setShowSuggestions(true)
     }
-    setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
-  };
+    setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId))
+  }
 
   const handleSuggestionClick = (suggestion: string) => {
-    setInternalQuery(suggestion);
-  };
+    setInternalQuery(suggestion)
+  }
 
   return (
     <div className="space-y-10">
@@ -136,21 +136,21 @@ export function SearchBar({
             width={35}
             height={35}
             sizes="100vw"
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: 'contain' }}
           />
         </div>
       </Link>
       <form
         onSubmit={handleSubmit}
-        className={cn("relative w-full max-w-4xl mx-auto", className)}
+        className={cn('relative w-full max-w-4xl mx-auto', className)}
         {...props}
       >
         <div
           className={cn(
-            "relative flex items-center w-full rounded-full border bg-white transition-shadow duration-300 ease-in-out",
+            'relative flex items-center w-full rounded-full border bg-white transition-shadow duration-300 ease-in-out',
             isFocused
-              ? "shadow-[0_1px_6px_0px_rgba(32,33,36,0.12),0_3px_8px_2px_rgba(32,33,36,0.14),0_3px_12px_3px_rgba(32,33,36,0.2)]"
-              : "shadow-none"
+              ? 'shadow-[0_1px_6px_0px_rgba(32,33,36,0.12),0_3px_8px_2px_rgba(32,33,36,0.14),0_3px_12px_3px_rgba(32,33,36,0.2)]'
+              : 'shadow-none'
           )}
         >
           <Search className="absolute left-4 h-5 w-5 text-muted-foreground" />
@@ -158,7 +158,7 @@ export function SearchBar({
             ref={inputRef}
             type="text"
             placeholder="Describe your system architecture"
-            value={internalQuery || ""}
+            value={internalQuery || ''}
             onChange={(e) => setInternalQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
@@ -176,8 +176,8 @@ export function SearchBar({
             <label
               htmlFor="file-upload"
               className={cn(
-                "flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors border border-gray-300 bg-gray-50",
-                "hover:bg-primary/30 focus:bg-gray-100 focus:outline-none"
+                'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors border border-gray-300 bg-gray-50',
+                'hover:bg-primary/30 focus:bg-gray-100 focus:outline-none'
               )}
             >
               {isReadingFile ? (
@@ -193,8 +193,8 @@ export function SearchBar({
               <button
                 type="submit"
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
-                  "bg-primary hover:bg-primary/90 focus:bg-primary/90 focus:outline-none"
+                  'flex h-8 w-8 items-center justify-center rounded-full transition-colors',
+                  'bg-primary hover:bg-primary/90 focus:bg-primary/90 focus:outline-none'
                 )}
               >
                 <SendHorizontal className="h-4 w-4 text-white" />
@@ -208,9 +208,9 @@ export function SearchBar({
             suggestions={defaultSuggestions}
             onSuggestionClick={handleSuggestionClick}
             onSearch={(query, files) => {
-              onSearch(query, files);
-              setHasSearched(true);
-              setShowSuggestions(false);
+              onSearch(query, files)
+              setHasSearched(true)
+              setShowSuggestions(false)
             }}
           />
         )}
@@ -222,12 +222,12 @@ export function SearchBar({
               key={id}
               fileName={file.name}
               fileSize={file.size}
-              fileType={file.type || "application/octet-stream"}
+              fileType={file.type || 'application/octet-stream'}
               onRemove={() => handleRemoveFile(id)}
             />
           ))}
         </div>
       )}
     </div>
-  );
+  )
 }

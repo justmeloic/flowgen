@@ -8,7 +8,8 @@ try {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    // Remove ignoreDuringBuilds to enable linting during builds
+    dirs: ['pages', 'components', 'app', 'lib', 'src']
   },
   typescript: {
     ignoreBuildErrors: true,

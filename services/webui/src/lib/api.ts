@@ -1,4 +1,4 @@
-interface MermaidRequest {
+type _MermaidRequest = {
   message: string;
   engine: string;
   conversation_id?: string;
