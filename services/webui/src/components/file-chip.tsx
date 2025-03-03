@@ -28,7 +28,7 @@ export function FileChip({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-400/50 to-pink-400/50 px-3 py-2 text-sm", //bg-blue-100/90
+        "flex items-center gap-2 rounded-full bg-gradient-to-r  from-blue-400/50 to-pink-400/50 px-3 py-2 text-sm", //bg-blue-100/90
         className
       )}
       {...props}

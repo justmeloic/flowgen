@@ -18,6 +18,9 @@ dependencies = [
     "uvicorn>=0.34.0",
     "httpc>=0.6.0",
     "python-multipart>=0.0.20",
+    "pypdf2>=3.0.1",
+    "docx2txt>=0.8",
+    "chardet>=5.2.0",
 ]
 
 

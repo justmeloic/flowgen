@@ -5,7 +5,7 @@ import "./globals.css";
 import type React from "react";
 import { Sidebar } from "@/components/ui/sidebar";
 import { useState } from "react";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
 import { UserProvider } from "@/context/UserContext"; // Import UserProvider
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -38,7 +38,7 @@ export default function RootLayout({
                 </div>
               </div>
             </div>
-            <Toaster />
+            <Toaster position="bottom-center" />
           </div>
         </UserProvider>
       </body>

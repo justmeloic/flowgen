@@ -14,7 +14,7 @@ import redis
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from models.mermaid_model import get_model, create_gemini_prompt
-
+from utils.processing import process_uploaded_file
 
 logger = logging.getLogger()
 
@@ -128,13 +128,8 @@ async def handle_mermaid(
         file_contents = []
         if files:
             for file in files:
-                logger.info(f"Received file: {file.filename}")
-                try:
-                    contents = await file.read()
-                    file_contents.append(contents.decode())
-                except Exception as e:
-                    logger.error(f"Error reading file {file.filename}: {e}")
-                    raise HTTPException(status_code=500, detail=f"Error reading file {file.filename}") from e
+                file_content = await process_uploaded_file(file)
+                file_contents.append(f"Content from {file.filename}:\n{file_content}")
 
         if file_contents:
             files_message = "\n".join(file_contents)

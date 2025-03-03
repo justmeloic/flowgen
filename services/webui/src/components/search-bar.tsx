@@ -8,6 +8,11 @@ import { cn } from "@/lib/utils";
 import { FileChip } from "./file-chip";
 import { SearchSuggestions } from "./search-suggestions";
 import Image from "next/image";
+import {
+  isFileTypeSupported,
+  getSupportedFileTypesText,
+} from "@/lib/file-utils";
+import { toast } from "sonner";
 
 interface SearchBarProps extends React.HTMLAttributes<HTMLFormElement> {
   onSearch: (query: string, files?: File[]) => void;
@@ -73,11 +78,36 @@ export function SearchBar({
     setShowSuggestions(false);
     const files = event.target.files;
     if (files) {
-      const newFiles = Array.from(files).map((file) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        file,
-      }));
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
+      const unsupportedFiles = Array.from(files).filter(
+        (file) => !isFileTypeSupported(file.name)
+      );
+
+      if (unsupportedFiles.length > 0) {
+        const fileNames = unsupportedFiles.map((f) => f.name).join(", ");
+        toast.error(
+          `You tried uploading an unsupported file type: ${fileNames}. Only ${getSupportedFileTypesText()} files are supported.`,
+          {
+            duration: 6000,
+            className: "bg-red-100 border border-none text-red-800 rounded-3xl",
+          }
+        );
+
+        // Filter out unsupported files
+        const supportedFiles = Array.from(files)
+          .filter((file) => isFileTypeSupported(file.name))
+          .map((file) => ({
+            id: Math.random().toString(36).substr(2, 9),
+            file,
+          }));
+
+        setUploadedFiles((prev) => [...prev, ...supportedFiles]);
+      } else {
+        const newFiles = Array.from(files).map((file) => ({
+          id: Math.random().toString(36).substr(2, 9),
+          file,
+        }));
+        setUploadedFiles((prev) => [...prev, ...newFiles]);
+      }
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
