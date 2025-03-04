@@ -67,73 +67,199 @@ FlowGen leverages a modern and powerful technology stack to provide a seamless u
 - **Google Generative AI (Gemini):** A state-of-the-art AI model for natural language understanding and code generation.
 - **Uvicorn:** An ASGI server used to run the FastAPI application.
 
-## 🚀 Getting Started
+## 🚀 Development Setup
 
-Follow these steps to get FlowGen up and running on your local machine:
+This guide will help you set up your development environment for both frontend and backend components.
 
-1.  **Prerequisites:**
+### Prerequisites
 
-    - **Python 3.13+**
-    - **Node.js 18.x+**
-    - **npm** (comes with Node.js)
-    - **An API key for Google's Gemini AI model.**
+- **Python 3.13+**
+- **Node.js 18.x+**
+- **npm** or **yarn**
+- **Docker** (optional, for containerized development)
+- **Google Cloud CLI** (optional, for cloud deployment)
+- **Gemini API key** (for AI features)
 
-2.  **Clone the Repository:**
+### Backend Development (FastAPI)
 
-    ```bash
-    git clone <repository-url>
-    cd flowgen
-    ```
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/justmeloic/flowgen.git
+   cd flowgen
+   ```
 
-3.  **Set Up Environment Variables:**
+2. **Set Up Python Environment:**
+   ```bash
+   cd services/mermaid
+   python -m venv venv
+   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-    - Create a `.env` file in the `services/mermaid` directory.
-    - Add your Gemini API key to the `.env` file:
+3. **Configure Environment Variables:**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` with your settings:
+   ```properties
+   GEMINI_API_KEY=your_api_key_here
+   REDIS_HOST=localhost  # Optional
+   REDIS_PORT=6379      # Optional
+   REDIS_DB=0          # Optional
+   ```
 
-      ```
-      GEMINI_API_KEY=your_api_key_here
-      ```
+4. **Start Backend Server:**
+   ```bash
+   uvicorn src.main:app --reload --port 8080
+   ```
+   The API will be available at `http://localhost:8080`
 
-      - You can optionally set up these environment variables:
+### Frontend Development (Next.js)
 
-      ```
-      REDIS_HOST=your_redis_host_here #default is localhost
-      REDIS_PORT=your_redis_port_here #default is 6379
-      REDIS_DB=your_redis_db_here #default is 0
-      ```
+1. **Navigate to Frontend Directory:**
+   ```bash
+   cd services/webui
+   ```
 
-4.  **Install Dependencies:**
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-    - Navigate to the backend directory and install the python dependencies:
+3. **Start Development Server:**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+   The frontend will be available at `http://localhost:3000`
 
-      ```bash
-      cd services/mermaid
-      pip install -r requirements.txt
-      ```
+### Development Tools
 
-    - Navigate to the frontend directory and install the node dependencies:
+- **API Documentation:** Available at `http://localhost:8080/docs`
+- **Backend Hot Reload:** Enabled by default with `--reload` flag
+- **Frontend Hot Reload:** Enabled by default in Next.js dev mode
 
-      ```bash
-      cd ../webui
-      npm install
-      ```
+### Using the Development Build Script
 
-5.  **Run the Application:**
+For convenience, you can use the build script in development mode:
+```bash
+./build-deploy.sh --local
+```
+This will:
+- Build the frontend
+- Copy static files to the backend
+- Start the FastAPI server
 
-    - in `services/mermaid`:
+### Testing
 
-      ```bash
-      cd ../mermaid
-      uvicorn src.main:app --reload
-      ```
+Run backend tests:
+```bash
+cd services/mermaid
+pytest
+```
 
-    - in `services/webui`:
-      ```bash
-      cd ../webui
-      npm run dev
-      ```
-    - Open your web browser and go to `http://localhost:3000` to interact with FlowGen.
-    - You can now go to `http://localhost:8080` to see the api documentation.
+Run frontend tests:
+```bash
+cd services/webui
+npm test
+```
+
+## 📦 Deployment
+
+FlowGen follows a distributed monolith architecture pattern, where the application is deployed as a single unit but maintains clear internal service boundaries. The build process compiles the Next.js frontend into static files that are served by the FastAPI backend, creating an efficient and easily deployable package.
+
+### Architecture Overview
+
+- **Frontend (Next.js)**: Compiled to static files during build
+- **Backend (FastAPI)**: Serves both the API and static files
+- **Deployment Model**: Single deployable unit with internal service separation
+
+### Deployment Options
+
+FlowGen provides three deployment methods using the `build-deploy.sh` script:
+
+1. **Local Development** (`--local`)
+   ```bash
+   ./build-deploy.sh --local
+   ```
+   # or
+   ```bash
+   ./build-deploy.sh  # default option
+   ```
+   - Builds Next.js frontend into static files
+   - Copies built files to FastAPI's static directory
+   - Starts FastAPI server in development mode
+   - Best for local development and testing
+
+2. **Docker Compose** (`--docker`)
+   ```bash
+   ./build-deploy.sh --docker
+   ```
+   - Builds and runs the application using Docker Compose
+   - Creates isolated environment with all dependencies
+   - Suitable for development and testing in containerized environment
+   - Eliminates "it works on my machine" problems
+
+3. **Cloud Run Deployment** (`--cloud`)
+   ```bash
+   ./build-deploy.sh --cloud
+   ```
+   - Builds and deploys to Google Cloud Run
+   - Requires proper GCP setup and permissions
+   - Provides scalable, serverless deployment
+
+### Cloud Run Deployment Prerequisites
+
+1. Create a `.env` file in the root directory with the following configuration:
+   ```properties
+   PROJECT_ID=your-project-id
+   REGION=your-region
+   REPO_NAME=flowgen-repo
+   SERVICE_NAME=flowgen-service
+   IMAGE_NAME=flowgen
+   IMAGE_TAG=latest
+   SERVICE_ACCOUNT=your-service-account@your-project.iam.gserviceaccount.com
+   ```
+
+2. Set up service account permissions by running:
+   ```bash
+   ./service-account-permissions.sh
+   ```
+   This script grants necessary permissions for:
+   - Artifact Registry access
+   - Cloud Run deployment
+   - Service account usage
+
+3. Ensure you have:
+   - Google Cloud CLI installed and configured
+   - Docker installed and running
+   - Authentication configured for Artifact Registry
+
+### Build Process
+
+The build process follows these steps:
+
+1. **Frontend Build**
+   - Compiles Next.js application
+   - Optimizes assets
+   - Generates static files
+
+2. **Integration**
+   - Copies static files to FastAPI's static directory
+   - Configures serving paths
+
+3. **Deployment**
+   - Packages everything into a single deployable unit
+   - Deploys according to chosen method
+
+### Monitoring and Maintenance
+
+- Local and Docker deployments can be monitored through standard logs
+- Cloud Run deployments can be monitored through Google Cloud Console
+- Logs are available through Cloud Logging when deployed to Cloud Run
 
 ## 📄 License
 
