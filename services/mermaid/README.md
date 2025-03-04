@@ -1,9 +1,8 @@
 # FlowGen Mermaid Service: AI-Powered Diagram Generator Backend
 
-[![Python](https://img.shields.io/badge/python-3.11+-blue?logo=python)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.13+-blue?logo=python)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-4285F4?logo=google)](https://ai.google.dev/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Google Gemini](https://img.shields.io/badge/Gemini-1225F1?logo=google)](https://ai.google.dev/)
 [![Codecov](https://codecov.io/gh/justmeloic/flowgen/graph/badge.svg?token=XZYQXJOMFV)](https://codecov.io/gh/justmeloic/flowgen)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/justmeloic/flowgen/actions)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/justmeloic/flowgen/issues)
@@ -25,7 +24,7 @@ This directory (`services/mermaid`) contains the backend service for FlowGen, an
 
 The Mermaid Service is built with a robust and efficient technology stack:
 
-- **Python 3.11+:** The core programming language, chosen for its versatility and extensive libraries.
+- **Python 3.13+:** The core programming language, chosen for its versatility and extensive libraries.
 - **FastAPI:** A modern, high-performance web framework for building APIs with Python.
 - **Google Generative AI (Gemini):** A state-of-the-art AI model that powers the natural language understanding and diagram generation.
 - **Uvicorn:** An ASGI server used to run the FastAPI application, ensuring high performance and concurrency.
@@ -37,7 +36,7 @@ The Mermaid Service is built with a robust and efficient technology stack:
 
 1.  **Prerequisites:**
 
-    - Python 3.11+
+    - Python 3.13+
     - pip (Python package installer)
     - An API key for Google's Gemini AI model.
     - (Optional) redis server.

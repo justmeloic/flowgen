@@ -1,7 +1,6 @@
 # FlowGen: AI-Powered Solution Architecture Generator
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/python-3.11+-blue?logo=python)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.13+-blue?logo=python)](https://www.python.org/)
 [![Node.js](https://img.shields.io/badge/node-18.x-green?logo=node.js)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](https://opensource.org/licenses/Apache-2.0)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/justmeloic/flowgen/issues)
@@ -63,7 +62,7 @@ FlowGen leverages a modern and powerful technology stack to provide a seamless u
 
 **Backend (Mermaid Service - `services/mermaid`)**
 
-- **Python 3.11+:** A versatile programming language for building robust server-side applications.
+- **Python 3.13+:** A versatile programming language for building robust server-side applications.
 - **FastAPI:** A modern, high-performance web framework for building APIs with Python.
 - **Google Generative AI (Gemini):** A state-of-the-art AI model for natural language understanding and code generation.
 - **Uvicorn:** An ASGI server used to run the FastAPI application.
@@ -74,7 +73,7 @@ Follow these steps to get FlowGen up and running on your local machine:
 
 1.  **Prerequisites:**
 
-    - **Python 3.11+**
+    - **Python 3.13+**
     - **Node.js 18.x+**
     - **npm** (comes with Node.js)
     - **An API key for Google's Gemini AI model.**
