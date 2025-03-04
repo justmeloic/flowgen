@@ -1,13 +1,23 @@
-# Stage 1: Build the Next.js application
+# Frontend builder stage
 FROM node:20-slim AS frontend-builder
+
 WORKDIR /app
+
+# Copy package files
 COPY services/webui/package*.json ./
+
+# Install dependencies
 RUN npm install
-COPY services/webui ./
+
+# Copy source code
+COPY services/webui .
+
+# Build static files
 RUN npm run build
 
-# Stage 2: Final image with Python and static files
-FROM python:3.13-slim
+# Backend stage
+FROM python:3.13-rc-slim AS backend
+
 WORKDIR /app
 
 # Install system dependencies
@@ -15,25 +25,22 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install uv and dependencies
+RUN pip install --no-cache-dir --upgrade pip uv
 
-# Copy Python application
+# Copy and install requirements
+COPY services/mermaid/requirements.txt .
+RUN uv pip install --system --upgrade --no-cache -r requirements.txt
+
+# Copy backend code
 COPY services/mermaid/src ./src
-COPY services/mermaid/requirements.txt ./
 
-# Install Python dependencies using uv
-RUN /root/.cargo/bin/uv pip install --require-virtualenv -r requirements.txt
-
-# Copy static files from frontend build
+# Copy built frontend from builder stage
 COPY --from=frontend-builder /app/out ./static
 
-# Set environment variables
+# Set Python path
 ENV PYTHONPATH=/app
-ENV PORT=8080
 
-# Expose port
 EXPOSE 8080
 
-# Run the application
-CMD ["python", "src/main.py"]
+CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]

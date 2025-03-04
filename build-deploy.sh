@@ -6,9 +6,9 @@ set -e
 # Check if building for Docker
 if [ "$1" = "--docker" ]; then
     echo "🐳 Building Docker image..."
-    docker-compose build
+    docker compose build
     echo "🚀 Starting Docker container..."
-    docker-compose up
+    docker compose up
     exit 0
 fi
 
@@ -34,6 +34,6 @@ cd ..
 
 echo "🚀 Starting FastAPI server..."
 cd "$MERMAID_DIR"
-echo 
+echo
 uv run src/main.py
 
