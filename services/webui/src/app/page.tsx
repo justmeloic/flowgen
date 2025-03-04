@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils'
 import { saveAs } from 'file-saver'
 import { useUser } from '@/context/UserContext'
 import { useEngine } from '@/context/EngineContext'
+import { useMermaidApi } from '@/hooks/useMermaidApi'
 
 interface MessageBubbleProps {
   message: string
@@ -227,7 +228,8 @@ const FeedbackActions: React.FC<FeedbackActionsProps> = ({
   )
 }
 
-export default function SearchPage() {
+export default function Home() {
+  const { loading, error, diagram, generateDiagram } = useMermaidApi()
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const { user, _loading } = useUser()
@@ -351,6 +353,13 @@ export default function SearchPage() {
     setSelectedEngine(engine)
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      await generateDiagram(searchQuery)
+    }
+  }
+
   return (
     <main className="flex-1 mt-0 max-w-3xl mx-auto w-full">
       <div className="flex items-center justify-between p-4">
@@ -429,6 +438,9 @@ export default function SearchPage() {
           <MessageBubble message={mermaidCode} />
         </div>
       )}
+      {diagram && <Mermaid chart={diagram} />}
+      {error && <div className="text-red-500">{error}</div>}
+      {loading && <div>Generating diagram...</div>}
     </main>
   )
 }

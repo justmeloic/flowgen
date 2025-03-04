@@ -12,6 +12,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from routers import mermaid_router
 from routers import landing_router
@@ -50,11 +51,17 @@ def create_app() -> FastAPI:
     )
     logger.info("CORS middleware configured.")
 
-    # Register application routers
+    # Register application routers FIRST
     app.include_router(mermaid_router.router, prefix="/api/v1")
     logger.info("Mermaid router included.")
     app.include_router(landing_router.router, prefix="/api/v1")
     logger.info("Landing router included.")
+
+    # Then serve static files
+    static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+
+    # Mount static files handler AFTER API routes
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
     return app
 

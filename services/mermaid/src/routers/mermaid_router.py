@@ -144,32 +144,6 @@ async def handle_mermaid(
         response = _model.generate_content(full_prompt)
         logger.debug("Generated response from model.")
 
-        # Retrieve conversation history from Redis
-        """
-        history = redis_client.lrange(conversation_id, 0, -1)
-        history = [
-            {"role": "user" if i % 2 == 0 else "model", "parts": [msg]}
-            for i, msg in enumerate(history)
-        ]
-        logger.debug(f"Retrieved conversation history from Redis: {history}")
-        """
-
-        # Prepare the full prompt (history + new message)
-        # messages = [{"role": "user", "parts": [mermaid_request.message]}]  # + history
-        # logger.debug("Prepared full prompt for model.")
-
-        # Generate response using the model
-        # response = _model.generate_content(messages)
-        # logger.debug("Generated response from model.")
-
-        # Add user message and model response to Redis
-        # redis_client.rpush(conversation_id, mermaid_request.message, response.text)
-        # logger.debug("Added user message and model response to Redis.")
-
-        # for some reason, logging the mermaid interactions to the trainingdata logger handler refreshes the mermaid and loses history.
-        # logger.info(f"[data][input] Conversation ID: {mermaid_request.message}")
-        # logger.info(f"[data][output] Conversation ID: {response.text}")
-
         logger.info(f"USER REQUEST: {message}")
         logger.info(f"SYSTEM RESPONSE: {response.text}")
 
