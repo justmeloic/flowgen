@@ -3,6 +3,15 @@
 # combining a Next.js frontend (web UI) with a FastAPI backend (Mermaid).
 set -e
 
+# Check if building for Docker
+if [ "$1" = "--docker" ]; then
+    echo "🐳 Building Docker image..."
+    docker-compose build
+    echo "🚀 Starting Docker container..."
+    docker-compose up
+    exit 0
+fi
+
 # Configuration
 WEBUI_DIR="services/webui"
 MERMAID_DIR="mermaid"
