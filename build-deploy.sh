@@ -8,11 +8,18 @@ set -a
 source .env
 set +a
 
-# Common variables
+# Configuration: env
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 WEBUI_DIR="$SCRIPT_DIR/services/webui"
 MERMAID_DIR="$SCRIPT_DIR/services/mermaid"
 STATIC_OUTPUT_DIR="$MERMAID_DIR/static"
+
+# Configuration: gcp
+PROJECT_ID=$(gcloud config get-value project)
+REGION="us-central1"
+SERVICE_NAME="flowgen"
+REPO_NAME="flowgen"
+IMAGE_NAME="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/app"
 
 function build_local() {
     # Validate directory structure
@@ -50,6 +57,43 @@ function build_local() {
     uv run src/main.py
 }
 
+function build_cloud() {
+    echo "☁️  Deploying to Cloud Run..."
+
+    # Create Artifact Registry repository if it doesn't exist
+    echo "🏗️  Ensuring Artifact Registry repository exists..."
+    if ! gcloud artifacts repositories describe $REPO_NAME --location=$REGION >/dev/null 2>&1; then
+        echo "Creating repository $REPO_NAME..."
+        gcloud artifacts repositories create $REPO_NAME \
+            --repository-format=docker \
+            --location=$REGION \
+            --description="Container repository for $SERVICE_NAME"
+    fi
+
+    # Ensure Docker is configured for Artifact Registry
+    gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
+
+    # Build and push the Docker image
+    echo "🏗️  Building Docker image..."
+    docker buildx build --platform linux/amd64 \
+        -t $IMAGE_NAME \
+        -f Dockerfile \
+        . --push || {
+            echo "❌ Failed to build or push image. Make sure you have necessary permissions."
+            exit 1
+        }
+
+    # Deploy to Cloud Run
+    echo "🚀 Deploying to Cloud Run..."
+    gcloud run deploy $SERVICE_NAME \
+        --image $IMAGE_NAME \
+        --platform managed \
+        --region $REGION \
+        --allow-unauthenticated
+
+    echo "✅ Deployment complete!"
+}
+
 # Check deployment type
 case "$1" in
     "--docker")
@@ -60,42 +104,9 @@ case "$1" in
         ;;
 
     "--cloud")
-        echo "☁️  Deploying to Cloud Run..."
+        echo "🚀 Starting cloud deployment..."
+        build_cloud
 
-        # Ensure gcloud is configured (Good practice, but probably already set)
-        if ! gcloud config get-value project &>/dev/null; then
-            echo "❌ Error: GCloud project not configured"
-            exit 1
-        fi
-        gcloud config set project $PROJECT_ID
-
-        # Configure Docker to use gcloud credentials (REQUIRED)
-        gcloud auth configure-docker ${REGION}-docker.pkg.dev
-
-        # Create Artifact Registry repository if it doesn't exist
-        if ! gcloud artifacts repositories describe $REPO_NAME --location=$REGION &>/dev/null; then
-            echo "🏗️  Creating Artifact Registry repository..."
-            gcloud artifacts repositories create $REPO_NAME \
-                --repository-format=docker \
-                --location=$REGION
-        fi
-
-        echo "🏗️  Building Docker image..."
-        docker build -t $ARTIFACT_REGISTRY .
-
-        echo "⬆️  Pushing image to Artifact Registry..."
-        docker push $ARTIFACT_REGISTRY
-
-        echo "🚀 Deploying to Cloud Run..."
-        gcloud run deploy $SERVICE_NAME \
-            --image=$ARTIFACT_REGISTRY \
-            --region=$REGION \
-            --project=$PROJECT_ID \
-            --platform=managed \
-            --allow-unauthenticated \
-            --service-account=$SERVICE_ACCOUNT
-
-        echo "✅ Deployment complete!"
         ;;
 
     "--local")
