@@ -13,8 +13,8 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
-from models.mermaid_model import get_model, create_gemini_prompt
-from utils.processing import process_uploaded_file
+from src.models.mermaid_model import get_model, create_gemini_prompt
+from src.utils.processing import process_uploaded_file
 
 logger = logging.getLogger()
 

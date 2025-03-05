@@ -15,7 +15,7 @@ Mermaid code generation.
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
-from models.system_instructions import SYSTEM_INSTRUCTIONS
+from src.models.system_instructions import SYSTEM_INSTRUCTIONS
 
 load_dotenv()
 

@@ -36,7 +36,14 @@ RUN uv pip install --system --upgrade --no-cache -r requirements.txt
 COPY services/mermaid/src ./src
 
 # Copy built frontend from builder stage
-COPY --from=frontend-builder /app/out ./static
+COPY --from=frontend-builder /app/out ./src/static
+
+# --- Runtime Environment Variables (for Cloud Run) ---
+# Define them here as ENV, but their *values* will come from Cloud Run.
+
+ENV APP_ENV=development
+ENV PORT=8080
+
 
 # Set Python path
 ENV PYTHONPATH=/app
@@ -44,3 +51,14 @@ ENV PYTHONPATH=/app
 EXPOSE 8080
 
 CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+
+
+
+
+
+
+
+
+
+

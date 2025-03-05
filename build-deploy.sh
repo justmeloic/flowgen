@@ -34,6 +34,8 @@ REGION="us-central1"
 SERVICE_NAME="flowgen"  # The name of the Cloud Run service
 REPO_NAME="flowgen"    # The name of the Artifact Registry repository
 IMAGE_NAME="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/app"  # Full image name
+SECRET_NAME="gemini-api-key"
+
 
 # --- Functions ---
 
@@ -112,7 +114,8 @@ function build_cloud() {
         --image $IMAGE_NAME \
         --platform managed \
         --region $REGION \
-        --allow-unauthenticated  # Make the service publicly accessible
+        --allow-unauthenticated \
+        --set-secrets=GEMINI_API_KEY=$SECRET_NAME:latest
 
     echo "✅ Deployment complete!"
 }
