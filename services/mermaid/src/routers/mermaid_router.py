@@ -10,7 +10,7 @@ import os
 import uuid
 from typing import List, Optional
 
-import redis
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from models.mermaid_model import get_model, create_gemini_prompt
@@ -21,35 +21,22 @@ logger = logging.getLogger()
 # Load environment variables
 try:
     _GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-    _REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")  # Default to localhost
-    _REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))  # Default to 6379
-    _REDIS_DB = int(os.environ.get("REDIS_DB", 0))  # Default to 0
     logger.debug("Environment variables loaded successfully.")
 except KeyError as e:
-    logger.error("Environment variables (GEMINI_API_KEY, REDIS_HOST, REDIS_PORT, REDIS_DB) must be set.")
-    raise ValueError("Environment variables (GEMINI_API_KEY, REDIS_HOST, REDIS_PORT, REDIS_DB) must be set.") from e
+    logger.error("Environment variables (GEMINI_API_KEY) must be set.")
+    raise ValueError("Environment variables (GEMINI_API_KEY) must be set.") from e
 
 
 # Initialize the AI model outside the request context for efficiency
 _model = get_model(api_key=_GEMINI_API_KEY)
 if _model is None:
-    logger.error("Failed to initialize the Gemini model. Ensure API Key and model availability.")
-    raise RuntimeError("Failed to initialize the Gemini model. Ensure API Key and model availability.")
+    logger.error(
+        "Failed to initialize the Gemini model. Ensure API Key and model availability."
+    )
+    raise RuntimeError(
+        "Failed to initialize the Gemini model. Ensure API Key and model availability."
+    )
 logger.info("Gemini model initialized successfully.")
-
-
-# Redis client
-def get_redis_client():
-    """
-    Dependency to get a Redis client.
-    """
-    try:
-        r = redis.StrictRedis(host=_REDIS_HOST, port=_REDIS_PORT, db=_REDIS_DB, decode_responses=True)
-        yield r
-        logger.debug("Redis client connected successfully.")
-    except redis.exceptions.ConnectionError as e:
-        logger.error(f"Error connecting to Redis: {e}")
-        raise HTTPException(status_code=500, detail="Failed to connect to Redis.") from e
 
 
 # Define router
@@ -92,8 +79,12 @@ class MermaidResponse(BaseModel):
         conversation_id: The unique ID of the conversation.
     """
 
-    response: str = Field(..., description="The generated response from the mermaid model.")
-    conversation_id: str = Field(..., description="Unique identifier for the conversation.")
+    response: str = Field(
+        ..., description="The generated response from the mermaid model."
+    )
+    conversation_id: str = Field(
+        ..., description="Unique identifier for the conversation."
+    )
 
 
 @router.post("/mermaid", response_model=MermaidResponse)
@@ -102,7 +93,6 @@ async def handle_mermaid(
     engine: str = Form(...),
     conversation_id: Optional[str] = Form(None),
     files: Optional[List[UploadFile]] = File(None),
-    # redis_client: redis.StrictRedis = Depends(get_redis_client),
 ) -> MermaidResponse:
     """
     Handles mermaid requests by generating responses using a Gemini model and maintains conversation history.
@@ -112,7 +102,7 @@ async def handle_mermaid(
         engine: The diagram engine to use (e.g., "mermaid").
         conversation_id: An optional unique ID to track the conversation.
         files: Optional list of uploaded files.
-        redis_client: Redis client instance (dependency injected).
+
 
     Raises:
         HTTPException: If an error occurs during model processing or Redis interaction.
@@ -138,7 +128,9 @@ async def handle_mermaid(
             message = f"{message}\nAdditional information from uploaded files:\n{files_message}"
 
         # Add engine information to the prompt
-        full_prompt = create_gemini_prompt(message, engine)  # Update create_gemini_prompt to accept engine parameter
+        full_prompt = create_gemini_prompt(
+            message, engine
+        )  # Update create_gemini_prompt to accept engine parameter
         logger.debug(f"Prepared full prompt for model using {engine} engine")
 
         response = _model.generate_content(full_prompt)
@@ -151,4 +143,6 @@ async def handle_mermaid(
 
     except Exception as e:
         print(f"Error during model processing or Redis interaction: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred during processing.") from e
+        raise HTTPException(
+            status_code=500, detail="An error occurred during processing."
+        ) from e
