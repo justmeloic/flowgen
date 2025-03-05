@@ -367,7 +367,7 @@ export default function Home() {
           onEngineChange={handleEngineChange}
           selectedEngine={selectedEngine}
         />
-        <UserNav />
+
       </div>
       <div className="bg-white px-8 py-6">
         <SearchBar
@@ -381,7 +381,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
             <h1 className="text-center text-5xl font-bold">
               <span className="bg-primary-gradient from-primary-start to-primary-end bg-clip-text text-transparent">
-                Hello, {user?.firstName}
+                Hello !
               </span>
             </h1>
             <h3 className="text-center text-sm font-bold w-[450px]">
