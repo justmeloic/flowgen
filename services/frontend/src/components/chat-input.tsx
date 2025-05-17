@@ -12,14 +12,16 @@ interface UploadedFile {
 }
 
 interface ChatInputProps extends React.HTMLAttributes<HTMLFormElement> {
-  onSend: (userMessage: string, botMessage: string) => void;
+  onSend: (userMessage: string, audioUrl: string) => void;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
 export function ChatInput({
   className,
   onSend,
   isLoading = false,
+  disabled = false,
   ...props
 }: ChatInputProps) {
   const [isFocused, setIsFocused] = React.useState(false);

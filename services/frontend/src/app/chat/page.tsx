@@ -12,6 +12,9 @@ import { createSession, sendMessage } from "@/lib/api";
 import { toast } from "@/components/ui/use-toast";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import remarkParse from 'remark-parse';
+
 interface ChatMessage {
   role: "user" | "bot";
   content: string;
@@ -197,15 +200,86 @@ export default function ChatPage() {
                         isLoading && message.content === loadingText && index === chatHistory.length - 1 ? (
                            <span className="italic">{loadingText}</span> // Display loading text directly
                         ) : (
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={{ // Optional: Custom renderers for specific markdown elements
-                              // Example: Customizing links
-                              // a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400" />
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
+                          <>
+                            {/* Debug output */}
+                            <div className="text-xs text-gray-500 mb-2">
+                              Raw content: {JSON.stringify(message.content)}
+                            </div>
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm, remarkBreaks, remarkParse]}
+                              skipHtml={false}
+                              components={{
+                                a: ({node, children, ...props}) => {
+                                  const href = props.href || '';
+                                  const childText = Array.isArray(children) ? children[0]?.toString() : children?.toString() || '';
+                                  
+                                  // Debug output for link parsing
+                                  console.log('Link props:', {href, childText, node, props});
+                                  
+                                  // Handle reference citations like [1]
+                                  if (/^\[\d+\]$/.test(childText)) {
+                                    return (
+                                      <button
+                                        onClick={() => {
+                                          const refNum = childText.replace(/[\[\]]/g, '');
+                                          console.log(`Opening reference ${refNum}`);
+                                          // Find and scroll to reference
+                                          const refElement = document.getElementById(`ref-${refNum}`);
+                                          refElement?.scrollIntoView({ behavior: 'smooth' });
+                                        }}
+                                        className="inline-flex items-center text-blue-600 hover:text-blue-800 hover:underline font-bold"
+                                      >
+                                        {children}
+                                      </button>
+                                    );
+                                  }
+
+                                  // Handle reference links in the References section
+                                  if (href.includes('Agreement.pdf') || href.includes('[Agr]')) {
+                                    return (
+                                      <button
+                                        onClick={() => {
+                                          console.log(`Opening document: ${href}`);
+                                        }}
+                                        className="inline-flex items-center text-blue-600 hover:text-blue-800 hover:underline"
+                                      >
+                                        <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                          <polyline points="13 2 13 9 20 9"></polyline>
+                                        </svg>
+                                        {children}
+                                      </button>
+                                    );
+                                  }
+                                  
+                                  return <a {...props} className="text-blue-600 hover:underline">{children}</a>;
+                                },
+                                p: ({node, ...props}) => {
+                                  // Add special handling for reference section
+                                  const text = props.children?.toString() || '';
+                                  if (text.startsWith('References:')) {
+                                    return <div className="mt-4 pt-2 border-t" {...props} />;
+                                  }
+                                  return <p {...props} />;
+                                },
+                                li: ({node, ...props}) => {
+                                  // Add IDs to reference list items
+                                  const text = props.children?.toString() || '';
+                                  const refMatch = text.match(/^(\d+)\./);
+                                  if (refMatch) {
+                                    return <li id={`ref-${refMatch[1]}`} {...props} />;
+                                  }
+                                  return <li {...props} />;
+                                }
+                              }}
+                            >
+                              {/* Pre-process the content to fix markdown link formatting */}
+                              {message.content.replace(
+                                /\[([^\]]+)\]\s+\(Link:\s+([^)]+)\)/g, 
+                                '[$1]($2)'
+                              )}
+                            </ReactMarkdown>
+                          </>
                         )
                       ) : (
                         message.content // User messages as plain text
