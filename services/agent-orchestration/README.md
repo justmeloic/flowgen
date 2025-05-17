@@ -12,7 +12,7 @@ The following diagram illustrates the high-level architecture of the agent orche
 
 ```mermaid
 graph TD
-    A[User] -- Asks Question --> B(CeeBee Agent - ADK Application);
+    A[User] -- Asks Question --> B(Agent - ADK Application);
     B -- Uses Tool with Query & Context Filters --> C{VertexAIDatastoreSearchTool};
     C -- Searches Indexed Documents --> D[(Vertex AI Datastore \n CBA PDFs)];
     D -- Returns Search Results --> C;
