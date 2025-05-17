@@ -157,7 +157,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between  border-b">
         <ModelSelector />
         <Link href="/" className="flex h-8 w-8 items-center justify-center">
           <svg
@@ -178,16 +178,14 @@ export default function ChatPage() {
         <div className="w-[180px]" />
       </div>
       <div className="flex flex-1 overflow-hidden">
-
-        
         {/* Main Chat Area */}
-        <main className="flex-1 flex flex-col items-center w-full relative overflow-hidden">
+        <main className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${references.length > 0 ? 'mr-80' : ''}`}>
           <div
             ref={chatContainerRef}
             className="flex-1 w-full max-w-[700px] mb-8 mx-auto px-4 pb-4 overflow-y-auto"
             style={{
-              height: "calc(100vh - 160px)",
-              maxHeight: "calc(100vh - 160px)",
+              height: "calc(100vh - 10rem)",
+              maxHeight: "calc(100vh - 10rem)",
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? ( // Ensure history is empty too
@@ -332,11 +330,9 @@ export default function ChatPage() {
           </div>
         </main>
         {/* References Panel */}
-        {references.length > 0 && (
-          <div className="w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-xl m-2">
-            <ReferencesPanel references={references} />
-          </div>
-        )}
+        <div className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 min-h-[200px] max-h-[calc(100vh-11rem)] transition-transform duration-1700 ease-in-out ${references.length > 0 ? 'translate-x-0' : 'translate-x-full'}`}>
+          <ReferencesPanel references={references} />
+        </div>
       </div>
       <Toaster />
     </div>

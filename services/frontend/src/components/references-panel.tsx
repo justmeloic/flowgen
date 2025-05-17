@@ -21,11 +21,11 @@ export function ReferencesPanel({ references }: ReferencesPanelProps) {
 
   return (
     <div className="h-full">
-      <h3 className="text-lg font-semibold mb-4 px-4">Latest References</h3>
+      <h3 className="text-lg font-semibold mb-4 mt-4 text-center text-gray-500 dark:text-gray-300">Search Results</h3>
       <Accordion type="single" collapsible className="w-full">
         {references.map((ref) => (
           <AccordionItem key={ref.id} value={`ref-${ref.id}`}>
-            <AccordionTrigger className="px-4">{ref.title}</AccordionTrigger>
+            <AccordionTrigger className="px-4 text-center justify-center">{ref.title}</AccordionTrigger>
             <AccordionContent className="px-4">
               <button
                 onClick={() => console.log(`Opening document: ${ref.link}`)}
