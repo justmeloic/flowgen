@@ -55,7 +55,7 @@ The backend service that coordinates AI agents for:
 
 Each service has its own README with specific setup instructions. Please refer to:
 
-- [Frontend Setup](services/front-end/README.md)
+- [Frontend Setup](services/frontend/README.md)
 - [Agent Orchestration Setup](services/agent-orchestration/README.md)
 
 ## License
