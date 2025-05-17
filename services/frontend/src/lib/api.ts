@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
-const BASE_URL = 'http://localhost:8000';  // Updated to FastAPI default port
+// Use environment variable with fallback
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 interface MessageResponse {
   response: string;

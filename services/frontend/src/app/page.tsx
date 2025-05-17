@@ -10,11 +10,11 @@ export default function HomePage() {
     <Shell>
       <div className="space-y-6">
         <h1 className="text-3xl font-bold" id="top">
-          Tariff Agentic System
+          CBA Agentic System
         </h1>
         <p className="text-lg text-gray-700">
-          An agentic system powered by AI for tariff analysis, built with Google
-          Cloud Platform services.
+          An agentic question answering system powered by AI for CBA analysis,
+          built with Google Cloud Platform services.
         </p>
 
         {/* Add the centered architecture diagram */}

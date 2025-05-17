@@ -20,14 +20,14 @@ export function Header() {
       <div className="container flex h-20 items-center px-0 ">
         <div className="flex items-center gap-2 pl-4 ml-4">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/team-logo-H0s99aG4Kh87pJ3BIfsunSvtSbmFcj.png"
+            src="https://upload.wikimedia.org/wikipedia/commons/1/11/CN_Railway_logo.svg"
             alt="Gen AI Logo"
             width={48}
             height={48}
           />
           <Link href="/" className="flex items-center space-x-2">
             <span className="hidden font-bold sm:inline-block">
-              Prototyping Template
+              CBA Agentic System
             </span>
           </Link>
         </div>

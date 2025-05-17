@@ -12,105 +12,16 @@ The following diagram illustrates the high-level architecture of the agent orche
 
 ```mermaid
 graph TD
-    subgraph "User Interaction"
-        User[/"CN Employee (User)"/]
-    end
+    A[User] -- Asks Question --> B(CeeBee Agent - ADK Application);
+    B -- Uses Tool with Query & Context Filters --> C{VertexAIDatastoreSearchTool};
+    C -- Searches Indexed Documents --> D[(Vertex AI Datastore \n CBA PDFs)];
+    D -- Returns Search Results --> C;
+    C -- Provides Results to Agent --> B;
+    B -- Formulates & Delivers Answer --> A;
 
-    subgraph "Core Agent System"
-        Supervisor[Supervisor Agent]
-
-        subgraph "Specialized Sub-Agents"
-            ContextAgent[Context Identification Agent]
-            CBARetrievalAgent[CBA Information Retrieval Agent]
-            PolicyAgent[Railway Policy & External Information Agent]
-            JargonAgent[Railway Jargon & Clarification Agent]
-        end
-
-        subgraph "Supervisor Tools"
-            ToolAskUser[Tool: Ask Clarifying Question to User]
-            ToolDelegate[Tool: Delegate to SubAgent]
-            ToolSynthesize[Tool: Synthesize Information]
-        end
-
-        subgraph "CBA Retrieval Agent Tools"
-            ToolVertexSearch[Tool: Vertex AI DataStore Search]
-        end
-
-        subgraph "Policy Agent Tools"
-            ToolCanadaLabourCode[Tool: Canada Labour Code Search]
-            ToolCNPolicyDB[Tool: CN Policy Update DB Search]
-            ToolWebSearch[Tool: General Web Search]
-        end
-
-        subgraph "Jargon Agent Tools"
-            ToolJargonGlossary[Tool: Jargon Glossary Lookup]
-        end
-    end
-
-    subgraph "External Data Sources"
-        VertexDS[("Vertex AI Datastore (CBAs)")]
-        CanadaLabourCodeDB[("Canada Labour Code DB")]
-        CNPolicyDB[("CN Policy Update DB")]
-        JargonGlossaryDB[("Jargon Glossary DB")]
-        WebSearchSource[("General Web")]
-    end
-
-    %% Connections
-    User --> Supervisor
-
-    Supervisor -->|1. Initial Query Analysis| Supervisor
-    Supervisor -- "If context needed" --> ToolAskUser
-    ToolAskUser --> Supervisor
-    Supervisor -- "If context needed via agent" --> ContextAgent
-    ContextAgent -->|"Structured Context"| Supervisor
-
-    Supervisor -- "Delegate Task" --> ToolDelegate
-    ToolDelegate -->|To CBA Retrieval| CBARetrievalAgent
-    ToolDelegate -->|To Policy Agent| PolicyAgent
-    ToolDelegate -->|To Jargon Agent| JargonAgent
-
-    CBARetrievalAgent --> ToolVertexSearch
-    ToolVertexSearch --> VertexDS
-    VertexDS --> ToolVertexSearch
-    ToolVertexSearch --> CBARetrievalAgent
-    CBARetrievalAgent -->|"Retrieved CBA Snippets"| Supervisor
-
-    PolicyAgent --> ToolCanadaLabourCode
-    ToolCanadaLabourCode --> CanadaLabourCodeDB
-    CanadaLabourCodeDB --> ToolCanadaLabourCode
-    ToolCanadaLabourCode --> PolicyAgent
-
-    PolicyAgent --> ToolCNPolicyDB
-    ToolCNPolicyDB --> CNPolicyDB
-    CNPolicyDB --> ToolCNPolicyDB
-    ToolCNPolicyDB --> PolicyAgent
-
-    PolicyAgent --> ToolWebSearch
-    ToolWebSearch --> WebSearchSource
-    WebSearchSource --> ToolWebSearch
-    ToolWebSearch --> PolicyAgent
-    PolicyAgent -->|"Policy/External Info"| Supervisor
-
-    JargonAgent --> ToolJargonGlossary
-    ToolJargonGlossary --> JargonGlossaryDB
-    JargonGlossaryDB --> ToolJargonGlossary
-    ToolJargonGlossary --> JargonAgent
-    JargonAgent -->|"Jargon Clarification"| Supervisor
-
-    Supervisor -- "Synthesize & Format" --> ToolSynthesize
-    ToolSynthesize -->|"Final Answer"| Supervisor
-    Supervisor --> User
-
-    %% Styling (Optional - basic for clarity)
-    classDef agent fill:#D6EAF8,stroke:#5DADE2,stroke-width:2px;
-    classDef tool fill:#E8DAEF,stroke:#A569BD,stroke-width:2px;
-    classDef datasource fill:#D5F5E3,stroke:#58D68D,stroke-width:2px;
-    classDef user fill:#FCF3CF,stroke:#F7DC6F,stroke-width:2px;
-
-    class User user;
-    class Supervisor,ContextAgent,CBARetrievalAgent,PolicyAgent,JargonAgent agent;
-    class ToolAskUser,ToolDelegate,ToolSynthesize,ToolVertexSearch,ToolCanadaLabourCode,ToolCNPolicyDB,ToolWebSearch,ToolJargonGlossary tool;
-    class VertexDS,CanadaLabourCodeDB,CNPolicyDB,JargonGlossaryDB,WebSearchSource datasource;
+    style B fill:#f9f,stroke:#333,stroke-width:2px
+    style C fill:#bbf,stroke:#333,stroke-width:2px
+    style D fill:#lightgrey,stroke:#333,stroke-width:2px
 ```
 
 The diagram shows the interaction between different components of the system:
