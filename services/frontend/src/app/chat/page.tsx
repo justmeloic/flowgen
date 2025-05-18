@@ -210,42 +210,14 @@ export default function ChatPage() {
                           isLoading && message.content === loadingText && index === chatHistory.length - 1 ? (
                              <span className="italic">{loadingText}</span>
                           ) : (
-                            <>
-                              {/* Remove debug output and process content to exclude references */}
+                            <div className="prose prose-sm max-w-none">
                               <ReactMarkdown
                                 remarkPlugins={[remarkGfm, remarkBreaks, remarkParse]}
                                 skipHtml={false}
-                                components={{
-                                  a: ({node, children, ...props}) => {
-                                    const href = props.href || '';
-                                    const childText = Array.isArray(children) ? children[0]?.toString() : children?.toString() || '';
-                                    
-                                    // Handle reference citations like [1]
-                                    if (/^\[\d+\]$/.test(childText)) {
-                                      return (
-                                        <button
-                                          onClick={() => {
-                                            const refNum = childText.replace(/[\[\]]/g, '');
-                                            console.log(`Opening reference ${refNum}`);
-                                            // Find and scroll to reference
-                                            const refElement = document.getElementById(`ref-${refNum}`);
-                                            refElement?.scrollIntoView({ behavior: 'smooth' });
-                                          }}
-                                          className="inline-flex items-center text-blue-600 hover:text-blue-800 hover:underline font-bold"
-                                        >
-                                          {children}
-                                        </button>
-                                      );
-                                    }
-
-                                    return <a {...props} className="text-blue-600 hover:underline">{children}</a>;
-                                  }
-                                }}
                               >
-                                {/* Remove references section from content */}
                                 {message.content.split('\n\nReferences:')[0]}
                               </ReactMarkdown>
-                            </>
+                            </div>
                           )
                         ) : (
                           message.content // User messages as plain text
@@ -270,7 +242,10 @@ export default function ChatPage() {
           </div>
         </main>
         {/* References Panel */}
-        <div className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 min-h-[200px] max-h-[calc(100vh-11rem)] transition-transform duration-1700 ease-in-out ${Object.keys(references).length > 0 ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div 
+          data-references-panel
+          className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 min-h-[200px] max-h-[calc(100vh-11rem)] transition-transform duration-1700 ease-in-out ${Object.keys(references).length > 0 ? 'translate-x-0' : 'translate-x-full'}`}
+        >
           <ReferencesPanel references={references} />
         </div>
       </div>

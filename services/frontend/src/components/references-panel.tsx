@@ -41,7 +41,7 @@ export function ReferencesPanel({ references }: ReferencesPanelProps) {
       <h3 className="text-lg font-semibold mb-4 mt-4 text-center text-gray-500 dark:text-gray-300">References</h3>
       <Accordion type="single" collapsible className="w-full">
         {referenceEntries.map(([key, ref]) => (
-          <AccordionItem key={ref.id} value={`ref-${key}`}>
+          <AccordionItem key={ref.id} value={`item-${key}`} data-reference={key} className="relative">
             <AccordionTrigger className="px-4 text-left">
               <span className="mr-2">[{key}]</span>
               {ref.title}
