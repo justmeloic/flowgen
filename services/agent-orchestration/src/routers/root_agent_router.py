@@ -21,7 +21,7 @@ It manages session state and handles agent interactions through FastAPI endpoint
 
 from typing import Dict, Any, Annotated, Optional
 import os
-import asyncio
+import json
 import logging
 import uuid
 from datetime import datetime, UTC
@@ -185,7 +185,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=Dict[str, str])
+@router.post("/", response_model=Dict[str, Any])
 async def agent_endpoint(
     request: Request,
     response: Response,
@@ -193,7 +193,7 @@ async def agent_endpoint(
     config: Annotated[AgentConfig, Depends(get_agent_config)],
     session: Annotated[Session, Depends(get_or_create_session)],
     runner: Annotated[Runner, Depends(get_runner)]
-) -> Dict[str, str]:
+) -> Dict[str, Any]:
     """
     Process user queries through the agent.
 
@@ -206,7 +206,7 @@ async def agent_endpoint(
         runner (Runner): Agent runner instance.
 
     Returns:
-        Dict[str, str]: A dictionary containing the agent's response.
+        Dict[str, Any]: A dictionary containing the agent's response and references.
 
     Raises:
         HTTPException: If there's an error processing the request.
@@ -219,6 +219,7 @@ async def agent_endpoint(
 
         content = types.Content(role="user", parts=[types.Part(text=query.text)])
         final_response_text = "Agent did not produce a final response."
+        references = {}
 
         async for event in runner.run_async(
             user_id=config.user_id,
@@ -228,12 +229,25 @@ async def agent_endpoint(
             if event.is_final_response():
                 if event.content and event.content.parts:
                     final_response_text = event.content.parts[0].text
+                    
+                    response_text = event.content.parts[0].text
+                    if "<START_OF_REFERENCE_DOCUMENTS>" in response_text:
+                        final_response_text = response_text.split("<START_OF_REFERENCE_DOCUMENTS>")[0]
+                        references_text = response_text.split("<START_OF_REFERENCE_DOCUMENTS>")[1]
+                        references_list = json.loads(references_text)
+                        references_json = { i + 1 : references_list[i] for i in range(len(references_list))}
+                    else:
+                        final_response_text = response_text
+                        references_json = {}
+
+
+
                 elif event.actions and event.actions.escalate:
                     final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
                 break
 
         logger.info(f"Successfully processed agent query for session {session_id}")
-        return {"response": final_response_text}
+        return {"response": final_response_text, "references": references_json}
 
     except Exception as e:
         logger.error(f"Error processing agent query: {str(e)}")

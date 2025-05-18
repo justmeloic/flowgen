@@ -2,7 +2,31 @@ from google.cloud import discoveryengine_v1beta as discoveryengine
 from dotenv import load_dotenv
 import os
 from typing import Dict, List, Optional, Any
+import traceback
 
+from typing import Optional
+from google.adk.tools.tool_context import ToolContext
+from google.adk.tools.base_tool import BaseTool
+from typing import Dict, Any
+
+
+
+def store_tool_result_callback(
+    tool: BaseTool,
+    args: Dict[str, Any],
+    tool_context: ToolContext,
+    tool_response: Dict[str, Any],
+) -> Optional[Dict[str, Any]]:
+    """Store raw results from google_search tool calls."""
+    try:
+        if tool.name == "search_cba_datastore":
+            tool_context.state["search_cba_datastore_tool_raw_output"] = tool_response
+            print(f"[store_tool_result_callback] Stored response for tool search_cba_datastore")
+        return None
+    except Exception as e:
+        print(f"ERROR in store_tool_result_callback: {str(e)}")
+        print(traceback.format_exc())
+        return None
 
 def search_cba_datastore(
     query: str
@@ -123,3 +147,44 @@ if __name__ == "__main__":
     # Pretty print the result
     import json
     print(json.dumps(result, indent=2))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+

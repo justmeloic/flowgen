@@ -21,11 +21,61 @@ This module defines the root agent that coordinates tariff-related queries.
 from datetime import date
 
 from google.adk.agents import Agent
+from google.genai.types import Content, Part
 from .prompts import return_global_instructions, return_root_agent_instructions
 from .tools import search_cba_datastore
+from .tools import store_tool_result_callback
+import json
 
 
 date_today = date.today()
+
+# Standard library imports
+from typing import Optional
+import traceback
+
+# Third-party imports
+from google.adk.agents.callback_context import CallbackContext
+from google.adk.models import LlmResponse
+
+
+def after_model_callback(
+    callback_context: CallbackContext, llm_response: LlmResponse
+) -> Optional[LlmResponse]:
+    """Format LLM response and include raw tool results in markdown."""
+    try:
+        if not llm_response.content or not llm_response.content.parts:
+            return None
+
+        active_part = llm_response.content.parts[0]
+        if active_part.function_call or llm_response.error_message:
+            return None
+        
+        if "search_cba_datastore_tool_raw_output" not in callback_context.state:
+            return None
+
+        original_text = active_part.text if active_part.text else None
+        search_cba_datastore_tool_raw_output = callback_context.state.get("search_cba_datastore_tool_raw_output")
+        documents = search_cba_datastore_tool_raw_output.get("documents", [])
+
+        
+        
+        if not documents:
+            return None
+            
+        # Format documents to only include allowed fields
+        documents_text = json.dumps(documents)
+        content_with_references = Content(parts=[Part(text=f"{original_text}<START_OF_REFERENCE_DOCUMENTS>{documents_text}")])
+        return LlmResponse(content=content_with_references)
+
+    except Exception as e:
+        print(f"ERROR : {str(e)}")
+        print(traceback.format_exc())
+        return None
+
+
+
+
 
 root_agent = Agent(
     name="root_agent",
@@ -34,4 +84,8 @@ root_agent = Agent(
     instruction=return_global_instructions(),
     global_instruction=return_root_agent_instructions(),
     tools=[search_cba_datastore],
+    after_tool_callback=store_tool_result_callback,
+    after_model_callback=after_model_callback
 )
+
+
