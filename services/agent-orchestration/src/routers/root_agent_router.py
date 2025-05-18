@@ -219,7 +219,7 @@ async def agent_endpoint(
 
         content = types.Content(role="user", parts=[types.Part(text=query.text)])
         final_response_text = "Agent did not produce a final response."
-        references = {}
+        references_json = {}
 
         async for event in runner.run_async(
             user_id=config.user_id,
@@ -228,26 +228,37 @@ async def agent_endpoint(
         ):
             if event.is_final_response():
                 if event.content and event.content.parts:
-                    final_response_text = event.content.parts[0].text
-                    
                     response_text = event.content.parts[0].text
                     if "<START_OF_REFERENCE_DOCUMENTS>" in response_text:
-                        final_response_text = response_text.split("<START_OF_REFERENCE_DOCUMENTS>")[0]
-                        references_text = response_text.split("<START_OF_REFERENCE_DOCUMENTS>")[1]
-                        references_list = json.loads(references_text)
-                        references_json = { i + 1 : references_list[i] for i in range(len(references_list))}
+                        final_response_text = response_text.split("<START_OF_REFERENCE_DOCUMENTS>")[0].strip()
+                        references_text = response_text.split("<START_OF_REFERENCE_DOCUMENTS>")[1].strip()
+                        try:
+                            references_list = json.loads(references_text)
+                            references_json = {
+                                str(i + 1): {
+                                    "title": ref.get("title", ""),
+                                    "link": ref.get("link", ""),
+                                    "text": ref.get("text", "")
+                                }
+                                for i, ref in enumerate(references_list)
+                                if isinstance(ref, dict)
+                            }
+                        except json.JSONDecodeError as e:
+                            logger.error(f"Failed to parse references JSON: {str(e)}")
+                            references_json = {}
                     else:
                         final_response_text = response_text
                         references_json = {}
-
-
 
                 elif event.actions and event.actions.escalate:
                     final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
                 break
 
         logger.info(f"Successfully processed agent query for session {session_id}")
-        return {"response": final_response_text, "references": references_json}
+        return {
+            "response": final_response_text,
+            "references": references_json
+        }
 
     except Exception as e:
         logger.error(f"Error processing agent query: {str(e)}")

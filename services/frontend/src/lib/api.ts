@@ -3,8 +3,16 @@ import { v4 as uuidv4 } from 'uuid';
 // Use environment variable with fallback
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
+interface Reference {
+  id: string;
+  name: string;
+  title: string;
+  link: string;
+}
+
 interface MessageResponse {
   response: string;
+  references: { [key: string]: Reference };
 }
 
 export const sendMessage = async (message: string): Promise<MessageResponse> => {

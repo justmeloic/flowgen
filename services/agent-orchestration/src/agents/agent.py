@@ -57,14 +57,21 @@ def after_model_callback(
         original_text = active_part.text if active_part.text else None
         search_cba_datastore_tool_raw_output = callback_context.state.get("search_cba_datastore_tool_raw_output")
         documents = search_cba_datastore_tool_raw_output.get("documents", [])
-
-        
         
         if not documents:
             return None
             
-        # Format documents to only include allowed fields
-        documents_text = json.dumps(documents)
+        # Format documents to include only title, link, and text fields
+        formatted_documents = [
+            {
+                "title": doc.get("title", ""),
+                "link": doc.get("link", ""),
+                "text": doc.get("text", "")
+            }
+            for doc in documents
+        ]
+        
+        documents_text = json.dumps(formatted_documents)
         content_with_references = Content(parts=[Part(text=f"{original_text}<START_OF_REFERENCE_DOCUMENTS>{documents_text}")])
         return LlmResponse(content=content_with_references)
 
