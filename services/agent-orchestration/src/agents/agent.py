@@ -15,7 +15,7 @@
 """
 Root Agent Module
 
-This module defines the root agent that coordinates tariff-related queries.
+This module defines the root agent that coordinates CBA-related queries.
 """
 
 from datetime import date
@@ -36,28 +36,25 @@ import traceback
 
 # Third-party imports
 from google.adk.agents.callback_context import CallbackContext
-from google.adk.models import LlmResponse
+from google.adk.models import LlmResponse, LlmRequest
 
 
-def after_model_callback(
-    callback_context: CallbackContext, llm_response: LlmResponse
-) -> Optional[LlmResponse]:
+def before_model_callback(
+    callback_context: CallbackContext, llm_request: LlmRequest
+) -> Optional[LlmRequest]:
     """Format LLM response and include raw tool results in markdown."""
     try:
-        if not llm_response.content or not llm_response.content.parts:
-            return None
 
-        active_part = llm_response.content.parts[0]
-        if active_part.function_call or llm_response.error_message:
-            return None
-        
         if "search_cba_datastore_tool_raw_output" not in callback_context.state:
             return None
-
-        original_text = active_part.text if active_part.text else None
+        
+        if not callback_context.state["search_cba_datastore_tool_raw_output"]:
+            return None
+        
         search_cba_datastore_tool_raw_output = callback_context.state.get("search_cba_datastore_tool_raw_output")
         documents = search_cba_datastore_tool_raw_output.get("documents", [])
         summary = search_cba_datastore_tool_raw_output.get("summary", "")
+        #callback_context.state["search_cba_datastore_tool_raw_output"] = None
         
         # Delete the search results from state after using them
         #callback_context.state["search_cba_datastore_tool_raw_output"] = None
@@ -80,7 +77,7 @@ root_agent = Agent(
     global_instruction=return_root_agent_instructions(),
     tools=[search_cba_datastore],
     after_tool_callback=store_tool_result_callback,
-    after_model_callback=after_model_callback
+    before_model_callback=before_model_callback
 )
 
 
