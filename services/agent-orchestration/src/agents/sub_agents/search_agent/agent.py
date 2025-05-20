@@ -19,6 +19,8 @@ This module defines the search agent that handles CBA document searches.
 """
 
 from datetime import date
+from dotenv import load_dotenv
+import os
 
 from google.adk.agents import Agent
 from google.genai.types import Content, Part
@@ -26,6 +28,9 @@ from .prompts import return_search_agent_instructions
 from .tools import search_cba_datastore
 from .tools import store_tool_result_callback
 import json
+
+# Load environment variables
+load_dotenv()
 
 date_today = date.today()
 
@@ -66,7 +71,7 @@ def before_model_callback(
 
 search_agent = Agent(
     name="search_agent",
-    model="gemini-2.0-flash",
+    model=os.getenv('GEMINI_MODEL', 'gemini-2.0-flash'),
     description="Specialized agent that searches through CN's CBA documents using Vertex AI Search. Processes search queries and returns relevant information to the supervisor agent. Formats search results with summaries and document references for easy consumption by the supervisor agent.",
     instruction=return_search_agent_instructions(),
     tools=[search_cba_datastore],

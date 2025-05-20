@@ -22,6 +22,9 @@ flags.DEFINE_string('api_title', 'Tariff Agent API', 'API title')
 flags.DEFINE_string('api_description', 'API for interacting with the tariff information agent', 'API description')
 flags.DEFINE_string('api_version', '1.0.0', 'API version')
 
+# Model configuration
+flags.DEFINE_string('gemini_model', os.getenv('GEMINI_MODEL', 'gemini-2.0-flash'), 'Gemini model version')
+
 def get_settings() -> Dict[str, Any]:
     """Get all application settings.
     
@@ -44,5 +47,8 @@ def get_settings() -> Dict[str, Any]:
             'allow_credentials': True,
             'allow_methods': ["*"],
             'allow_headers': ["*"],
+        },
+        'model': {
+            'gemini_version': FLAGS.gemini_model,
         }
     } 
