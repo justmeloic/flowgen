@@ -63,6 +63,7 @@ def before_model_callback(
         return None
 
 
+
 search_agent = Agent(
     name="search_agent",
     model="gemini-2.0-flash",

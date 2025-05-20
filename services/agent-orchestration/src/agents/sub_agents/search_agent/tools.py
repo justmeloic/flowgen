@@ -62,6 +62,7 @@ def search_cba_datastore(
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "")
     location = "global"
     data_store_id = os.getenv("DATA_STORE_ID", "cn-cba_1747357876332")  
+    summary_result_count = os.getenv("SUMMARY_RESULT_COUNT", 5)
     
     client = discoveryengine.SearchServiceClient()
 
@@ -76,7 +77,7 @@ def search_cba_datastore(
     # Content search spec for summary and citations
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
         summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
-            summary_result_count=5,  # Number of results to use for the summary
+            summary_result_count=summary_result_count,  # Number of results to use for the summary
             include_citations=True,
             # You can customize the prompt if needed
             # model_prompt_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelPromptSpec(
