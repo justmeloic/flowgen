@@ -13,7 +13,7 @@ export default function HomePage() {
           CBA Agentic System
         </h1>
         <p className="text-lg text-gray-700">
-          An agentic question answering system powered by AI for CBA analysis,
+          An agentic question answering system powered by Google AI for CBA analysis,
           built with Google Cloud Platform services.
         </p>
 
@@ -29,7 +29,7 @@ export default function HomePage() {
         </div>
 
         <h2 className="text-2xl font-semibold mt-6" id="demo-applications">
-          Demo Applications
+          Demo Agents
         </h2>
         <div className="mt-4 flex space-x-4">
           {/* Use Shadcn UI Button component for consistent styling */}
@@ -37,7 +37,7 @@ export default function HomePage() {
             asChild
             className="bg-primary text-white px-6 py-3 rounded-full hover:bg-primary/70 transition-colors"
           >
-            <Link href="/chat">Try the Chat UI</Link>
+            <Link href="/chat">Try the CBA Agent</Link>
           </Button>
         </div>
       </div>

@@ -173,12 +173,21 @@ export default function ChatPage() {
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? ( // Ensure history is empty too
-              <div className="flex items-center justify-center h-full">
+              <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
                 <h1 className="text-center text-4xl md:text-5xl font-bold"> {/* Responsive text size */}
                   <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent"> {/* Adjusted gradient */}
-                    Hello, Loïc
+                    Hello!
                   </span>
                 </h1>
+                <h3 className="text-center text-sm md:text-sm font-bold w-[460px] "> {/* Responsive text size */}
+                  <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent"> {/* Adjusted gradient */}
+                  I can help you with questions about your Collective Bargaining Agreement (CBA). 
+                  To find the most accurate information, could you please tell me your role 
+                  (like engineer or conductor) and your region or the specific agreement 
+                  you're referring to?
+                  </span>
+                </h3>
+                
               </div>
             ) : (
               <div className="w-full space-y-4 py-8">

@@ -4,6 +4,7 @@ import type * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Cloud, MessageSquare } from "lucide-react";
+import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,10 +22,11 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const [isHovered, setIsHovered] = useState(false);
 
   const sidebarLinks = [
     {
-      title: "Chat",
+      title: "CBA",
       icon: MessageSquare,
       variant: "default",
       href: "/chat",
@@ -35,16 +37,18 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
     <div
       className={cn(
         "relative flex h-screen flex-col gap-4 px-3 pb-3 pt-16 transition-all duration-300 bg-[#f0f4f8] shadow-[2px_0_10px_0_rgba(0,0,0,0.1)] z-10 rounded-tr-xl rounded-br-xl border-r border-gray-200",
-        isCollapsed ? "w-[80px]" : "w-[250px]",
+        isCollapsed && !isHovered ? "w-[80px]" : "w-[250px]",
         className
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <TooltipProvider>
         <Button
           variant="ghost"
           className={cn(
             "absolute top-4 p-2 hover:bg-white/50",
-            isCollapsed ? "left-1/2 -translate-x-1/2" : "left-4"
+            isCollapsed && !isHovered ? "left-1/2 -translate-x-1/2" : "left-4"
           )}
           onClick={onToggle}
         >
@@ -55,10 +59,14 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           </div>
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
+                {/* **New Title Added Here** */}
+                <div className="mb-2 mt-[300px] font-semibold text-gray-700 text-sm ">
+          Agents
+        </div>
         <nav className="grid gap-1">
           {sidebarLinks.map((link, index) => {
             const Icon = link.icon;
-            return isCollapsed ? (
+            return isCollapsed && !isHovered ? (
               <Tooltip key={index} delayDuration={0}>
                 <TooltipTrigger asChild>
                   <Link

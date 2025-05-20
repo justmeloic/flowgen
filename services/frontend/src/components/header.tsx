@@ -25,11 +25,7 @@ export function Header() {
             width={48}
             height={48}
           />
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="hidden font-bold sm:inline-block">
-              CBA Agentic System
-            </span>
-          </Link>
+
         </div>
 
         <div className="ml-auto mr-5 ">
