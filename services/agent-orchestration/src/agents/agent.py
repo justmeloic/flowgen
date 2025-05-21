@@ -22,6 +22,7 @@ from datetime import date
 from dotenv import load_dotenv
 import os
 
+from google.adk.tools.agent_tool import AgentTool
 from google.adk.agents import Agent
 from .prompts import return_global_instructions, return_root_agent_instructions
 from .sub_agents import search_agent
@@ -38,6 +39,7 @@ root_agent = Agent(
     instruction=return_global_instructions(),
     global_instruction=return_root_agent_instructions(),
     sub_agents=[search_agent]
+    #tools=[AgentTool(agent=search_agent)]
 )
 
 
