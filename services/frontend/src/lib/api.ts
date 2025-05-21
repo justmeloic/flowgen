@@ -17,11 +17,13 @@ interface MessageResponse {
 
 export const sendMessage = async (message: string): Promise<MessageResponse> => {
   try {
+    const storedSessionId = localStorage.getItem('chatSessionId');
+    
     const response = await fetch(`${BASE_URL}/api/v1/root_agent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Session-ID': localStorage.getItem('chatSessionId') || uuidv4(),
+        ...(storedSessionId && { 'X-Session-ID': storedSessionId }),
       },
       body: JSON.stringify({ text: message }),
     });
@@ -30,24 +32,19 @@ export const sendMessage = async (message: string): Promise<MessageResponse> => 
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    
-    // Store the session ID if it's a new session
+    // Get session ID from response header
     const sessionId = response.headers.get('X-Session-ID');
     if (sessionId) {
       localStorage.setItem('chatSessionId', sessionId);
     }
 
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Failed to send message:', error);
     throw error;
   }
 };
 
-// Initialize session and store session ID
-export const createSession = async () => {
-  const sessionId = uuidv4();
-  localStorage.setItem('chatSessionId', sessionId);
-  return Promise.resolve();
+export const hasExistingSession = (): boolean => {
+  return !!localStorage.getItem('chatSessionId');
 };

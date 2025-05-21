@@ -8,12 +8,12 @@ import { ModelSelector } from "@/components/model-selector";
 import { MessageActions } from "@/components/message-actions";
 import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
-import { createSession, sendMessage } from "@/lib/api";
+import { sendMessage } from "@/lib/api";
 import { toast } from "@/components/ui/use-toast";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
-import remarkParse from 'remark-parse';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
+import remarkParse from "remark-parse";
 import { ReferencesPanel } from "@/components/references-panel";
 
 interface ChatMessage {
@@ -30,11 +30,12 @@ interface Reference {
 
 export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [references, setReferences] = useState<{ [key: string]: Reference }>({});
+  const [references, setReferences] = useState<{ [key: string]: Reference }>(
+    {}
+  );
   const [isFirstPrompt, setIsFirstPrompt] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Thinking...");
-  const [sessionInitialized, setSessionInitialized] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -44,30 +45,6 @@ export default function ChatPage() {
       const maxScrollTop = scrollHeight - height;
       chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
     }
-  }, []);
-
-  useEffect(() => {
-    const initSession = async () => {
-      try {
-        const existingUserId = localStorage.getItem("chatUserId");
-        const existingSessionId = localStorage.getItem("chatSessionId");
-
-        if (!existingUserId || !existingSessionId) {
-          await createSession();
-        }
-        setSessionInitialized(true);
-      } catch (error) {
-        console.error("Failed to initialize session:", error);
-        toast({
-          title: "Error",
-          description:
-            "Failed to initialize chat session. Please refresh the page.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    initSession();
   }, []);
 
   useEffect(() => {
@@ -83,14 +60,6 @@ export default function ChatPage() {
 
   const handleSend = useCallback(
     async (userMessage: string, _botMessage: string) => {
-      if (!sessionInitialized) {
-         toast({
-          title: "Session Not Ready",
-          description: "Please wait for the chat session to initialize.",
-          variant: "default",
-        });
-        return;
-      }
       if (isFirstPrompt) {
         setIsFirstPrompt(false);
       }
@@ -104,14 +73,20 @@ export default function ChatPage() {
 
       try {
         const response = await sendMessage(userMessage);
-        
+
         // Update references with the new references from the response
         setReferences(response.references || {});
 
         setChatHistory((prev) => {
           const newHistory = [...prev];
-          if (newHistory.length > 0 && newHistory[newHistory.length -1].role === 'bot') {
-            newHistory[newHistory.length - 1] = { role: "bot", content: response.response };
+          if (
+            newHistory.length > 0 &&
+            newHistory[newHistory.length - 1].role === "bot"
+          ) {
+            newHistory[newHistory.length - 1] = {
+              role: "bot",
+              content: response.response,
+            };
           } else {
             newHistory.push({ role: "bot", content: response.response });
           }
@@ -121,7 +96,12 @@ export default function ChatPage() {
       } catch (error) {
         console.error("Error sending message:", error);
         setChatHistory((prev) =>
-          prev.slice(0, -1).concat({ role: "bot", content: "Sorry, I encountered an error. Please try again." })
+          prev
+            .slice(0, -1)
+            .concat({
+              role: "bot",
+              content: "Sorry, I encountered an error. Please try again.",
+            })
         );
         toast({
           title: "Error",
@@ -132,7 +112,7 @@ export default function ChatPage() {
         setIsLoading(false);
       }
     },
-    [scrollToBottom, isFirstPrompt, loadingText, sessionInitialized]
+    [scrollToBottom, isFirstPrompt, loadingText]
   );
 
   useEffect(() => {
@@ -163,7 +143,11 @@ export default function ChatPage() {
       </div>
       <div className="flex flex-1 overflow-hidden">
         {/* Main Chat Area */}
-        <main className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${Object.keys(references).length > 0 ? 'mr-80' : ''}`}>
+        <main
+          className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${
+            Object.keys(references).length > 0 ? "mr-80" : ""
+          }`}
+        >
           <div
             ref={chatContainerRef}
             className="flex-1 w-full max-w-[700px] mb-8 mx-auto px-4 pb-4 overflow-y-auto"
@@ -174,20 +158,27 @@ export default function ChatPage() {
           >
             {isFirstPrompt && chatHistory.length === 0 ? ( // Ensure history is empty too
               <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
-                <h1 className="text-center text-4xl md:text-5xl font-bold"> {/* Responsive text size */}
-                  <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent"> {/* Adjusted gradient */}
+                <h1 className="text-center text-4xl md:text-5xl font-bold">
+                  {" "}
+                  {/* Responsive text size */}
+                  <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
+                    {" "}
+                    {/* Adjusted gradient */}
                     Hello!
                   </span>
                 </h1>
-                <h3 className="text-center text-sm md:text-sm font-bold w-[460px] "> {/* Responsive text size */}
-                  <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent"> {/* Adjusted gradient */}
-                  I can help you with questions about your Collective Bargaining Agreement (CBA). 
-                  To find the most accurate information, could you please tell me your role 
-                  (like engineer or conductor) and your region or the specific agreement 
-                  you're referring to?
+                <h3 className="text-center text-sm md:text-sm font-bold w-[460px] ">
+                  {" "}
+                  {/* Responsive text size */}
+                  <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
+                    {" "}
+                    {/* Adjusted gradient */}I can help you with questions about
+                    your Collective Bargaining Agreement (CBA). To find the most
+                    accurate information, could you please tell me your role
+                    (like engineer or conductor) and your region or the specific
+                    agreement you're referring to?
                   </span>
                 </h3>
-                
               </div>
             ) : (
               <div className="w-full space-y-4 py-8">
@@ -198,9 +189,15 @@ export default function ChatPage() {
                       message.role === "user" ? "items-end" : "items-start"
                     } mb-4`}
                   >
-                    <div className={`flex items-start gap-2.5 max-w-[85%] md:max-w-[80%]`}> {/* Adjusted gap and max-width */}
+                    <div
+                      className={`flex items-start gap-2.5 max-w-[85%] md:max-w-[80%]`}
+                    >
+                      {" "}
+                      {/* Adjusted gap and max-width */}
                       {message.role === "bot" && (
-                        <Avatar className="w-8 h-8 shrink-0"> {/* Added shrink-0 */}
+                        <Avatar className="w-8 h-8 shrink-0">
+                          {" "}
+                          {/* Added shrink-0 */}
                           <AvatarImage
                             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-avatar-icon-sp2bKzW5OCu4C1f64jSvrbY0bgCc8M.png"
                             alt="Bot Avatar"
@@ -208,7 +205,8 @@ export default function ChatPage() {
                         </Avatar>
                       )}
                       <div
-                        className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-2xl ${ // Added prose classes for markdown styling
+                        className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-2xl ${
+                          // Added prose classes for markdown styling
                           message.role === "user"
                             ? "bg-blue-500 text-white rounded-tr-none dark:bg-blue-600" // Adjusted user bubble style
                             : "bg-gray-100 text-gray-800 rounded-tl-none dark:bg-gray-700 dark:text-gray-200" // Adjusted bot bubble style
@@ -216,15 +214,21 @@ export default function ChatPage() {
                       >
                         {message.role === "bot" ? (
                           // The loading animation for bot messages needs careful handling
-                          isLoading && message.content === loadingText && index === chatHistory.length - 1 ? (
-                             <span className="italic">{loadingText}</span>
+                          isLoading &&
+                          message.content === loadingText &&
+                          index === chatHistory.length - 1 ? (
+                            <span className="italic">{loadingText}</span>
                           ) : (
                             <div className="prose prose-sm max-w-none">
                               <ReactMarkdown
-                                remarkPlugins={[remarkGfm, remarkBreaks, remarkParse]}
+                                remarkPlugins={[
+                                  remarkGfm,
+                                  remarkBreaks,
+                                  remarkParse,
+                                ]}
                                 skipHtml={false}
                               >
-                                {message.content.split('\n\nReferences:')[0]}
+                                {message.content.split("\n\nReferences:")[0]}
                               </ReactMarkdown>
                             </div>
                           )
@@ -247,13 +251,17 @@ export default function ChatPage() {
             )}
           </div>
           <div className="w-full max-w-[700px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-3 px-4 border-t dark:border-gray-700">
-            <ChatInput onSend={handleSend} isLoading={isLoading} disabled={!sessionInitialized} />
+            <ChatInput onSend={handleSend} isLoading={isLoading} />
           </div>
         </main>
         {/* References Panel */}
-        <div 
+        <div
           data-references-panel
-          className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 min-h-[200px] max-h-[calc(100vh-11rem)] transition-transform duration-1700 ease-in-out ${Object.keys(references).length > 0 ? 'translate-x-0' : 'translate-x-full'}`}
+          className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 min-h-[200px] max-h-[calc(100vh-11rem)] transition-transform duration-1700 ease-in-out ${
+            Object.keys(references).length > 0
+              ? "translate-x-0"
+              : "translate-x-full"
+          }`}
         >
           <ReferencesPanel references={references} />
         </div>
