@@ -148,10 +148,15 @@ export default function ChatPage() {
         >
           <div
             ref={chatContainerRef}
-            className="flex-1 w-full max-w-[700px] mb-8 mx-auto px-4 pb-4 overflow-y-auto"
+            className="flex-1 w-full max-w-[700px] mb-8 mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide"
             style={{
               height: "calc(100vh - 10rem)",
               maxHeight: "calc(100vh - 10rem)",
+              scrollbarWidth: "none" /* Firefox */,
+              msOverflowStyle: "none" /* IE and Edge */,
+              "&::-webkit-scrollbar": {
+                display: "none" /* Chrome, Safari and Opera */,
+              },
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? ( // Ensure history is empty too
@@ -179,7 +184,7 @@ export default function ChatPage() {
                 </h3>
               </div>
             ) : (
-              <div className="w-full space-y-4 py-8">
+              <div className="w-full">
                 {chatHistory.map((message, index) => (
                   <div
                     key={index}
@@ -203,11 +208,11 @@ export default function ChatPage() {
                         </Avatar>
                       )}
                       <div
-                        className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-2xl ${
-                          // Added prose classes for markdown styling
+                        className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-3xl text-justify ${
+                          // Added text-justify class
                           message.role === "user"
-                            ? "bg-blue-500 text-white rounded-tr-none dark:bg-blue-600" // Adjusted user bubble style
-                            : "bg-gray-100 text-gray-800 rounded-tl-none dark:bg-gray-700 dark:text-gray-200" // Adjusted bot bubble style
+                            ? "bg-blue-100 text-gray-800 rounded-tr-none dark:bg-blue-600"
+                            : "bg-white text-gray-800 rounded-tl-none dark:bg-gray-700 dark:text-gray-200"
                         }`}
                       >
                         {message.role === "bot" ? (
@@ -248,7 +253,7 @@ export default function ChatPage() {
               </div>
             )}
           </div>
-          <div className="w-full max-w-[700px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-3 px-4  dark:border-gray-700">
+          <div className="w-full max-w-[750px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-4 px-4  dark:border-gray-700">
             <ChatInput onSend={handleSend} isLoading={isLoading} />
           </div>
         </main>

@@ -92,3 +92,13 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Add these styles to your existing globals.css */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
