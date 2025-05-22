@@ -128,30 +128,13 @@ export function ChatInput({
     >
       <div
         className={cn(
-          "relative flex items-center w-full rounded-full border bg-white transition-shadow duration-300 ease-in-out",
+          "relative flex flex-col w-full h-28 rounded-3xl border bg-white transition-shadow duration-300 ease-in-out ",
           isFocused
             ? "shadow-[0_1px_6px_1px_rgba(32,33,36,0.12),0_3px_8px_2px_rgba(32,33,36,0.14),0_3px_12px_3px_rgba(32,33,36,0.2)]"
             : "shadow-none"
         )}
       >
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          onChange={handleFileUpload}
-          className="hidden"
-          id="chat-file-upload"
-        />
-        <label
-          htmlFor="chat-file-upload"
-          className={cn(
-            "absolute left-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors border border-gray-300 bg-gray-50",
-            "hover:bg-primary/30 focus:bg-gray-100 focus:outline-none"
-          )}
-        >
-          <Plus className="h-5 w-5 text-gray-600" />
-          <span className="sr-only">Upload files</span>
-        </label>
+        {/* Top section with text input */}
         <input
           type="text"
           placeholder="Ask Gemini"
@@ -159,41 +142,68 @@ export function ChatInput({
           onChange={(e) => setMessage(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="h-12 w-full rounded-full bg-transparent pl-12 pr-20 text-base outline-none placeholder:text-muted-foreground"
+          className="h-12 w-full rounded-full bg-transparent px-4 text-base outline-none placeholder:text-muted-foreground"
         />
-        <div className="absolute right-2 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={isRecording ? stopRecording : startRecording}
-            className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
-              isRecording
-                ? "bg-red-500 hover:bg-red-600"
-                : "text-gray-600 hover:bg-primary/30",
-              "focus:outline-none"
-            )}
-          >
-            {isRecording ? (
-              <Square className="h-4 w-4 text-white" />
-            ) : (
-              <Mic className="h-5 w-5" />
-            )}
-            <span className="sr-only">
-              {isRecording ? "Stop recording" : "Start recording"}
-            </span>
-          </button>
-          {message.trim() && !isLoading ? (
-            <button
-              type="submit"
+
+        {/* Bottom section with buttons */}
+        <div className="flex justify-between items-center mt-6  px-2">
+          {/* File upload button */}
+          <div className="flex items-center">
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileUpload}
+              className="hidden"
+              id="chat-file-upload"
+            />
+            <label
+              htmlFor="chat-file-upload"
               className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
-                "bg-primary hover:bg-primary/90 focus:bg-primary/90 focus:outline-none"
+                "flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors  ",
+                "hover:bg-gradient-to-r from-blue-500/20 to-pink-500/20 focus:bg-gray-100 focus:outline-none"
               )}
             >
-              <SendHorizontal className="h-4 w-4 text-white" />
-              <span className="sr-only">Send message</span>
+              <Plus className="h-5 w-5 text-gray-600" />
+              <span className="sr-only">Upload files</span>
+            </label>
+          </div>
+
+          {/* Right side buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={isRecording ? stopRecording : startRecording}
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                isRecording
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "text-gray-600 hover:bg-gradient-to-r from-blue-500/20 to-pink-500/20",
+                "focus:outline-none"
+              )}
+            >
+              {isRecording ? (
+                <Square className="h-4 w-4 text-white" />
+              ) : (
+                <Mic className="h-5 w-5 text-gray-600" />
+              )}
+              <span className="sr-only">
+                {isRecording ? "Stop recording" : "Start recording"}
+              </span>
             </button>
-          ) : null}
+            {message.trim() && !isLoading ? (
+              <button
+                type="submit"
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                  "bg-primary hover:bg-primary/90 focus:bg-primary/90 focus:outline-none"
+                )}
+              >
+                <SendHorizontal className="h-4 w-4 text-white" />
+                <span className="sr-only">Send message</span>
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
       {uploadedFiles.length > 0 && (

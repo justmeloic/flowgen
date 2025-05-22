@@ -96,12 +96,10 @@ export default function ChatPage() {
       } catch (error) {
         console.error("Error sending message:", error);
         setChatHistory((prev) =>
-          prev
-            .slice(0, -1)
-            .concat({
-              role: "bot",
-              content: "Sorry, I encountered an error. Please try again.",
-            })
+          prev.slice(0, -1).concat({
+            role: "bot",
+            content: "Sorry, I encountered an error. Please try again.",
+          })
         );
         toast({
           title: "Error",
@@ -121,7 +119,7 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="flex items-center justify-between  border-b">
+      <div className="flex items-center justify-between ">
         <ModelSelector />
         <Link href="/" className="flex h-8 w-8 items-center justify-center">
           <svg
@@ -250,7 +248,7 @@ export default function ChatPage() {
               </div>
             )}
           </div>
-          <div className="w-full max-w-[700px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-3 px-4 border-t dark:border-gray-700">
+          <div className="w-full max-w-[700px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-3 px-4  dark:border-gray-700">
             <ChatInput onSend={handleSend} isLoading={isLoading} />
           </div>
         </main>
