@@ -23,7 +23,7 @@ export const sendMessage = async (message: string): Promise<MessageResponse> => 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(storedSessionId && { 'X-Session-ID': storedSessionId }),
+        'X-Session-ID': storedSessionId || '', // Always send the header, even if empty
       },
       body: JSON.stringify({ text: message }),
     });
@@ -32,10 +32,13 @@ export const sendMessage = async (message: string): Promise<MessageResponse> => 
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // Get session ID from response header
-    const sessionId = response.headers.get('X-Session-ID');
-    if (sessionId) {
-      localStorage.setItem('chatSessionId', sessionId);
+    // Get session ID from response header and store it if present
+    const newSessionId = response.headers.get('x-session-id'); // Note: header names are case-insensitive
+    if (newSessionId) {
+      localStorage.setItem('chatSessionId', newSessionId);
+      console.log('Stored new session ID:', newSessionId); // Debug logging
+    } else {
+      console.warn('No session ID received from server'); // Debug logging
     }
 
     return await response.json();

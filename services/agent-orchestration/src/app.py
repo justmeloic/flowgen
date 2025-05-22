@@ -98,7 +98,10 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # Add session middleware
+    # Configure CORS first - order matters!
+    app.add_middleware(CORSMiddleware, **settings["cors"])
+
+    # Add session middleware after CORS
     app.add_middleware(SessionMiddleware)
 
     @app.get("/")
@@ -121,12 +124,8 @@ def create_app() -> FastAPI:
     # Create API v1 router
     api_v1_router = APIRouter(prefix="/api/v1")
 
-    # Configure CORS
-    app.add_middleware(CORSMiddleware, **settings["cors"])
-
     # Register routers under API v1
     try:
-        # Include the root_agent_router without modifying its prefix
         api_v1_router.include_router(root_agent_router)
         app.include_router(api_v1_router)
         logger.info("Successfully registered all routers")
