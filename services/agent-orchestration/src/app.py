@@ -30,6 +30,7 @@ from absl import app as absl_app, flags
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
+from google.adk.sessions import InMemorySessionService
 from config import get_settings
 from routers.root_agent_router import router as root_agent_router, SessionMiddleware
 
@@ -66,15 +67,17 @@ def signal_handler(signum: int, frame: Optional[object]) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Handle application startup and shutdown events.
-
-    Args:
-        app: FastAPI application instance
-    """
+    """Handle application startup and shutdown events."""
     # Startup
     logger.info("Starting up application...")
+    # Create and store session service in app state
+    app.state.session_service = InMemorySessionService()
     yield
-    # Shutdown
+    # Cleanup
+    if hasattr(app.state, "runner"):
+        await app.state.runner.cleanup()
+    if hasattr(app.state, "session_service"):
+        await app.state.session_service.cleanup()
     logger.info("Shutting down application...")
 
 

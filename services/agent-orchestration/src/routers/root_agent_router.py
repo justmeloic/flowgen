@@ -28,7 +28,7 @@ import uuid
 from datetime import datetime, UTC
 from pydantic import BaseModel, Field, field_validator
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, Depends, Request, Response
+from fastapi import APIRouter, HTTPException, Depends, Request, Response, FastAPI
 
 # Removed Header from fastapi imports as it's not directly used as a dependency type
 # from fastapi.responses import JSONResponse # Not explicitly used
@@ -100,11 +100,6 @@ class AgentConfig(BaseModel):
     user_id: str = Field(default="default_user")
 
 
-# Global session service to maintain state
-_session_service = InMemorySessionService()
-# Removed _sessions: Dict[str, Dict[str, Any]] = {} to rely on ADK service
-
-
 class SessionMiddleware(BaseHTTPMiddleware):
     """Middleware to manage session IDs."""
 
@@ -150,16 +145,15 @@ def get_agent_config() -> AgentConfig:
     )
 
 
-def get_session_service() -> InMemorySessionService:
+def get_session_service(request: Request) -> InMemorySessionService:
     """Dependency for session service."""
-    return _session_service
+    return request.app.state.session_service
 
 
 async def get_or_create_session(
     request: Request,
     response: Response,
     config: Annotated[AgentConfig, Depends(get_agent_config)],
-    session_service: Annotated[InMemorySessionService, Depends(get_session_service)],
 ) -> Session:
     """Gets or creates a session and ensures proper header handling."""
     candidate_session_id = request.state.candidate_session_id
@@ -168,9 +162,11 @@ async def get_or_create_session(
     session = None
     if candidate_session_id:
         try:
-            # Try to get existing session
-            session = await session_service.get_session(
-                session_id=candidate_session_id, user_id=config.user_id
+            # Try to get existing session with specific parameters
+            session = await request.app.state.session_service.get_session(
+                app_name=config.app_name,
+                user_id=config.user_id,
+                session_id=candidate_session_id,
             )
             logger.info(f"Found existing session: {session.id}")
         except SessionNotFoundError:
@@ -178,11 +174,20 @@ async def get_or_create_session(
             session = None
 
     if not session:
-        # Create new session if not found
+        # Create new session with specific initial state
         session_id = candidate_session_id or str(uuid.uuid4())
         logger.info(f"Creating new session with ID: {session_id}")
-        session = await session_service.create_session(
-            app_name=config.app_name, user_id=config.user_id, session_id=session_id
+        initial_state = {
+            "app_name": config.app_name,
+            "user_id": config.user_id,
+            "created_at": time.time(),
+            "query_count": 0,
+        }
+        session = await request.app.state.session_service.create_session(
+            app_name=config.app_name,
+            user_id=config.user_id,
+            session_id=session_id,
+            state=initial_state,
         )
 
     # Always set both request state and response headers
@@ -195,22 +200,28 @@ async def get_or_create_session(
 
 
 def get_runner(
+    request: Request,
     config: Annotated[AgentConfig, Depends(get_agent_config)],
-    session_service: Annotated[InMemorySessionService, Depends(get_session_service)],
 ) -> Runner:
-    """Dependency for runner, ensuring app_name is provided."""
-    try:
-        return Runner(
-            agent=root_agent,
-            app_name=config.app_name,  # Ensure app_name is passed
-            session_service=session_service,
-        )
-    except Exception as e:
-        logger.error(f"Failed to create runner: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail={"message": "Failed to initialize agent runner", "error": str(e)},
-        )
+    """Get or create the singleton runner instance."""
+    if not hasattr(request.app.state, "runner"):
+        try:
+            request.app.state.runner = Runner(
+                agent=root_agent,
+                app_name=config.app_name,
+                session_service=request.app.state.session_service,
+            )
+            logger.info("Created new Runner instance")
+        except Exception as e:
+            logger.error(f"Failed to create runner: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "message": "Failed to initialize agent runner",
+                    "error": str(e),
+                },
+            )
+    return request.app.state.runner
 
 
 router = APIRouter(
@@ -219,42 +230,58 @@ router = APIRouter(
 )
 
 
+from google.adk.events import Event, EventActions
+import time
+
+
 @router.post("/", response_model=Dict[str, Any])
 async def agent_endpoint(
-    request: Request,  # Contains request.state.actual_session_id (set by get_or_create_session)
-    # response: Response, # No longer needed here, as get_or_create_session handles its headers
+    request: Request,
     query: Query,
     config: Annotated[AgentConfig, Depends(get_agent_config)],
-    session: Annotated[
-        Session, Depends(get_or_create_session)
-    ],  # This session object has the actual_session_id
+    session: Annotated[Session, Depends(get_or_create_session)],
     runner: Annotated[Runner, Depends(get_runner)],
 ) -> Dict[str, Any]:
-    """
-    Process user queries through the agent.
-    Uses the actual_session_id from request.state, which is set by get_or_create_session.
-    """
-    actual_session_id = request.state.actual_session_id  # Use the finalized session ID
-
-    # Logging the session's last update time from the ADK Session object
-    logger.info(
-        f"Processing agent query for session '{actual_session_id}' (User: {config.user_id}). Session's last known ADK update: {datetime.fromtimestamp(session.last_update_time, UTC) if session.last_update_time else 'N/A'}."
-    )
-
+    """Process user queries through the agent."""
     try:
-        content = types.Content(role="user", parts=[types.Part(text=query.text)])
+        # Create user message event with state tracking
+        user_content = types.Content(role="user", parts=[types.Part(text=query.text)])
+        user_event = Event(
+            author="user",
+            content=user_content,
+            timestamp=time.time(),
+            actions=EventActions(
+                state_delta={
+                    "last_query": query.text,
+                    "last_query_ts": time.time(),
+                    "query_count": session.state.get("query_count", 0) + 1,
+                }
+            ),
+            invocation_id=str(uuid.uuid4()),
+        )
+        await request.app.state.session_service.append_event(session, user_event)
+
         final_response_text = "Agent did not produce a final response."
         references_json = {}
 
+        # Ensure session is properly loaded before running
+        if not session:
+            raise HTTPException(
+                status_code=500, detail="Failed to load or create session"
+            )
+
         logger.info(
-            f"Running agent for session '{actual_session_id}', user '{config.user_id}' with query: '{query.text[:100]}...'"
+            f"Running agent for session '{request.state.actual_session_id}' with query: '{query.text[:100]}...'"
         )
 
         async for event in runner.run_async(
             user_id=config.user_id,
-            session_id=actual_session_id,  # Pass the actual_session_id
-            new_message=content,
+            session_id=request.state.actual_session_id,
+            new_message=user_content,
         ):
+            # For each event from the runner, append it to maintain state
+            await request.app.state.session_service.append_event(session, event)
+
             if event.is_final_response():
                 if event.content and event.content.parts:
                     response_text = event.content.parts[0].text
@@ -276,7 +303,7 @@ async def agent_endpoint(
                                 }
                             except json.JSONDecodeError as e:
                                 logger.error(
-                                    f"Failed to parse references JSON for session {actual_session_id}: {str(e)}\nContent: {references_text[:200]}"
+                                    f"Failed to parse references JSON for session {request.state.actual_session_id}: {str(e)}\nContent: {references_text[:200]}"
                                 )
                                 references_json = {}
                         else:
@@ -284,17 +311,35 @@ async def agent_endpoint(
                     else:
                         final_response_text = response_text.strip()
                         references_json = {}
-                elif event.actions and event.actions.escalate:
-                    final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
-                break
+
+                    # Create a state update event for the final response
+                    state_changes = {
+                        "last_response": final_response_text,
+                        "last_interaction_ts": time.time(),
+                        f"user:{config.user_id}:query_count": session.state.get(
+                            f"user:{config.user_id}:query_count", 0
+                        )
+                        + 1,
+                    }
+
+                    state_update_event = Event(
+                        author="system",
+                        actions=EventActions(state_delta=state_changes),
+                        timestamp=time.time(),
+                        invocation_id=str(uuid.uuid4()),
+                    )
+                    await request.app.state.session_service.append_event(
+                        session, state_update_event
+                    )
 
         logger.info(
-            f"Successfully processed agent query for session '{actual_session_id}'. Response: '{final_response_text[:100]}...'"
+            f"Successfully processed agent query for session '{request.state.actual_session_id}'. Response: '{final_response_text[:100]}...'"
         )
         return {"response": final_response_text, "references": references_json}
+
     except Exception as e:
         logger.exception(
-            f"Error processing agent query for session {actual_session_id}: {str(e)}"
+            f"Error processing agent query for session {request.state.actual_session_id}: {str(e)}"
         )
         raise HTTPException(
             status_code=500,
