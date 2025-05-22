@@ -247,7 +247,7 @@ async def agent_endpoint(
         # Create user message event with state tracking
         user_content = types.Content(role="user", parts=[types.Part(text=query.text)])
         user_event = Event(
-            author="user",
+            author=root_agent.name,  # Use agent name instead of "system"
             content=user_content,
             timestamp=time.time(),
             actions=EventActions(
@@ -323,7 +323,7 @@ async def agent_endpoint(
                     }
 
                     state_update_event = Event(
-                        author="system",
+                        author=root_agent.name,  # Use agent name instead of "system"
                         actions=EventActions(state_delta=state_changes),
                         timestamp=time.time(),
                         invocation_id=str(uuid.uuid4()),

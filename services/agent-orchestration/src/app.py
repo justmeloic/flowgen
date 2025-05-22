@@ -74,11 +74,19 @@ async def lifespan(app: FastAPI):
     app.state.session_service = InMemorySessionService()
     yield
     # Cleanup
-    if hasattr(app.state, "runner"):
-        await app.state.runner.cleanup()
-    if hasattr(app.state, "session_service"):
-        await app.state.session_service.cleanup()
     logger.info("Shutting down application...")
+    if hasattr(app.state, "session_service"):
+        try:
+            await app.state.session_service.cleanup()
+        except Exception as e:
+            logger.error(f"Error cleaning up session service: {e}")
+
+    # Runner doesn't have cleanup, so we'll just remove it
+    if hasattr(app.state, "runner"):
+        try:
+            delattr(app.state, "runner")
+        except Exception as e:
+            logger.error(f"Error removing runner: {e}")
 
 
 def create_app() -> FastAPI:
