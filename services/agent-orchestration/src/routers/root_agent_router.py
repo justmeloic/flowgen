@@ -29,10 +29,14 @@ from datetime import datetime, UTC
 from pydantic import BaseModel, Field, field_validator
 from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, Depends, Request, Response, FastAPI
+from utils.formatters import format_text_response
 
 # Removed Header from fastapi imports as it's not directly used as a dependency type
 # from fastapi.responses import JSONResponse # Not explicitly used
 from google.adk.sessions import InMemorySessionService, Session
+from google.adk.events import Event, EventActions
+import time
+
 
 try:
     from google.adk.sessions import SessionNotFoundError
@@ -230,10 +234,6 @@ router = APIRouter(
 )
 
 
-from google.adk.events import Event, EventActions
-import time
-
-
 @router.post("/", response_model=Dict[str, Any])
 async def agent_endpoint(
     request: Request,
@@ -285,32 +285,9 @@ async def agent_endpoint(
             if event.is_final_response():
                 if event.content and event.content.parts:
                     response_text = event.content.parts[0].text
-                    if "<START_OF_REFERENCE_DOCUMENTS>" in response_text:
-                        parts = response_text.split("<START_OF_REFERENCE_DOCUMENTS>", 1)
-                        final_response_text = parts[0].strip()
-                        if len(parts) > 1:
-                            references_text = parts[1].strip()
-                            try:
-                                references_list = json.loads(references_text)
-                                references_json = {
-                                    str(i + 1): {
-                                        "title": ref.get("title", ""),
-                                        "link": ref.get("link", ""),
-                                        "text": ref.get("text", ""),
-                                    }
-                                    for i, ref in enumerate(references_list)
-                                    if isinstance(ref, dict)
-                                }
-                            except json.JSONDecodeError as e:
-                                logger.error(
-                                    f"Failed to parse references JSON for session {request.state.actual_session_id}: {str(e)}\nContent: {references_text[:200]}"
-                                )
-                                references_json = {}
-                        else:
-                            references_json = {}
-                    else:
-                        final_response_text = response_text.strip()
-                        references_json = {}
+                    final_response_text, references_json = format_text_response(
+                        response_text=response_text, request=request
+                    )
 
                     # Create a state update event for the final response
                     state_changes = {
