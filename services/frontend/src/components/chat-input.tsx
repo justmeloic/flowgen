@@ -196,10 +196,10 @@ export function ChatInput({
                 type="submit"
                 className={cn(
                   "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
-                  "bg-primary hover:bg-primary/90 focus:bg-primary/90 focus:outline-none"
+                  "bg-blue-100 hover:bg-blue-200 focus:bg-blue-200 focus:outline-none"
                 )}
               >
-                <SendHorizontal className="h-4 w-4 text-white" />
+                <SendHorizontal className="h-4 w-4 text-gray-800" />
                 <span className="sr-only">Send message</span>
               </button>
             ) : null}
