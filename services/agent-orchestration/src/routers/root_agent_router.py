@@ -37,6 +37,9 @@ from google.adk.sessions import InMemorySessionService, Session
 from google.adk.events import Event, EventActions
 import time
 
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.requests import Request  # Import Request from starlette.requests
+from starlette.responses import Response
 
 try:
     from google.adk.sessions import SessionNotFoundError
@@ -110,15 +113,27 @@ class SessionMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint
     ) -> Response:
+        # --- BEGIN ADDED PATH SCOPING ---
+        if not request.url.path.startswith("/api/v1/"):
+            # Not an API path that needs session management, pass through directly
+            # logger.debug(f"Skipping session middleware for non-API path: {request.url.path}") # Optional debug log
+            response = await call_next(request)
+            return response
+        # --- END ADDED PATH SCOPING ---
+
         # Get candidate session ID from header
         candidate_session_id = request.headers.get("X-Session-ID")
 
         # If no session ID provided, generate a new one
         if not candidate_session_id:
             candidate_session_id = str(uuid.uuid4())
-            logger.info(f"Generated new session ID: {candidate_session_id}")
+            logger.info(
+                f"Generated new session ID: {candidate_session_id} for API path: {request.url.path}"
+            )
         else:
-            logger.info(f"Using existing session ID: {candidate_session_id}")
+            logger.info(
+                f"Using existing session ID: {candidate_session_id} for API path: {request.url.path}"
+            )
 
         # Store the session ID on the request state
         request.state.candidate_session_id = candidate_session_id
@@ -126,16 +141,26 @@ class SessionMiddleware(BaseHTTPMiddleware):
         # Call next middleware/route handler
         response = await call_next(request)
 
-        # Ensure session ID is in response headers
+        # Ensure session ID is in response headers (only if it's an API path, which it is if we reached here)
         actual_session_id = getattr(
             request.state, "actual_session_id", candidate_session_id
         )
         response.headers["X-Session-ID"] = actual_session_id
 
         # Explicitly set CORS headers for the session ID
-        response.headers["Access-Control-Expose-Headers"] = "X-Session-ID"
+        # This might be needed for any path that sets X-Session-ID, so keep it inside the API path logic.
+        current_exposed_headers = response.headers.get("Access-Control-Expose-Headers")
+        if current_exposed_headers:
+            if "X-Session-ID" not in current_exposed_headers.split(", "):
+                response.headers["Access-Control-Expose-Headers"] = (
+                    f"{current_exposed_headers}, X-Session-ID"
+                )
+        else:
+            response.headers["Access-Control-Expose-Headers"] = "X-Session-ID"
 
-        logger.info(f"Set session ID in response headers: {actual_session_id}")
+        logger.info(
+            f"Set session ID in response headers: {actual_session_id} for API path: {request.url.path}"
+        )
         return response
 
 

@@ -19,7 +19,7 @@ export const sendMessage = async (message: string): Promise<MessageResponse> => 
   try {
     const storedSessionId = localStorage.getItem('chatSessionId');
     
-    const response = await fetch(`${BASE_URL}/api/v1/root_agent`, {
+    const response = await fetch(`${BASE_URL}/api/v1/root_agent/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

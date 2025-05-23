@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "target": "esnext", // Changed from "ES6" to "esnext" (more modern)
     "skipLibCheck": true,
@@ -18,18 +22,42 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",  // Added baseUrl
+    "baseUrl": ".", // Added baseUrl
     "paths": {
-      "@/*": ["./src/*"], // Updated path to point to src
-      "@/components/*": ["./src/components/*"],  // Added specific component path
-      "@/hooks/*": ["./src/hooks/*"],          // Added specific hook path
-      "@/lib/*": ["./src/lib/*"],            // Added specific lib path
-      "@/styles/*": ["./src/styles/*"],        // Added specific styles path
-      "@/app/*": ["./src/app/*"],             // Added specific app path
-      "@/types/*": ["./src/types/*"],       // Added specific types path
-      "@/providers/*": ["./src/providers/*"]  // Added specific providers path
+      "@/*": [
+        "./src/*"
+      ], // Updated path to point to src
+      "@/components/*": [
+        "./src/components/*"
+      ], // Added specific component path
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ], // Added specific hook path
+      "@/lib/*": [
+        "./src/lib/*"
+      ], // Added specific lib path
+      "@/styles/*": [
+        "./src/styles/*"
+      ], // Added specific styles path
+      "@/app/*": [
+        "./src/app/*"
+      ], // Added specific app path
+      "@/types/*": [
+        "./src/types/*"
+      ], // Added specific types path
+      "@/providers/*": [
+        "./src/providers/*"
+      ] // Added specific providers path
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "out/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -16,7 +16,8 @@
 Application Entry Point Module
 
 This module initializes and configures the FastAPI application,
-sets up CORS middleware, and includes the necessary routers.
+sets up CORS middleware, includes the necessary routers,
+and serves the static frontend application.
 """
 
 import logging
@@ -24,11 +25,14 @@ import signal
 import sys
 from typing import NoReturn, Optional, Dict
 from contextlib import asynccontextmanager
+import os  # <-- Add os import
 
 import uvicorn
 from absl import app as absl_app, flags
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException  # <-- Add HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles  # <-- Add StaticFiles
+from fastapi.responses import FileResponse  # <-- Add FileResponse
 
 from google.adk.sessions import InMemorySessionService
 from config import get_settings
@@ -115,48 +119,117 @@ def create_app() -> FastAPI:
     # Add session middleware after CORS
     app.add_middleware(SessionMiddleware)
 
-    @app.get("/")
-    async def root() -> Dict[str, str]:
-        """Root endpoint that provides API information.
+    # --- API Routes ---
+    # Create API v1 router
+    api_v1_router = APIRouter(prefix="/api/v1")
 
-        Returns:
-            Dict[str, str]: Basic API information
-        """
+    # (Optional) Move old root API info to a dedicated API endpoint
+    @api_v1_router.get("/status", tags=["Server Info"])
+    async def api_status() -> Dict[str, str]:
+        """Provides API information."""
         return {
             "title": settings["api"]["title"],
             "description": settings["api"]["description"],
             "version": settings["api"]["version"],
             "status": "healthy",
-            "docs_url": "/docs",
-            "redoc_url": "/redoc",
-            "api_v1_url": "/api/v1",
         }
 
-    # Create API v1 router
-    api_v1_router = APIRouter(prefix="/api/v1")
-
-    # Register routers under API v1
+    # Register your API routers under API v1
     try:
         api_v1_router.include_router(root_agent_router)
+        # Add other API routers to api_v1_router if you have them
         app.include_router(api_v1_router)
-        logger.info("Successfully registered all routers")
+        logger.info("Successfully registered all API routers under /api/v1")
     except Exception as e:
-        logger.error(f"Failed to register routers: {str(e)}")
+        logger.error(f"Failed to register API routers: {str(e)}")
         raise
+
+    # --- Static Frontend Files Configuration ---
+    # app.py is in services/agent-orchestration/src
+    # static_frontend is in services/agent-orchestration/static_frontend
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    STATIC_FILES_DIR = os.path.join(BASE_DIR, "..", "static_frontend")
+
+    if not os.path.exists(STATIC_FILES_DIR):
+        logger.warning(
+            f"Frontend static files directory not found at: {STATIC_FILES_DIR}"
+        )
+        logger.warning("Frontend will not be served. Ensure 'static_frontend' exists.")
+    else:
+        logger.info(f"Serving frontend static files from: {STATIC_FILES_DIR}")
+
+        # Mount Next.js's internal static assets (e.g., /_next/static/...)
+        next_assets_path = os.path.join(STATIC_FILES_DIR, "_next")
+        if os.path.exists(next_assets_path):
+            app.mount(
+                "/_next",
+                StaticFiles(directory=next_assets_path),
+                name="next-static-assets",
+            )
+            logger.info(f"Mounted Next.js static assets from: {next_assets_path}")
+        else:
+            logger.warning(
+                f"Next.js '_next' assets directory not found at: {next_assets_path}. Critical frontend assets might be missing."
+            )
+
+        # Catch-all route to serve index.html for client-side routing,
+        # or other static files from the root of STATIC_FILES_DIR (e.g., favicon.ico)
+        # This MUST be defined AFTER API routes and specific static mounts like /_next.
+        @app.get("/{full_path:path}")
+        async def serve_frontend_app(full_path: str):
+            file_path = os.path.join(STATIC_FILES_DIR, full_path)
+
+            # If the requested path is a file, serve it directly
+            if os.path.isfile(file_path):
+                return FileResponse(file_path)
+
+            # If not a direct file, it's likely a client-side route. Serve index.html.
+            index_html_path = os.path.join(STATIC_FILES_DIR, "index.html")
+            if os.path.exists(index_html_path):
+                return FileResponse(index_html_path)
+
+            logger.warning(
+                f"Requested path '{full_path}' not found as a file, and index.html is missing from {STATIC_FILES_DIR}."
+            )
+            raise HTTPException(status_code=404, detail="Not Found")
+
+        # Ensure root path serves index.html if it exists
+        # The catch-all above handles this, but this can be an explicit check.
+        @app.get("/")
+        async def serve_root_index():
+            index_html_path = os.path.join(STATIC_FILES_DIR, "index.html")
+            if os.path.exists(index_html_path):
+                return FileResponse(index_html_path)
+            logger.warning(
+                f"index.html not found at root in {STATIC_FILES_DIR}. API status might be served if no frontend is present."
+            )
+            # Fallback if you want to show API status if index.html isn't found AT ALL.
+            # However, the goal is usually to serve the frontend or 404.
+            # The catch-all route above will typically handle this better with a 404 if index.html is missing.
+            # This explicit @app.get("/") here might become redundant or conflict depending on exact registration order
+            # with the catch-all. It's generally safer to rely on the catch-all for SPA behavior.
+            # For clarity, relying on the catch-all is better. I'll comment this explicit root out.
+            raise HTTPException(
+                status_code=404, detail="Frontend index.html not found."
+            )
 
     return app
 
 
-def run_server(app: FastAPI, host: str, port: int) -> None:
+def run_server(
+    app_instance: FastAPI, host: str, port: int
+) -> None:  # Renamed app to app_instance to avoid conflict
     """Run the uvicorn server.
 
     Args:
-        app: FastAPI application instance
+        app_instance: FastAPI application instance
         host: Server host
         port: Server port
     """
     try:
-        uvicorn.run(app, host=host, port=port, log_level=FLAGS.log_level.lower())
+        uvicorn.run(
+            app_instance, host=host, port=port, log_level=FLAGS.log_level.lower()
+        )
     except Exception as e:
         logger.error(f"Failed to start server: {str(e)}")
         raise
@@ -176,11 +249,16 @@ def main(argv) -> NoReturn:
     setup_logging(FLAGS.log_level)
 
     # Get settings
-    settings = get_settings()
+    settings = (
+        get_settings()
+    )  # settings is already fetched here, can be passed if needed
 
     # Create and run application
-    app = create_app()
-    run_server(app, host=settings["server"]["host"], port=settings["server"]["port"])
+    # Renamed 'app' variable to 'fastapi_app' in this scope to avoid confusion
+    fastapi_app = create_app()
+    run_server(
+        fastapi_app, host=settings["server"]["host"], port=settings["server"]["port"]
+    )
 
 
 # Create the FastAPI application instance for use by other modules
@@ -190,5 +268,7 @@ if __name__ == "__main__":
 else:
     # When imported as a module (e.g. by tests), ensure flags are parsed
     if not FLAGS.is_parsed():
-        FLAGS(sys.argv)
-    app = create_app()
+        FLAGS(sys.argv)  # Pass sys.argv for flag parsing
+    # Renamed 'app' variable to 'application' to avoid potential global/local scope issues
+    # or conflict if 'app' is expected to be a specific instance by importers.
+    application = create_app()

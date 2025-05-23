@@ -69,3 +69,6 @@ uv.lock
 
 # Local test
 src/test.py
+
+# Builds
+static_frontend/
