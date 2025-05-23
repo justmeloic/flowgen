@@ -53,7 +53,7 @@ export default function ChatPage() {
         setLoadingText((prevText) =>
           prevText === "Generating..." ? "Thinking..." : "Generating..."
         );
-      }, 1000); // Adjusted to match the intended "Thinking..." / "Generating..." toggle
+      }, 1000);
       return () => clearInterval(intervalId);
     }
   }, [isLoading]);
@@ -73,8 +73,6 @@ export default function ChatPage() {
 
       try {
         const response = await sendMessage(userMessage);
-
-        // Update references with the new references from the response
         setReferences(response.references || {});
 
         setChatHistory((prev) => {
@@ -115,11 +113,11 @@ export default function ChatPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatHistory, scrollToBottom]); // Also scroll when chatHistory updates
+  }, [chatHistory, scrollToBottom]);
 
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between">
         <ModelSelector />
         <Link href="/" className="flex h-8 w-8 items-center justify-center">
           <svg
@@ -139,8 +137,8 @@ export default function ChatPage() {
         </Link>
         <div className="w-[180px]" />
       </div>
+
       <div className="flex flex-1 overflow-hidden">
-        {/* Main Chat Area */}
         <main
           className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${
             Object.keys(references).length > 0 ? "mr-80" : ""
@@ -148,37 +146,30 @@ export default function ChatPage() {
         >
           <div
             ref={chatContainerRef}
-            className="flex-1 w-full max-w-[700px] mb-8 mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide"
+            className="flex-1 w-full max-w-[700px] mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide"
             style={{
               height: "calc(100vh - 10rem)",
               maxHeight: "calc(100vh - 10rem)",
-              scrollbarWidth: "none" /* Firefox */,
-              msOverflowStyle: "none" /* IE and Edge */,
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
               "&::-webkit-scrollbar": {
-                display: "none" /* Chrome, Safari and Opera */,
+                display: "none",
               },
             }}
           >
-            {isFirstPrompt && chatHistory.length === 0 ? ( // Ensure history is empty too
+            {isFirstPrompt && chatHistory.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
                 <h1 className="text-center text-4xl md:text-5xl font-bold">
-                  {" "}
-                  {/* Responsive text size */}
                   <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                    {" "}
-                    {/* Adjusted gradient */}
                     Hello!
                   </span>
                 </h1>
-                <h3 className="text-center text-sm md:text-sm font-bold w-[460px] ">
-                  {" "}
-                  {/* Responsive text size */}
+                <h3 className="text-center text-sm md:text-sm font-bold w-[460px]">
                   <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                    {" "}
-                    {/* Adjusted gradient */}I can help you with questions about
-                    your Collective Bargaining Agreement (CBA). To find the most
-                    accurate information, could you please tell me your role
-                    (like engineer or conductor) and your region or the specific
+                    I can help you with questions about your Collective
+                    Bargaining Agreement (CBA). To find the most accurate
+                    information, could you please tell me your role (like
+                    engineer or conductor) and your region or the specific
                     agreement you're referring to?
                   </span>
                 </h3>
@@ -192,15 +183,9 @@ export default function ChatPage() {
                       message.role === "user" ? "items-end" : "items-start"
                     } mb-4`}
                   >
-                    <div
-                      className={`flex items-start gap-2.5 max-w-[85%] md:max-w-[80%]`}
-                    >
-                      {" "}
-                      {/* Adjusted gap and max-width */}
+                    <div className="flex items-start gap-2.5 max-w-[85%] md:max-w-[80%]">
                       {message.role === "bot" && (
                         <Avatar className="w-8 h-8 shrink-0">
-                          {" "}
-                          {/* Added shrink-0 */}
                           <AvatarImage
                             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-avatar-icon-sp2bKzW5OCu4C1f64jSvrbY0bgCc8M.png"
                             alt="Bot Avatar"
@@ -209,14 +194,12 @@ export default function ChatPage() {
                       )}
                       <div
                         className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-3xl text-justify ${
-                          // Added text-justify class
                           message.role === "user"
                             ? "bg-blue-100 text-gray-800 rounded-tr-none dark:bg-blue-600"
                             : "bg-white text-gray-800 rounded-tl-none dark:bg-gray-700 dark:text-gray-200"
                         }`}
                       >
                         {message.role === "bot" ? (
-                          // The loading animation for bot messages needs careful handling
                           isLoading &&
                           message.content === loadingText &&
                           index === chatHistory.length - 1 ? (
@@ -236,14 +219,13 @@ export default function ChatPage() {
                             </div>
                           )
                         ) : (
-                          message.content // User messages as plain text
+                          message.content
                         )}
                       </div>
                     </div>
-                    {/* Message Actions: ensure it's only for the very last bot message and not a loading one */}
                     {message.role === "bot" &&
                       index === chatHistory.length - 1 &&
-                      !(isLoading && message.content === loadingText) && ( // Don't show actions for loading message
+                      !(isLoading && message.content === loadingText) && (
                         <div className="ml-10 mt-2">
                           <MessageActions message={message.content} />
                         </div>
@@ -253,14 +235,21 @@ export default function ChatPage() {
               </div>
             )}
           </div>
-          <div className="w-full max-w-[750px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-4 px-4  dark:border-gray-700">
+
+          {/* Top Gradient Overlay */}
+          <div className="pointer-events-none absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white dark:from-gray-800 to-transparent z-10" />
+
+          {/* Bottom Gradient Overlay */}
+          <div className="pointer-events-none absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-800 to-transparent z-10" />
+
+          <div className="w-full max-w-[750px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-2 px-4 dark:border-gray-700">
             <ChatInput onSend={handleSend} isLoading={isLoading} />
           </div>
         </main>
-        {/* References Panel */}
+
         <div
           data-references-panel
-          className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 min-h-[200px] max-h-[calc(100vh-11rem)] transition-transform duration-1700 ease-in-out ${
+          className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-1700 ease-in-out ${
             Object.keys(references).length > 0
               ? "translate-x-0"
               : "translate-x-full"

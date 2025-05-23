@@ -123,14 +123,14 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className={cn("relative w-full max-w-[70%] mx-auto", className)}
+      className={cn("relative w-full  max-w-[70%] mx-auto", className)}
       {...props}
     >
       <div
         className={cn(
-          "relative flex flex-col w-full h-28 rounded-3xl border bg-white transition-shadow duration-300 ease-in-out ",
+          "relative flex flex-col w-full h-28 rounded-3xl  border bg-white transition-shadow duration-300 ease-in-out ",
           isFocused
-            ? "shadow-[0_1px_6px_1px_rgba(32,33,36,0.12),0_3px_8px_2px_rgba(32,33,36,0.14),0_3px_12px_3px_rgba(32,33,36,0.2)]"
+            ? "shadow-[0_1px_6px_1px_rgba(32,33,36,0.12),0_1px_8px_2px_rgba(32,33,36,0.12),0_1px_12px_3px_rgba(32,33,36,0.2)]"
             : "shadow-none"
         )}
       >
@@ -195,7 +195,7 @@ export function ChatInput({
               <button
                 type="submit"
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                  "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
                   "bg-primary hover:bg-primary/90 focus:bg-primary/90 focus:outline-none"
                 )}
               >
