@@ -135,7 +135,7 @@ export default function ChatPage() {
             <path d="M3 10L12 3L21 10V20H14V14H10V20H3V10Z" />
           </svg>
         </Link>
-        <div className="w-[180px]" />
+        <div className="w-[110px]" />
       </div>
 
       <div className="flex flex-1 overflow-hidden">
@@ -158,7 +158,7 @@ export default function ChatPage() {
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-[400px] space-y-10">
+              <div className="flex flex-col items-center justify-center h-[600px] space-y-10">
                 <h1 className="text-center text-4xl md:text-5xl font-bold">
                   <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
                     Hello!
@@ -247,16 +247,18 @@ export default function ChatPage() {
           </div>
         </main>
 
-        <div
-          data-references-panel
-          className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-1700 ease-in-out ${
-            Object.keys(references).length > 0
-              ? "translate-x-0"
-              : "translate-x-full"
-          }`}
-        >
-          <ReferencesPanel references={references} />
-        </div>
+        {Object.keys(references).length > 0 && (
+          <div
+            data-references-panel
+            className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-1700 ease-in-out ${
+              Object.keys(references).length > 0
+                ? "translate-x-0"
+                : "translate-x-[120%]"
+            }`}
+          >
+            <ReferencesPanel references={references} />
+          </div>
+        )}
       </div>
       <Toaster />
     </div>
