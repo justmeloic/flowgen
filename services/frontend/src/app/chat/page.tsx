@@ -158,21 +158,26 @@ export default function ChatPage() {
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-[600px] space-y-10">
-                <h1 className="text-center text-4xl md:text-5xl font-bold">
-                  <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                    Hello!
-                  </span>
-                </h1>
-                <h3 className="text-center text-sm md:text-sm font-bold w-[460px]">
-                  <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                    I can help you with questions about your Collective
-                    Bargaining Agreement (CBA). To find the most accurate
-                    information, could you please tell me your role (like
-                    engineer or conductor) and your region or the specific
-                    agreement you're referring to?
-                  </span>
-                </h3>
+              <div className="relative -mt-32">
+                <div className="flex flex-col items-center justify-center h-[500px] space-y-10">
+                  <h1 className="text-center text-4xl md:text-5xl font-bold">
+                    <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
+                      Hello!
+                    </span>
+                  </h1>
+                  <h3 className="text-center text-sm md:text-sm font-bold w-[460px]">
+                    <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
+                      I can help you with questions about your Collective
+                      Bargaining Agreement (CBA). To find the most accurate
+                      information, could you please tell me your role (like
+                      engineer or conductor) and your region or the specific
+                      agreement you're referring to?
+                    </span>
+                  </h3>
+                </div>
+                <div className="absolute bottom-8 left-0 right-0 w-full max-w-[750px] mx-auto">
+                  <ChatInput onSend={handleSend} isLoading={isLoading} />
+                </div>
               </div>
             ) : (
               <div className="w-full">
@@ -237,13 +242,26 @@ export default function ChatPage() {
           </div>
 
           {/* Top Gradient Overlay */}
-          <div className="pointer-events-none absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white dark:from-gray-800 to-transparent z-10" />
+          {(!isFirstPrompt || chatHistory.length > 0) && (
+            <div className="pointer-events-none absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white dark:from-gray-800 to-transparent z-10" />
+          )}
 
           {/* Bottom Gradient Overlay */}
-          <div className="pointer-events-none absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-800 to-transparent z-10" />
+          {(!isFirstPrompt || chatHistory.length > 0) && (
+            <div className="pointer-events-none absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-800 to-transparent z-10" />
+          )}
 
-          <div className="w-full max-w-[750px] mx-auto sticky bottom-0 bg-white dark:bg-gray-800 py-2 px-4 dark:border-gray-700">
-            <ChatInput onSend={handleSend} isLoading={isLoading} />
+          {/* Move the ChatInput outside the conditional render and add transition */}
+          <div
+            className={`w-full max-w-[750px] mx-auto sticky transition-all duration-700 ease-in-out ${
+              isFirstPrompt && chatHistory.length === 0
+                ? "opacity-0"
+                : "opacity-100 bottom-0 bg-white dark:bg-gray-800 py-2 px-4 dark:border-gray-700"
+            }`}
+          >
+            {!isFirstPrompt && (
+              <ChatInput onSend={handleSend} isLoading={isLoading} />
+            )}
           </div>
         </main>
 
