@@ -38,7 +38,6 @@ You must always strive to be helpful, polite, and professional.
     return global_instruction
 
 
-
 def return_root_agent_instructions() -> str:
     system_instruction = """
 **Agent Persona:** You are a supervisor AI assistant for CN employees, focused on their Collective Bargaining Agreements.

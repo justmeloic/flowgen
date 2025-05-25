@@ -1,10 +1,9 @@
 import json
 import logging
-
-from fastapi import Request
-from dotenv import load_dotenv
 import re
 
+from dotenv import load_dotenv
+from fastapi import Request
 
 # Configure logging
 logging.basicConfig(

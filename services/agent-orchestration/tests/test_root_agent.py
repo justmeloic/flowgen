@@ -1,11 +1,12 @@
-import pytest
-from fastapi.testclient import TestClient
-from httpx import AsyncClient, ASGITransport
+import asyncio
 import sys
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import pytest
+from fastapi.testclient import TestClient
 from google.genai import types
-import asyncio
+from httpx import ASGITransport, AsyncClient
 
 # Add the src directory to the Python path
 src_path = Path(__file__).parent.parent / "src"

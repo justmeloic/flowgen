@@ -1,14 +1,11 @@
-from google.cloud import discoveryengine_v1beta as discoveryengine
-from dotenv import load_dotenv
 import os
-from typing import Dict, List, Optional, Any
 import traceback
+from typing import Any, Dict, Optional
 
-from typing import Optional
-from google.adk.tools.tool_context import ToolContext
+from dotenv import load_dotenv
 from google.adk.tools.base_tool import BaseTool
-from typing import Dict, Any
-
+from google.adk.tools.tool_context import ToolContext
+from google.cloud import discoveryengine_v1beta as discoveryengine
 
 
 def store_tool_result_callback(
@@ -21,16 +18,17 @@ def store_tool_result_callback(
     try:
         if tool.name == "search_cba_datastore":
             tool_context.state["search_cba_datastore_tool_raw_output"] = tool_response
-            print(f"[store_tool_result_callback] Stored response for tool search_cba_datastore")
+            print(
+                "[store_tool_result_callback] Stored response for tool search_cba_datastore"
+            )
         return None
     except Exception as e:
         print(f"ERROR in store_tool_result_callback: {str(e)}")
         print(traceback.format_exc())
         return None
 
-def search_cba_datastore(
-    query: str
-) -> Dict[str, Any]:
+
+def search_cba_datastore(query: str) -> Dict[str, Any]:
     """Search CN's Collective Bargaining Agreements (CBAs) using Vertex AI Search.
 
     This function searches through CBA documents using Google Cloud's Vertex AI Search
@@ -61,9 +59,9 @@ def search_cba_datastore(
 
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "")
     location = "global"
-    data_store_id = os.getenv("DATA_STORE_ID", "cn-cba_1747357876332")  
+    data_store_id = os.getenv("DATA_STORE_ID", "cn-cba_1747357876332")
     summary_result_count = os.getenv("SUMMARY_RESULT_COUNT", 5)
-    
+
     client = discoveryengine.SearchServiceClient()
 
     # Serving config format
@@ -77,7 +75,9 @@ def search_cba_datastore(
     # Content search spec for summary and citations
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
         summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
-            summary_result_count=int(summary_result_count),  # Number of results to use for the summary
+            summary_result_count=int(
+                summary_result_count
+            ),  # Number of results to use for the summary
             include_citations=True,
             # You can customize the prompt if needed
             # model_prompt_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelPromptSpec(
@@ -101,17 +101,13 @@ def search_cba_datastore(
         # Ensure that user pseudo ID is set for analytics and billing.
         # This can be any unique identifier for the end user.
         # NOTE: This might be something we can use to associate a user with their user profile.
-        user_pseudo_id="YOUR_UNIQUE_USER_ID", # Replace with a unique user identifier
+        user_pseudo_id="YOUR_UNIQUE_USER_ID",  # Replace with a unique user identifier
     )
 
     try:
         response = client.search(request)
-        
-        result = {
-            "query": query,
-            "summary": None,
-            "documents": []
-        }
+
+        result = {"query": query, "summary": None, "documents": []}
 
         if response.summary and response.summary.summary_text:
             result["summary"] = response.summary.summary_text
@@ -123,69 +119,25 @@ def search_cba_datastore(
                     "id": doc.id,
                     "name": doc.name,
                     "title": doc.derived_struct_data.get("title", "N/A"),
-                    "link": doc.derived_struct_data.get("link", "N/A")
+                    "link": doc.derived_struct_data.get("link", "N/A"),
                 }
                 result["documents"].append(document_info)
 
         return result
 
     except Exception as e:
-        return {
-            "query": query,
-            "error": str(e),
-            "summary": None,
-            "documents": []
-        }
+        return {"query": query, "error": str(e), "summary": None, "documents": []}
+
 
 if __name__ == "__main__":
     # --- CONFIGURATION ---
-    USER_QUERY = "What are the main topics in these documents?" # Replace with your query
-
-    result = search_cba_datastore(
-        query=USER_QUERY
+    USER_QUERY = (
+        "What are the main topics in these documents?"  # Replace with your query
     )
+
+    result = search_cba_datastore(query=USER_QUERY)
 
     # Pretty print the result
     import json
+
     print(json.dumps(result, indent=2))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-

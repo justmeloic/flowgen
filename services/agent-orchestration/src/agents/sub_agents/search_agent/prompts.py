@@ -19,7 +19,6 @@ These instructions guide the agent's behavior, workflow, and tool usage.
 """
 
 
-
 def return_search_agent_instructions() -> str:
     system_instruction = """
 **Agent Persona:** You are a specialized AI assistant for CN employees, focused on their Collective Bargaining Agreements.

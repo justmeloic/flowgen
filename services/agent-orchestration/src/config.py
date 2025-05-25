@@ -1,9 +1,10 @@
 """Configuration module for the application."""
 
-from absl import flags
-from typing import Dict, Any
-from dotenv import load_dotenv
 import os
+from typing import Any, Dict
+
+from absl import flags
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()

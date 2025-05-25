@@ -18,12 +18,12 @@ Root Agent Module
 This module defines the root agent that coordinates CBA-related queries.
 """
 
-from datetime import date
-from dotenv import load_dotenv
 import os
+from datetime import date
 
-from google.adk.tools.agent_tool import AgentTool
+from dotenv import load_dotenv
 from google.adk.agents import Agent
+
 from .prompts import return_global_instructions, return_root_agent_instructions
 from .sub_agents import search_agent
 

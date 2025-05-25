@@ -2,9 +2,9 @@
 import logging
 import time
 import uuid
-from typing import Dict, Any
+from typing import Any, Dict
 
-from fastapi import Request, HTTPException
+from fastapi import HTTPException, Request
 from google.adk.events import Event, EventActions
 from google.adk.runners import Runner
 from google.adk.sessions import Session
@@ -12,9 +12,9 @@ from google.genai import (
     types as genai_types,
 )  # Renamed to avoid conflict with 'types' module
 
-from routers.datamodels import Query, AgentConfig
-from utils.formatters import format_text_response
 from agents.agent import root_agent  # Your existing agent
+from routers.datamodels import AgentConfig, Query
+from utils.formatters import format_text_response
 
 logger = logging.getLogger(__name__)
 

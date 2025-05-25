@@ -1,18 +1,17 @@
 """
 Pytest configuration file for the test suite.
 """
-import pytest
 import os
 import sys
 from unittest.mock import patch
-from fastapi.testclient import TestClient
-from httpx import AsyncClient
-import asyncio
+
+import pytest
 from fastapi import FastAPI
-from absl import flags
+from fastapi.testclient import TestClient
 
 # Import flags from config
 from config import FLAGS
+
 
 def pytest_configure(config):
     """Configure custom markers for the test suite."""

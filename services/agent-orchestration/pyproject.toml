@@ -9,11 +9,12 @@ dependencies = [
     "fastapi>=0.104.0",
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",  # Required for test coverage
-    "httpx>=0.24.1",  # Required for FastAPI TestClient
-    "absl-py>=2.1.0",  # Required for flags and app management
-    "uvicorn>=0.27.0",  # Required for running the server
-    "python-dotenv>=1.0.0",  # Required for environment variables
+    "pytest-cov>=4.1.0",      # Required for test coverage
+    "httpx>=0.24.1",          # Required for FastAPI TestClient
+    "absl-py>=2.1.0",         # Required for flags and app management
+    "uvicorn>=0.27.0",        # Required for running the server
+    "python-dotenv>=1.0.0",   # Required for environment variables
+    "ruff>=0.11.11",
 ]
 
 [tool.pytest.ini_options]
@@ -27,12 +28,7 @@ asyncio_default_fixture_loop_scope = "function"
 [tool.coverage.run]
 source = ["src"]
 branch = true
-omit = [
-    "src/__init__.py",
-    "src/config.py",
-    "tests/*",
-    "**/__init__.py",
-]
+omit = ["src/__init__.py", "src/config.py", "tests/*", "**/__init__.py"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -52,3 +48,18 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.ruff]
+select = ["E", "F", "I"]
+exclude = [".git", "__pycache__", "build", "dist", ".venv", "uv.lock"]
+target-version = "py313"
+fix = true
+
+[tool.ruff.lint]
+
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "single"
+skip-magic-trailing-comma = false
+indent-style = "space"
