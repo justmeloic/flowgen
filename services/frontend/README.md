@@ -1,4 +1,4 @@
-# Frontend Client
+# Frontend Client Service
 
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
 ![React](https://img.shields.io/badge/react-18.0.0+-blue.svg)
@@ -14,15 +14,28 @@ Web interface for the CBA Agentic system. Built with Next.js for optimal perform
 - npm or yarn
 - Google Cloud CLI
 
-
 ### Installation
 
 ```bash
 npm install
 ```
+
 ### or
+
 ```bash
 yarn install
+```
+
+### Configuration
+
+Configure environment variables:
+
+```bash
+# Copy the example environment file
+cp src/.env.local.example src/.env.local
+
+# Open the .env.local file and update the following variables:
+# - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 (or where ever backend service is hosted)
 ```
 
 ### Running Development Server
@@ -30,7 +43,9 @@ yarn install
 ```bash
 npm run dev
 ```
+
 ### or
+
 ```bash
 yarn dev
 ```
@@ -47,7 +62,7 @@ npm run start
 ## Project Structure
 
 ```
-front-end/
+frontend/
 ├── components/    # Reusable React components
 ├── pages/         # Next.js pages and API routes
 ├── public/        # Static assets

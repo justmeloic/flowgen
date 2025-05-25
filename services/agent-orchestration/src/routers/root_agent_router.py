@@ -20,15 +20,14 @@ It manages session state purely through ADK's SessionService and handles agent
 interactions through FastAPI endpoints.
 """
 
-from typing import Dict, Any, Annotated, Optional
+from typing import Dict, Any, Annotated
 import os
-import json
 import logging
 import uuid
 from datetime import datetime, UTC
 from pydantic import BaseModel, Field, field_validator
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, Depends, Request, Response, FastAPI
+from fastapi import APIRouter, HTTPException, Depends, Request, Response
 from utils.formatters import format_text_response
 
 # Removed Header from fastapi imports as it's not directly used as a dependency type

@@ -25,14 +25,14 @@ import signal
 import sys
 from typing import NoReturn, Optional, Dict
 from contextlib import asynccontextmanager
-import os  # <-- Add os import
+import os
 
 import uvicorn
 from absl import app as absl_app, flags
-from fastapi import FastAPI, APIRouter, HTTPException  # <-- Add HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles  # <-- Add StaticFiles
-from fastapi.responses import FileResponse  # <-- Add FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from google.adk.sessions import InMemorySessionService
 from config import get_settings
