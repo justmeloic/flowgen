@@ -36,7 +36,8 @@ from fastapi.responses import FileResponse
 
 from google.adk.sessions import InMemorySessionService
 from config import get_settings
-from routers.root_agent_router import router as root_agent_router, SessionMiddleware
+from routers.root_agent_router import router as root_agent_router
+from middleware.session_middleware import SessionMiddleware
 
 # Configure logging
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
