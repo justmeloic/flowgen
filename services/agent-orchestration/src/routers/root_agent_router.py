@@ -148,6 +148,9 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
         # Explicitly set CORS headers for the session ID
         # This might be needed for any path that sets X-Session-ID, so keep it inside the API path logic.
+        # NOTE: Crucially, we will add X-Session-ID to the Access-Control-Expose-Headers header.
+        # This allows the frontend JavaScript to actually read the X-Session-ID header
+        # from the response. Without this, the browser would hide it for security reasons.
         current_exposed_headers = response.headers.get("Access-Control-Expose-Headers")
         if current_exposed_headers:
             if "X-Session-ID" not in current_exposed_headers.split(", "):
