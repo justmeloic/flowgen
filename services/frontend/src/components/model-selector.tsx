@@ -20,15 +20,15 @@ import {
 
 const models = [
   {
-    value: "gemini-2.0-flash",
+    value: "gemini-2.5-flash",
     label: "Gemini",
-    description: "2.0 Flash",
+    description: "2.5 Flash",
   },
 ];
 
 export function ModelSelector() {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("gemini-2.0-flash");
+  const [value, setValue] = React.useState("gemini-2.5-flash");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

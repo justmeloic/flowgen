@@ -1,7 +1,7 @@
 "use client";
 
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "../styles/globals.css";
 import type React from "react";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/ui/sidebar";
