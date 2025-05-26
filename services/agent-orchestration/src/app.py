@@ -25,6 +25,7 @@ import os
 import signal
 import sys
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Dict, NoReturn, Optional
 
 import uvicorn
@@ -99,22 +100,22 @@ def signal_handler(signum: int, frame: Optional[object]) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Handle application startup and shutdown events."""
     # Startup
     logger.info('Starting up application...')
-    # Create and store session service in app state
-    app.state.session_service = InMemorySessionService()
+    app.state.session_service = InMemorySessionService()  # Initialize immediately
     yield
     # Cleanup
     logger.info('Shutting down application...')
-    if hasattr(app.state, 'session_service'):
-        try:
-            await app.state.session_service.cleanup()
-        except Exception as e:
-            logger.error(f'Error cleaning up session service: {e}')
+    # Remove or make conditional the cleanup call if the method doesn't exist:
+    # if hasattr(app.state, 'session_service') and hasattr(app.state.session_service, 'cleanup'):
+    #     try:
+    #         await app.state.session_service.cleanup() # Only call if it exists
+    #     except Exception as e:
+    #         logger.error(f'Error cleaning up session service: {e}')
+    # OR, if no cleanup is needed at all for InMemorySessionService, just remove the block.
+    # For now, let's assume no specific cleanup method is available for this ADK version.
 
-    # Runner doesn't have cleanup, so we'll just remove it
-    if hasattr(app.state, 'runner'):
+    if hasattr(app.state, 'runner'):  # Runner cleanup (already as you have it)
         try:
             delattr(app.state, 'runner')
         except Exception as e:
@@ -179,7 +180,7 @@ def create_app() -> FastAPI:
     # app.py is in services/agent-orchestration/src
     # static_frontend is in services/agent-orchestration/static_frontend
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    STATIC_FILES_DIR = os.path.join(BASE_DIR, '..', 'static_frontend')
+    STATIC_FILES_DIR = os.path.join(Path(__file__).parent.parent, 'static_frontend')
 
     if not os.path.exists(STATIC_FILES_DIR):
         logger.warning(
@@ -226,23 +227,16 @@ def create_app() -> FastAPI:
 
         # Ensure root path serves index.html if it exists
         # The catch-all above handles this, but this can be an explicit check.
-        @app.get('/')
-        async def serve_root_index():
-            index_html_path = os.path.join(STATIC_FILES_DIR, 'index.html')
-            if os.path.exists(index_html_path):
-                return FileResponse(index_html_path)
-            logger.warning(
-                f'index.html not found at root in {STATIC_FILES_DIR}. API status might be served if no frontend is present.'
-            )
-            # Fallback if you want to show API status if index.html isn't found AT ALL.
-            # However, the goal is usually to serve the frontend or 404.
-            # The catch-all route above will typically handle this better with a 404 if index.html is missing.
-            # This explicit @app.get("/") here might become redundant or conflict depending on exact registration order
-            # with the catch-all. It's generally safer to rely on the catch-all for SPA behavior.
-            # For clarity, relying on the catch-all is better. I'll comment this explicit root out.
-            raise HTTPException(
-                status_code=404, detail='Frontend index.html not found.'
-            )
+        @app.get('/', response_class=FileResponse)
+        async def serve_frontend_root():
+            """Serve the frontend's index.html from the root path."""
+            index_path = os.path.join(STATIC_FILES_DIR, 'index.html')
+            if not os.path.exists(index_path):
+                raise HTTPException(
+                    status_code=404,
+                    detail='Frontend index.html not found'
+                )
+            return FileResponse(index_path)
 
     return app
 

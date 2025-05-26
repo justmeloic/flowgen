@@ -66,7 +66,7 @@ gcloud auth application-default login
 
 ```bash
 # Copy the example environment file
-cp src/.env.example src/.env
+cp .env.example .env
 
 # Open the .env file and update the following variables:
 # - GOOGLE_CLOUD_PROJECT: Your GCP project ID
