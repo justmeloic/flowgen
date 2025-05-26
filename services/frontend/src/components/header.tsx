@@ -20,17 +20,14 @@ export function Header() {
       <div className="container flex h-20 items-center px-0 ">
         <div className="flex items-center gap-2 pl-4 ml-4">
           <Image
-            src="https://upload.wikimedia.org/wikipedia/commons/1/11/CN_Railway_logo.svg"
+            src="/CN_Railway_logo.svg"
             alt="Gen AI Logo"
             width={48}
             height={48}
           />
-
         </div>
 
-        <div className="ml-auto mr-5 ">
-
-        </div>
+        <div className="ml-auto mr-5 "></div>
       </div>
     </header>
   );

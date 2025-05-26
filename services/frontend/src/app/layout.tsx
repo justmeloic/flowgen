@@ -20,11 +20,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <title>CBA Assistant</title>
-        <link
-          rel="icon"
-          href="https://upload.wikimedia.org/wikipedia/commons/1/11/CN_Railway_logo.svg"
-          type="image/svg+xml"
-        />
+        <link rel="icon" href="/CN_Railway_logo.svg" type="image/svg+xml" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <div className="relative flex min-h-screen flex-col">
