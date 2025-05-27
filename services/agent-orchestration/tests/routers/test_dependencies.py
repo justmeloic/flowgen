@@ -7,8 +7,8 @@ from google.adk.sessions import InMemorySessionService
 from google.adk.sessions import Session as ADKSession
 
 from src.agents.agent import root_agent  # Your actual agent
-from src.routers.datamodels import AgentConfig
-from src.routers.dependencies import (
+from src.routers.root_agent.datamodels import AgentConfig
+from src.routers.root_agent.dependencies import (
     get_agent_config,
     get_or_create_session,
     get_runner,
@@ -39,7 +39,7 @@ def mock_response_obj() -> MagicMock:
 
 def test_get_agent_config_caching():
     """Test that get_agent_config caches results as expected."""
-    with patch('src.routers.dependencies.get_settings') as mock_get_settings:
+    with patch('src.routers.root_agent.dependencies.get_settings') as mock_get_settings:
         mock_settings = {
             'app_name': 'cached_app',
             'user_id': 'cached_user',
@@ -192,7 +192,7 @@ def test_get_runner_creates_new_if_not_exists(
     mock_session_service = MagicMock(spec=InMemorySessionService)
     mock_request_obj.app.state.session_service = mock_session_service
 
-    with patch('src.routers.dependencies.Runner') as MockRunnerClass:
+    with patch('src.routers.root_agent.dependencies.Runner') as MockRunnerClass:
         mock_runner = MagicMock(spec=Runner)
         MockRunnerClass.return_value = mock_runner
 
@@ -216,7 +216,7 @@ def test_get_runner_returns_existing(
     mock_request_obj.app.state.runner = existing_runner_instance
     mock_request_obj.app.state.session_service = MagicMock(spec=InMemorySessionService)
 
-    with patch('src.routers.dependencies.Runner') as MockRunnerClass:
+    with patch('src.routers.root_agent.dependencies.Runner') as MockRunnerClass:
         runner = get_runner(mock_request_obj, test_agent_config)
         MockRunnerClass.assert_not_called()  # Should not create a new one
         assert runner is existing_runner_instance
@@ -230,7 +230,8 @@ def test_get_runner_raises_http_exception_on_creation_failure(
     mock_request_obj.app.state.session_service = MagicMock(spec=InMemorySessionService)
 
     with patch(
-        'src.routers.dependencies.Runner', side_effect=Exception('Creation failed')
+        'src.routers.root_agent.dependencies.Runner',
+        side_effect=Exception('Creation failed'),
     ) as MockRunnerClass:
         with pytest.raises(HTTPException) as exc_info:
             get_runner(mock_request_obj, test_agent_config)

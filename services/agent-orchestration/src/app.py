@@ -38,9 +38,10 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from google.adk.sessions import InMemorySessionService
 
-from config import get_settings
+from config.api import get_settings
 from middleware.session_middleware import SessionMiddleware
-from routers.root_agent_router import router as root_agent_router
+from routers.root_agent.router import router as root_agent_router
+
 
 # Configure logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -233,8 +234,7 @@ def create_app() -> FastAPI:
             index_path = os.path.join(STATIC_FILES_DIR, 'index.html')
             if not os.path.exists(index_path):
                 raise HTTPException(
-                    status_code=404,
-                    detail='Frontend index.html not found'
+                    status_code=404, detail='Frontend index.html not found'
                 )
             return FileResponse(index_path)
 

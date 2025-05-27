@@ -27,21 +27,20 @@ from fastapi import APIRouter, Depends, Request
 from google.adk.runners import Runner  # For type hinting
 from google.adk.sessions import Session  # For type hinting
 
-from routers.agent_handler import process_agent_query
-
-# Modular imports
-from routers.datamodels import AgentConfig, Query
-from routers.dependencies import get_agent_config, get_or_create_session, get_runner
+# Internal modules
+from .agent_handler import process_agent_query
+from .datamodels import AgentConfig, Query
+from .dependencies import get_agent_config, get_or_create_session, get_runner
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/root_agent",
-    tags=["root_agent"],
+    prefix='/root_agent',
+    tags=['root_agent'],
 )
 
 
-@router.post("/", response_model=Dict[str, Any])
+@router.post('/', response_model=Dict[str, Any])
 async def agent_endpoint(
     request: Request,
     query: Query,  # Validated request body
@@ -53,7 +52,7 @@ async def agent_endpoint(
     Endpoint to process user queries via the root agent.
     Delegates core logic to the agent_handler.
     """
-    logger.info(f"Received query for root_agent: {query.text[:50]}...")
+    logger.info(f'Received query for root_agent: {query.text[:50]}...')
     return await process_agent_query(
         request=request,
         query=query,

@@ -10,10 +10,10 @@ from google.adk.sessions import InMemorySessionService
 from google.adk.sessions import Session as ADKSession
 
 # Assuming root_agent is importable for author field (or use a mock string)
-from src.routers.agent_handler import process_agent_query
+from src.routers.root_agent.agent_handler import process_agent_query
 
 # Corrected import for models
-from src.routers.datamodels import AgentConfig, Query
+from src.routers.root_agent.datamodels import AgentConfig, Query
 
 
 @pytest.fixture

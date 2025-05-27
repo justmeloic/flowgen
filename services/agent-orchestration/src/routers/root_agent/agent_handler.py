@@ -12,9 +12,12 @@ from google.genai import (
     types as genai_types,
 )  # Renamed to avoid conflict with 'types' module
 
-from agents.agent import root_agent  # Your existing agent
-from routers.datamodels import AgentConfig, Query
+# External package modules
+from agents.agent import root_agent
 from utils.formatters import format_text_response
+
+# Internal modules
+from .datamodels import AgentConfig, Query
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +36,7 @@ async def process_agent_query(
         )  # Get session service from app state
 
         user_content = genai_types.Content(
-            role="user", parts=[genai_types.Part(text=query.text)]
+            role='user', parts=[genai_types.Part(text=query.text)]
         )
         user_event = Event(
             author=root_agent.name,
@@ -41,21 +44,21 @@ async def process_agent_query(
             timestamp=time.time(),
             actions=EventActions(
                 state_delta={
-                    "last_query": query.text,
-                    "last_query_ts": time.time(),
-                    "query_count": session.state.get("query_count", 0) + 1,
+                    'last_query': query.text,
+                    'last_query_ts': time.time(),
+                    'query_count': session.state.get('query_count', 0) + 1,
                 }
             ),
             invocation_id=str(uuid.uuid4()),
         )
         await session_service.append_event(session, user_event)
 
-        final_response_text = "Agent did not produce a final response."
+        final_response_text = 'Agent did not produce a final response.'
         references_json = {}
 
         if not session:  # Should be guaranteed by get_or_create_session dependency
             raise HTTPException(
-                status_code=500, detail="Failed to load or create session (handler)"
+                status_code=500, detail='Failed to load or create session (handler)'
             )
 
         logger.info(
@@ -77,8 +80,8 @@ async def process_agent_query(
                     )
 
                     state_changes = {
-                        "last_response": final_response_text,
-                        "last_interaction_ts": time.time(),
+                        'last_response': final_response_text,
+                        'last_interaction_ts': time.time(),
                         # Query count already updated with user_event, or update here if preferred
                     }
                     state_update_event = Event(
@@ -92,14 +95,14 @@ async def process_agent_query(
         logger.info(
             f"Successfully processed agent query for session '{request.state.actual_session_id}'. Response: '{final_response_text[:100]}...'"
         )
-        return {"response": final_response_text, "references": references_json}
+        return {'response': final_response_text, 'references': references_json}
 
     except Exception as e:
         logger.exception(
-            f"Error processing agent query for session {getattr(request.state, 'actual_session_id', 'UNKNOWN')}: {str(e)}"
+            f'Error processing agent query for session {getattr(request.state, "actual_session_id", "UNKNOWN")}: {str(e)}'
         )
         # Consider specific error types for more granular HTTPExceptions
         raise HTTPException(
             status_code=500,
-            detail={"message": "Error processing agent query", "error": str(e)},
+            detail={'message': 'Error processing agent query', 'error': str(e)},
         )

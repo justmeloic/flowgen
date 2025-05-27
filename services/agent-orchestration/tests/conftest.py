@@ -23,7 +23,7 @@ from src.agents.agent import root_agent  # Your actual agent instance
 from src.app import create_app  # Your application factory
 
 # Corrected import based on your project structure
-from src.routers.datamodels import AgentConfig
+from src.routers.root_agent.datamodels import AgentConfig
 
 # --- Global Test Configuration & Fixtures ---
 
