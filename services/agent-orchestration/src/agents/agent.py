@@ -33,12 +33,12 @@ load_dotenv()
 date_today = date.today()
 
 root_agent = Agent(
-    name="root_agent",
-    model=os.getenv("GEMINI_MODEL", "gemini-2.0-flash"),
+    name='root_agent',
+    model=os.getenv('GEMINI_MODEL', 'gemini-2.0-flash'),
     description="Supervisor agent that orchestrates CN's CBA query processing system. Coordinates with the search agent to provide comprehensive answers about collective bargaining agreements, railway policies, and labor regulations. Manages user interactions, delegates search tasks, and synthesizes information into coherent responses.",
     instruction=return_global_instructions(),
     global_instruction=return_root_agent_instructions(),
     sub_agents=[search_agent],
-    output_key="last_agent_response",
+    output_key='last_agent_response',
     # tools=[AgentTool(agent=search_agent)]
 )

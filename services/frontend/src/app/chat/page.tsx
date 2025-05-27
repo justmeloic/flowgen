@@ -146,7 +146,7 @@ export default function ChatPage() {
         >
           <div
             ref={chatContainerRef}
-            className="flex-1 w-full max-w-[700px] mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide"
+            className="flex-1 w-full max-w-[800px] mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide"
             style={{
               height: "calc(100vh - 10rem)",
               maxHeight: "calc(100vh - 10rem)",
@@ -175,7 +175,7 @@ export default function ChatPage() {
                     </span>
                   </h3>
                 </div>
-                <div className="absolute bottom-8 left-0 right-0 w-full max-w-[750px] mx-auto">
+                <div className="absolute bottom-8 left-0 right-0 w-full max-w-[850px] mx-auto">
                   <ChatInput onSend={handleSend} isLoading={isLoading} />
                 </div>
               </div>
@@ -253,7 +253,7 @@ export default function ChatPage() {
 
           {/* Move the ChatInput outside the conditional render and add transition */}
           <div
-            className={`w-full max-w-[750px] mx-auto sticky transition-all duration-700 ease-in-out ${
+            className={`w-full max-w-[850px] mx-auto sticky transition-all duration-700 ease-in-out ${
               isFirstPrompt && chatHistory.length === 0
                 ? "opacity-0"
                 : "opacity-100 bottom-0 bg-white dark:bg-gray-800 py-2 px-4 dark:border-gray-700"
