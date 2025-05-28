@@ -58,6 +58,7 @@ The backend service that coordinates AI agents for:
 
 | Component                   | Type             | Description                                                                                 |
 | --------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| Vertext AI Search           | GCP              | Semantic search for RAG                                                                     |
 | GCS Bucket                  | GCP              | Storage for raw CBA files, temporary processing data, and backup storage                    |
 | Cloud Logging               | GCP              | Monitors application performance and tracks data processing operations                      |
 | Cloud Run                   | GCP              | Hosts containerized services for web interfaces and APIs                                    |
