@@ -29,9 +29,7 @@ WORKDIR /app
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PORT=8080
-
-# ... (the variables from Dockerfile) ...
+ENV PORT=8080 
 ENV GOOGLE_GENAI_USE_VERTEXAI="TRUE"
 ENV GEMINI_MODEL="gemini-2.5-flash-preview-05-20"
 ENV GOOGLE_CLOUD_PROJECT="technical-assets-loicmuhirwa"
@@ -40,26 +38,34 @@ ENV DATA_STORE_ID="cn-cba_1747357876332"
 ENV SUMMARY_RESULT_COUNT="5"
 ENV FRONTEND_URL="http://localhost:3000"
 
-# Install uv (Python package manager)
-RUN pip install --no-cache-dir "uv>=0.2.0" # Ensures uv 0.2.8 or newer is installed
+# --- Python Dependency Installation using pip ---
 
-# Copy files needed for agent-orchestration package build AND dependency sync
-# Make sure to copy the agent-orchestration's README.md to the root of /app
-COPY services/agent-orchestration/pyproject.toml \
-    services/agent-orchestration/uv.lock* \
-    services/agent-orchestration/README.md \
-    ./
-
-# Install Python dependencies using uv
-# Use the correct --frozen flag and keep the fallback
-RUN uv sync --no-dev --frozen || uv sync --no-dev
-
-# Copy the backend application code (source from agent-orchestration service)
+# Copy necessary files for installing dependencies and the local package
+# 1. pyproject.toml (needed for 'pip install .')
+# 2. README.md (if your pyproject.toml references it for the package build)
+# 3. The newly generated requirements.txt
+# 4. The source code of your application
+COPY services/agent-orchestration/pyproject.toml ./pyproject.toml
+COPY services/agent-orchestration/README.md ./README.md
+COPY services/agent-orchestration/requirements.txt ./requirements.txt
 COPY services/agent-orchestration/src/ ./src/
+
+# Upgrade pip and install dependencies from requirements.txt
+# These will be installed into the system Python's site-packages for this image
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r ./requirements.txt
+
+# Install the local 'agent-orchestration' package itself (from /app)
+# This will use the pyproject.toml and src/ directory already copied.
+RUN pip install --no-cache-dir .
+
+# --- End Python Dependency Installation ---
 
 # Copy the built static frontend assets from the frontend-builder stage
 COPY --from=frontend-builder /app/frontend/out/ ./static_frontend/
 
-EXPOSE 8080
-CMD ["/app/.venv/bin/python", "-m", "uvicorn", "src.app:application", "--host", "0.0.0.0"]
+EXPOSE 8080 
 
+# CMD to run the application.
+# Use 'python' directly, as packages are installed in the image's main Python environment.
+CMD ["sh", "-c", "exec python -m uvicorn src.app:application --host 0.0.0.0 --port \"$PORT\""]

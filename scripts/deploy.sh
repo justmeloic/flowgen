@@ -111,16 +111,28 @@ echo "✅ Image built and pushed to Artifact Registry: $IMAGE_NAME"
 
 # Deploy the image to Cloud Run.
 echo "🚀 Deploying to Cloud Run..."
-# Make sure the Cloud Run service agent has permissions to pull from Artifact Registry if needed (usually default)
-# Also ensure the runtime service account for Cloud Run has permissions for any GCP services it accesses (e.g., Secret Manager for GEMINI_API_KEY)
 gcloud run deploy "$SERVICE_NAME" \
         --image "$IMAGE_NAME" \
         --platform managed \
         --region "$REGION" \
-        --allow-unauthenticated \
+        --no-allow-unauthenticated \
         --set-secrets=GEMINI_API_KEY="$SECRET_NAME":latest \
         --project "$PROJECT_ID" \
-        --quiet # Add quiet for less interactive output if preferred
+        --quiet
 
 echo "✅ Deployment complete for service $SERVICE_NAME!"
-echo "🔗 Access your service at the URL provided above (if successful)."
+
+
+# Granting permission to access the service for specific user you needs "user:" prefix, for specific group you need "group:" prefix etc...
+
+gcloud run services add-iam-policy-binding "$SERVICE_NAME" \
+    --member="user:loic.muhirwa@gmail.com" \
+    --role="roles/run.invoker" \
+    --region="$REGION" \
+    --project="$PROJECT_ID"
+
+gcloud run services add-iam-policy-binding cn-cba-agent \
+    --member="domain:loicmuhirwa.altostrat.com" \
+    --role="roles/run.invoker" \
+    --region="us-central1" \
+    --project="technical-assets-loicmuhirwa"
