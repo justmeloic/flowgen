@@ -65,7 +65,6 @@ instance/
 
 # Dependencies
 node_modules/
-uv.lock
 
 # Local test
 src/test.py

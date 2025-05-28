@@ -13,8 +13,8 @@ from google.genai import (
 )  # Renamed to avoid conflict with 'types' module
 
 # External package modules
-from agents.agent import root_agent
-from utils.formatters import format_text_response
+from src.agents.agent import root_agent
+from src.utils.formatters import format_text_response
 
 # Internal modules
 from .datamodels import AgentConfig, Query

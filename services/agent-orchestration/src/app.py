@@ -38,9 +38,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from google.adk.sessions import InMemorySessionService
 
-from config.api import get_settings
-from middleware.session_middleware import SessionMiddleware
-from routers.root_agent.router import router as root_agent_router
+from src.config.api import get_settings
+from src.middleware.session_middleware import SessionMiddleware
+from src.routers.root_agent.router import router as root_agent_router
 
 
 # Configure logging
@@ -130,8 +130,8 @@ def create_app() -> FastAPI:
         FastAPI: Configured FastAPI application instance
     """
     # Ensure flags are parsed before accessing them
-    if not FLAGS.is_parsed():
-        FLAGS(sys.argv)
+    # if not FLAGS.is_parsed():
+    #    FLAGS(sys.argv)
 
     # Configure environment before creating the app
     configure_gcp_environment()

@@ -14,7 +14,7 @@ FLAGS = flags.FLAGS
 
 # Server configuration
 flags.DEFINE_string('host', '0.0.0.0', 'Server host')
-flags.DEFINE_integer('port', 8000, 'Server port')
+flags.DEFINE_integer('port', 8080, 'Server port')
 flags.DEFINE_string(
     'frontend_url',
     os.getenv('FRONTEND_URL', 'http://localhost:3000'),

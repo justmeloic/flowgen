@@ -9,12 +9,13 @@ dependencies = [
     "fastapi>=0.104.0",
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",      # Required for test coverage
-    "httpx>=0.24.1",          # Required for FastAPI TestClient
-    "absl-py>=2.1.0",         # Required for flags and app management
-    "uvicorn>=0.27.0",        # Required for running the server
-    "python-dotenv>=1.0.0",   # Required for environment variables
+    "pytest-cov>=4.1.0",
+    "httpx>=0.24.1",                # Required for FastAPI TestClient
+    "absl-py>=2.1.0",
+    "uvicorn[standard]>=0.27.0",
+    "python-dotenv>=1.0.0",
     "ruff>=0.11.11",
+    "google-cloud-discoveryengine", # <<< --- ADD THIS LINE
 ]
 
 [tool.pytest.ini_options]

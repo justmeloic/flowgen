@@ -9,8 +9,8 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService, Session
 
 # External package modules
-from agents.agent import root_agent
-from config.api import get_settings
+from src.agents.agent import root_agent
+from src.config.api import get_settings
 
 # Internal modules
 from .datamodels import AgentConfig
