@@ -39,7 +39,7 @@ flags.DEFINE_string('api_version', '1.0.0', 'API version')
 # Model configuration
 flags.DEFINE_string(
     'gemini_model',
-    os.getenv('GEMINI_MODEL', 'gemini-2.0-flash'),
+    os.getenv('GEMINI_MODEL', 'gemini-2.5-flash-preview-05-20'),
     'Gemini model version',
 )
 

@@ -1,0 +1,26 @@
+.DS_Store
+*.pyc
+__pycache__/
+*.log
+
+# Node.js
+services/frontend/node_modules/
+services/frontend/.next/ # If your build output is in 'out', .next might not be needed in context
+services/frontend/npm-debug.log*
+services/frontend/yarn-debug.log*
+services/frontend/yarn-error.log*
+
+# Python
+services/agent-orchestration/.venv/
+services/agent-orchestration/.pytest_cache/
+services/agent-orchestration/.ruff_cache/
+services/agent-orchestration/.coverage
+services/agent-orchestration/logs/ # If logs are generated locally and not needed in image
+
+# IDE/Editor specific
+.vscode/
+.idea/
+
+# Other
+.git/
+*.env
