@@ -52,11 +52,13 @@ yarn dev
 
 The application will be available at `http://localhost:3000`
 
-## Building for Production
+## Local Static Build for Testing
 
 ```bash
-npm run build
-npm run start
+npm run build-local# This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend agent-orchestration/static_frontend
+
+cd ../agent-orchestration/src/
+uv run app.py # Services backend with agent-orchestration/static_frontend mounted
 ```
 
 ## Project Structure
