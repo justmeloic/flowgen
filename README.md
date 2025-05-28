@@ -1,4 +1,12 @@
-# CBA Agent
+<div align="center">
+  <img src="services/frontend/public/CN_Railway_logo.svg">
+
+  <br>
+</div>
+
+---
+
+# Collective Bargaining Agreement & Grievance Agent
 
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
