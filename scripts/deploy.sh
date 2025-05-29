@@ -36,12 +36,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Assuming the script is in a 'scripts' subdirectory, the project root is one level up.
 PROJECT_ROOT_DIR="$SCRIPT_DIR/.."
 
-# Define paths to key directories, relative to the project root.
-# These might not be strictly needed if Dockerfile handles paths correctly from root.
-# FRONTEND_DIR="$PROJECT_ROOT_DIR/services/frontend"
-# BACKEND_DIR="$PROJECT_ROOT_DIR/services/agent-orchestration"
-# STATIC_OUTPUT_DIR="$BACKEND_DIR/static_frontend"
-
 # Get the Google Cloud project ID from gcloud configuration.
 PROJECT_ID=$(gcloud config get-value project)
 if [ -z "$PROJECT_ID" ]; then
@@ -87,18 +81,9 @@ echo "🏗️  Ensuring Artifact Registry repository exists..."
         echo "Repository $REPO_NAME already exists in $REGION."
     fi
 
-# The gcloud auth configure-docker step is generally not needed when Cloud Build
-# pushes to Artifact Registry in the same project, as Cloud Build's service account
-# will have the necessary permissions by default. You might need it if you were
-# running 'docker push' manually.
-# echo "🔑 Configuring Docker authentication for Artifact Registry..."
-# gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet --project="$PROJECT_ID"
-
 # Build the Docker image using Google Cloud Build and push it to Artifact Registry.
 echo "🏗️  Building Docker image with Google Cloud Build..."
-# The build context is PROJECT_ROOT_DIR (where Dockerfile is located)
-# The Dockerfile itself will be found automatically if it's named "Dockerfile"
-# in the root of the build context.
+
 (cd "$PROJECT_ROOT_DIR" && gcloud builds submit . \
     --tag "$IMAGE_NAME" \
     --project "$PROJECT_ID" \
