@@ -41,13 +41,27 @@ The backend service that coordinates AI agents for:
 
 ```
 .
-└── services/
-    ├── agent-orchestration/      # Backend service for AI agent orchestration
-    │   ├── pyproject.toml       # Python project dependencies
-    │   ├── src/                 # Source code for agent orchestration
-    │   └── uv.lock              # Dependency lock file
-    │
-    └── front-end/              # Next.js web application
+├── docs
+├── scripts
+│   └── deploy.sh
+└── services
+    ├── agent-orchestration
+    │   ├── pyproject.toml
+    │   ├── src
+    │   ├── static_frontend
+    │   ├── tests
+    │   └── uv.lock
+    └── frontend
+        ├── components.json
+        ├── next-env.d.ts
+        ├── next.config.mjs
+        ├── package-lock.json
+        ├── package.json
+        ├── postcss.config.mjs
+        ├── public
+        ├── src
+        ├── tailwind.config.js
+        └── tsconfig.json
 ```
 
 ## Architecture
