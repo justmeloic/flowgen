@@ -15,7 +15,7 @@ dependencies = [
     "uvicorn[standard]>=0.27.0",
     "python-dotenv>=1.0.0",
     "ruff>=0.11.11",
-    "google-cloud-discoveryengine", # <<< --- ADD THIS LINE
+    "google-cloud-discoveryengine",
 ]
 
 [tool.pytest.ini_options]
