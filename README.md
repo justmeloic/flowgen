@@ -83,12 +83,14 @@ This guide will help you set up your development environment for both frontend a
 ### Backend Development (FastAPI)
 
 1. **Clone the Repository:**
+
    ```bash
    git clone https://github.com/justmeloic/flowgen.git
    cd flowgen
    ```
 
 2. **Set Up Python Environment:**
+
    ```bash
    cd services/mermaid
    python -m venv venv
@@ -97,10 +99,13 @@ This guide will help you set up your development environment for both frontend a
    ```
 
 3. **Configure Environment Variables:**
+
    ```bash
    cp .env.example .env
    ```
+
    Edit `.env` with your settings:
+
    ```properties
    GEMINI_API_KEY=your_api_key_here
    REDIS_HOST=localhost  # Optional
@@ -117,11 +122,13 @@ This guide will help you set up your development environment for both frontend a
 ### Frontend Development (Next.js)
 
 1. **Navigate to Frontend Directory:**
+
    ```bash
    cd services/webui
    ```
 
 2. **Install Dependencies:**
+
    ```bash
    npm install
    # or
@@ -145,10 +152,13 @@ This guide will help you set up your development environment for both frontend a
 ### Using the Development Build Script
 
 For convenience, you can use the build script in development mode:
+
 ```bash
 ./build-deploy.sh --local
 ```
+
 This will:
+
 - Build the frontend
 - Copy static files to the backend
 - Start the FastAPI server
@@ -156,12 +166,14 @@ This will:
 ### Testing
 
 Run backend tests:
+
 ```bash
 cd services/mermaid
 pytest
 ```
 
 Run frontend tests:
+
 ```bash
 cd services/webui
 npm test
@@ -182,22 +194,28 @@ FlowGen follows a distributed monolith architecture pattern, where the applicati
 FlowGen provides three deployment methods using the `build-deploy.sh` script:
 
 1. **Local Development** (`--local`)
+
    ```bash
    ./build-deploy.sh --local
    ```
+
    # or
+
    ```bash
    ./build-deploy.sh  # default option
    ```
+
    - Builds Next.js frontend into static files
    - Copies built files to FastAPI's static directory
    - Starts FastAPI server in development mode
    - Best for local development and testing
 
 2. **Docker Compose** (`--docker`)
+
    ```bash
    ./build-deploy.sh --docker
    ```
+
    - Builds and runs the application using Docker Compose
    - Creates isolated environment with all dependencies
    - Suitable for development and testing in containerized environment
@@ -214,6 +232,7 @@ FlowGen provides three deployment methods using the `build-deploy.sh` script:
 ### Cloud Run Deployment Prerequisites
 
 1. Create a `.env` file in the root directory with the following configuration:
+
    ```properties
    PROJECT_ID=your-project-id
    REGION=your-region
@@ -225,10 +244,13 @@ FlowGen provides three deployment methods using the `build-deploy.sh` script:
    ```
 
 2. Set up service account permissions by running:
+
    ```bash
    ./service-account-permissions.sh
    ```
+
    This script grants necessary permissions for:
+
    - Artifact Registry access
    - Cloud Run deployment
    - Service account usage
@@ -243,11 +265,13 @@ FlowGen provides three deployment methods using the `build-deploy.sh` script:
 The build process follows these steps:
 
 1. **Frontend Build**
+
    - Compiles Next.js application
    - Optimizes assets
    - Generates static files
 
 2. **Integration**
+
    - Copies static files to FastAPI's static directory
    - Configures serving paths
 
@@ -270,3 +294,16 @@ This project is licensed under the [Apache License 2.0](https://opensource.org/l
 **[Loïc Muhirwa](https://github.com/justmeloic/)**
 
 ---
+
+```mermaid
+graph LR
+    A[GCS File Upload] --> B(Document Processing Cloud Function);
+    B --> C{OCR & Information Extraction};
+    C --> D[Database Upload];
+    B --> E[Logging System];
+    C --> F{Inconsistent Data Flagging};
+    F --> G[Query Mechanism for Inconsistent Data];
+    G --> H(GoA Users);
+    C --> I[Review Tool];
+    I --> J(Staff);
+```
