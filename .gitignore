@@ -14,7 +14,7 @@ docs/_build/  # If you build Sphinx documentation
 *.log
 
 # Environment files
-.env
+.envcle
 !.env.example #Keep example, if it exists
 
 # IDE/Editor specific
@@ -118,3 +118,6 @@ venv.bak/
 
 # mypy type checker
 .mypy_cache/
+
+# stuff
+logs/

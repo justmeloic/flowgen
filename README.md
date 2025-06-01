@@ -154,7 +154,7 @@ This guide will help you set up your development environment for both frontend a
 For convenience, you can use the build script in development mode:
 
 ```bash
-./build-deploy.sh --local
+source deploy.sh --local
 ```
 
 This will:
@@ -196,13 +196,14 @@ FlowGen provides three deployment methods using the `build-deploy.sh` script:
 1. **Local Development** (`--local`)
 
    ```bash
-   ./build-deploy.sh --local
+   source deploy.sh --local
    ```
 
    # or
 
    ```bash
-   ./build-deploy.sh  # default option
+   cd scripts
+   source deploy.sh  # default option
    ```
 
    - Builds Next.js frontend into static files
@@ -213,7 +214,8 @@ FlowGen provides three deployment methods using the `build-deploy.sh` script:
 2. **Docker Compose** (`--docker`)
 
    ```bash
-   ./build-deploy.sh --docker
+   cd scripts
+   source deploy.sh --docker
    ```
 
    - Builds and runs the application using Docker Compose
@@ -223,7 +225,8 @@ FlowGen provides three deployment methods using the `build-deploy.sh` script:
 
 3. **Cloud Run Deployment** (`--cloud`)
    ```bash
-   ./build-deploy.sh --cloud
+   cd scripts
+   source deploy.sh --cloud
    ```
    - Builds and deploys to Google Cloud Run
    - Requires proper GCP setup and permissions

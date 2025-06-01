@@ -28,6 +28,14 @@ WEBUI_DIR="$PROJECT_ROOT/services/webui"        # Next.js frontend
 MERMAID_DIR="$PROJECT_ROOT/services/mermaid"    # FastAPI backend
 STATIC_OUTPUT_DIR="$MERMAID_DIR/static"         # Where the built Next.js files go
 
+# Load environment variables from .env file if it exists
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    echo "📄 Loading environment variables from .env file..."
+    source "$PROJECT_ROOT/.env"
+else
+    echo "⚠️  No .env file found at $PROJECT_ROOT/.env"
+fi
+
 # Get the Google Cloud project ID from gcloud configuration.  This assumes gcloud
 # is already configured.
 PROJECT_ID=$(gcloud config get-value project)
@@ -36,7 +44,7 @@ PROJECT_ID=$(gcloud config get-value project)
 REGION="us-central1"
 SERVICE_NAME="flowgen"  # The name of the Cloud Run service
 REPO_NAME="flowgen"    # The name of the Artifact Registry repository
-IMAGE_NAME="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/app"  # Full image name
+IMAGE_NAME="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/app"  # Full image nameclear
 SECRET_NAME="gemini-api-key"
 
 
@@ -71,6 +79,10 @@ function build_local() {
 
     echo "🚀 Starting FastAPI server..."
     cd "$MERMAID_DIR"
+    
+    # Set PYTHONPATH to include the 'src' directory
+    export PYTHONPATH=$(pwd)/src:$PYTHONPATH
+    
     if [ ! -f "src/main.py" ]; then  # Basic check for FastAPI entry point
         echo "❌ Error: main.py not found at $MERMAID_DIR/src/main.py"
         exit 1
