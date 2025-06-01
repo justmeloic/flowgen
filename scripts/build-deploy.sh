@@ -4,26 +4,29 @@
 # backend (which handles Mermaid diagram generation).  It supports local development,
 # Docker Compose based deployment, and deployment to Google Cloud Run.
 
+# Create logs directory if it doesn't exist
+mkdir -p ../logs # Assuming script is in ./scripts, logs go to ./logs
+LOG_FILE="../logs/deploy_$(date +%Y%m%d_%H%M%S).log"
+# Redirect all output to both console and log file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+echo "📝 Logging deployment to $LOG_FILE"
+
 # --- Setup and Configuration ---
 
 # Exit immediately if any command fails.
 set -e
 
-# Load environment variables from a .env file (if it exists).  `set -a` makes
-# subsequently defined variables automatically exported to the environment. `set +a`
-# turns this off again.  This is a good way to manage secrets and configuration
-# that shouldn't be hardcoded in the script.
-set -a
-source .env
-set +a
-
 # Determine the script's directory. This allows the script to be run from anywhere.
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Define paths to key directories, relative to the script's location.
-WEBUI_DIR="$SCRIPT_DIR/services/webui"        # Next.js frontend
-MERMAID_DIR="$SCRIPT_DIR/services/mermaid"    # FastAPI backend
-STATIC_OUTPUT_DIR="$MERMAID_DIR/static"        # Where the built Next.js files go
+# Determine the project root directory relative to the script's location
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+
+# Define paths to key directories, relative to the project root
+WEBUI_DIR="$PROJECT_ROOT/services/webui"        # Next.js frontend
+MERMAID_DIR="$PROJECT_ROOT/services/mermaid"    # FastAPI backend
+STATIC_OUTPUT_DIR="$MERMAID_DIR/static"         # Where the built Next.js files go
 
 # Get the Google Cloud project ID from gcloud configuration.  This assumes gcloud
 # is already configured.
