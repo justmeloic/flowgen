@@ -57,6 +57,7 @@ def before_model_callback(
         search_cba_datastore_tool_raw_output = callback_context.state.get(
             'search_cba_datastore_tool_raw_output'
         )
+        callback_context.state['search_cba_datastore_tool_raw_output'] = None
         documents = search_cba_datastore_tool_raw_output.get('documents', [])
         summary = search_cba_datastore_tool_raw_output.get('summary', '')
 

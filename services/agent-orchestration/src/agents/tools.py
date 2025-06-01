@@ -1,11 +1,14 @@
 import os
 import traceback
+import logging
 from typing import Any, Dict, Optional
 
 from dotenv import load_dotenv
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.cloud import discoveryengine_v1beta as discoveryengine
+
+logger = logging.getLogger(__name__)
 
 
 def store_tool_result_callback(
@@ -18,13 +21,13 @@ def store_tool_result_callback(
     try:
         if tool.name == 'search_cba_datastore':
             tool_context.state['search_cba_datastore_tool_raw_output'] = tool_response
-            print(
+            logger.info(
                 '[store_tool_result_callback] Stored response for tool search_cba_datastore'
             )
         return None
     except Exception as e:
-        print(f'ERROR in store_tool_result_callback: {str(e)}')
-        print(traceback.format_exc())
+        logger.error(f'Error in store_tool_result_callback: {str(e)}')
+        logger.error(traceback.format_exc())
         return None
 
 
@@ -87,10 +90,6 @@ def search_cba_datastore(query: str) -> Dict[str, Any]:
         snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
             return_snippet=True
         ),
-        # Optional: if you want extractive answers in addition to summary
-        # extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
-        #    max_extractive_answer_count=3
-        # )
     )
 
     request = discoveryengine.SearchRequest(
