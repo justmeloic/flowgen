@@ -73,7 +73,14 @@ export default function ChatPage() {
 
       try {
         const response = await sendMessage(userMessage);
-        setReferences(response.references || {});
+        // Only update references if the new response has references
+        if (
+          response.references &&
+          Object.keys(response.references).length > 0
+        ) {
+          setReferences(response.references);
+        }
+        // Otherwise keep the previous references
 
         setChatHistory((prev) => {
           const newHistory = [...prev];
