@@ -54,8 +54,6 @@ venv.bak/
 # macOS
 .DS_Store
 
-# Specific to your project
-uv.lock 
 
 # Test converage
 .coverage

@@ -294,16 +294,3 @@ This project is licensed under the [Apache License 2.0](https://opensource.org/l
 **[Loïc Muhirwa](https://github.com/justmeloic/)**
 
 ---
-
-```mermaid
-graph LR
-    A[GCS File Upload] --> B(Document Processing Cloud Function);
-    B --> C{OCR & Information Extraction};
-    C --> D[Database Upload];
-    B --> E[Logging System];
-    C --> F{Inconsistent Data Flagging};
-    F --> G[Query Mechanism for Inconsistent Data];
-    G --> H(GoA Users);
-    C --> I[Review Tool];
-    I --> J(Staff);
-```
