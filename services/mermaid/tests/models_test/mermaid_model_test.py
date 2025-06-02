@@ -1,5 +1,5 @@
 import pytest
-from src.models.mermaid_model import create_gemini_prompt
+from src.models.model import create_gemini_prompt
 
 
 def test_create_gemini_prompt():

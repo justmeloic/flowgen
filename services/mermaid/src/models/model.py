@@ -13,11 +13,14 @@ Mermaid code generation.
 """
 
 import os
+import logging
 import google.generativeai as genai
 from dotenv import load_dotenv
 from src.models.system_instructions import SYSTEM_INSTRUCTIONS
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 def create_gemini_prompt(message: str, engine: str = "mermaid") -> str:
@@ -41,13 +44,13 @@ def create_gemini_prompt(message: str, engine: str = "mermaid") -> str:
     return base_prompt
 
 
-def get_model(api_key, model_name="gemini-2.0-flash", safety_settings=None):
+def get_model(model_name="gemini-2.5-flash-preview-05-20", safety_settings=None):
     """
     Configures the Generative AI API and returns a GenerativeModel instance.
 
     Args:
         api_key: Your Google Cloud Generative AI API key.
-        model_name: The name of the model to use (default: "gemini-2.0-flash").
+        model_name: The name of the model to use (default: "gemini-2.5-flash-preview-05-20").
         safety_settings: A list of SafetySetting objects to configure content filtering.
 
     Returns:
@@ -57,10 +60,16 @@ def get_model(api_key, model_name="gemini-2.0-flash", safety_settings=None):
         ValueError: if the API Key is not valid.
         RuntimeError: if the model configuration fails.
     """
-    if not api_key:
-        raise ValueError("API key is required.")
+
     try:
-        genai.configure(api_key=api_key)
+        _GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+        logger.debug("Environment variables loaded successfully.")
+    except KeyError as e:
+        logger.error("Environment variables (GEMINI_API_KEY) must be set.")
+        raise ValueError("Environment variables (GEMINI_API_KEY) must be set.") from e
+
+    try:
+        genai.configure(api_key=_GEMINI_API_KEY)
         model = genai.GenerativeModel(model_name)
         return model
     except Exception as e:
