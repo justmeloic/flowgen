@@ -36,7 +36,7 @@ RUN uv pip install --system --upgrade --no-cache -r requirements.txt
 COPY services/mermaid/src ./src
 
 # Copy built frontend from builder stage
-COPY --from=frontend-builder /app/out ./src/static
+COPY --from=frontend-builder /app/out ./static
 
 # --- Runtime Environment Variables (for Cloud Run) ---
 # Define them here as ENV, but their *values* will come from Cloud Run.

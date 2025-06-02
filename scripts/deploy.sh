@@ -91,48 +91,53 @@ function build_local() {
     uv run src/main.py  # Start the FastAPI server using `uv`
 }
 
-# `build_cloud`: Builds a Docker image and deploys it to Google Cloud Run.
+# `build_cloud`: Builds a Docker image using Cloud Build and deploys it to Google Cloud Run.
 function build_cloud() {
     echo "☁️  Deploying to Cloud Run..."
 
-    # Create the Artifact Registry repository if it doesn't already exist.
+    # Ensure required Google Cloud APIs are enabled
+    echo "🛠️  Ensuring required APIs are enabled..."
+    gcloud services enable cloudbuild.googleapis.com --project="$PROJECT_ID"
+    gcloud services enable artifactregistry.googleapis.com --project="$PROJECT_ID"
+    gcloud services enable run.googleapis.com --project="$PROJECT_ID"
+    gcloud services enable secretmanager.googleapis.com --project="$PROJECT_ID"
+
+    # Create the Artifact Registry repository if it doesn't already exist
     echo "🏗️  Ensuring Artifact Registry repository exists..."
-    if ! gcloud artifacts repositories describe $REPO_NAME --location=$REGION >/dev/null 2>&1; then
-        echo "Creating repository $REPO_NAME..."
-        gcloud artifacts repositories create $REPO_NAME \
+    if ! gcloud artifacts repositories describe "$REPO_NAME" --location="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
+        echo "Creating repository $REPO_NAME in $REGION..."
+        gcloud artifacts repositories create "$REPO_NAME" \
             --repository-format=docker \
-            --location=$REGION \
-            --description="Container repository for $SERVICE_NAME"
+            --location="$REGION" \
+            --description="Container repository for $SERVICE_NAME" \
+            --project="$PROJECT_ID"
+    else
+        echo "Repository $REPO_NAME already exists in $REGION."
     fi
 
-    # Configure Docker to authenticate with Artifact Registry.  This allows
-    # `docker push` to work.  The `--quiet` flag suppresses unnecessary output.
-    gcloud auth configure-docker $REGION-docker.pkg.dev --quiet
-
-    # Build and push the Docker image.  `docker buildx build` is used for
-    # multi-platform builds (though here we're only targeting linux/amd64).
-    # The `--push` flag automatically pushes the image after building.  The
-    # `|| { ... }` part handles errors: if `docker buildx build` fails, the
-    # commands inside the curly braces will execute.
-    echo "🏗️  Building Docker image..."
-    docker buildx build --platform linux/amd64 \
-        -t $IMAGE_NAME \
-        -f Dockerfile \
-        . --push || {
-            echo "❌ Failed to build or push image. Make sure you have necessary permissions."
+    # Build and push the Docker image using Cloud Build
+    echo "🏗️  Building Docker image with Google Cloud Build..."
+    (cd "$PROJECT_ROOT" && gcloud builds submit . \
+        --tag "$IMAGE_NAME" \
+        --project "$PROJECT_ID" \
+        --region="$REGION" \
+        --timeout=20m) || {
+            echo "❌ Failed to build image with Google Cloud Build."
             exit 1
         }
+    echo "✅ Image built and pushed to Artifact Registry: $IMAGE_NAME"
 
-    # Deploy the image to Cloud Run.
+    # Deploy the image to Cloud Run
     echo "🚀 Deploying to Cloud Run..."
-    gcloud run deploy $SERVICE_NAME \
-        --image $IMAGE_NAME \
+    gcloud run deploy "$SERVICE_NAME" \
+        --image "$IMAGE_NAME" \
         --platform managed \
-        --region $REGION \
+        --region "$REGION" \
         --allow-unauthenticated \
-        --set-secrets=GEMINI_API_KEY=$SECRET_NAME:latest
+        --set-secrets=GEMINI_API_KEY="$SECRET_NAME":latest \
+        --project "$PROJECT_ID"
 
-    echo "✅ Deployment complete!"
+    echo "✅ Deployment complete for service $SERVICE_NAME!"
 }
 
 # --- Main Script Logic (Command-line Argument Handling) ---

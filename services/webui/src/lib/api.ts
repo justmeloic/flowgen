@@ -10,6 +10,9 @@ interface MermaidResponse {
   conversation_id: string
 }
 
+// Use environment variable with fallback
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+
 export const sendMermaidQuery = async (
   message: string,
   engine: string,
@@ -29,7 +32,7 @@ export const sendMermaidQuery = async (
     })
   }
 
-  const response = await fetch('http://0.0.0.0:8080/api/v1/mermaid', {
+  const response = await fetch(`${BASE_URL}/api/v1/mermaid`, {
     method: 'POST',
     body: formData,
   })

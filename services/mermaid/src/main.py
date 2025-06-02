@@ -37,7 +37,9 @@ def create_app() -> FastAPI:
             load_dotenv()
             logger.info("Loaded environment variables from .env file.")
         except FileNotFoundError:
-            logger.warning("'.env' file not found. Using default environment variables.")
+            logger.warning(
+                "'.env' file not found. Using default environment variables."
+            )
 
     api_key = os.environ.get("API_KEY", "default_api_key")
     database_url = os.environ.get("DATABASE_URL", "default_db_url")
@@ -66,8 +68,15 @@ def create_app() -> FastAPI:
     app.include_router(landing_router.router, prefix="/api/v1")
 
     # --- Static Files ---
-    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+    static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
     logger.info(f"Static files directory: {static_dir}")
+
+    # Add error handling for static files
+    if not os.path.exists(static_dir):
+        logger.error(f"Static directory not found at: {static_dir}")
+        os.makedirs(static_dir, exist_ok=True)
+        logger.info(f"Created static directory at: {static_dir}")
+
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
     logger.info("FastAPI application configured successfully.")
