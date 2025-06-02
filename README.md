@@ -7,7 +7,14 @@
 [![GitHub issues](https://img.shields.io/github/issues/justmeloic/flowgen)](https://github.com/justmeloic/flowgen/issues)
 [![GitHub stars](https://img.shields.io/github/stars/justmeloic/flowgen)](https://github.com/justmeloic/flowgen/stargazers)
 
-FlowGen uses generative AI to create solution architecture diagrams from natural language input and existing documentation. It generates Mermaid diagrams to visualize these architectures. Furthermore, FlowGen can leverage these diagrams to produce Infrastructure-as-Code (IaC) in the form of Terraform scripts, suitable for deployment on Google Cloud Platform.
+FlowGen uses generative AI to create solution architecture diagrams from natural language input and existing documentation. It generates Mermaid diagrams to visualize these architectures. In future releases, FlowGen will leverage these diagrams to produce Infrastructure-as-Code (IaC) in the form of Terraform scripts, suitable for deployment on Google Cloud Platform.
+
+## Services
+
+Each service has its own README with specific setup instructions. Please refer to:
+
+- [Frontend Setup](services/webui/README.md)
+- [Backend Setup](services/mermaid/README.md)
 
 ## 🌟 Key Features
 
@@ -16,13 +23,13 @@ FlowGen uses generative AI to create solution architecture diagrams from natural
 - **Intelligent File Processing:** Upload existing documentation files (e.g., text, Markdown) and let FlowGen analyze and diagram them.
 - **Real-Time Diagram Preview:** See your diagrams update instantly as you refine your descriptions.
 - **Versatile Export Options:** Download generated diagrams in various formats to fit your documentation needs.
-- **Distributed Monolith Architecture:** Experience a robust and efficient system, optimized for both performance and maintainability.
+- **Modular Monolith Architecture:** Experience a robust and efficient system, optimized for both performance and maintainability.
 - **User Friendly Interface**: easy to use and designed for all kind of user.
 - **Engine selection**: choose the diagram engine that you want to use.
 
 ## 🏗️ System Architecture
 
-FlowGen is built using a **distributed monolith** architecture, which offers the benefits of both monolithic and microservices architectures. This means the application is structured as a single deployable unit, but internally, it's composed of distinct, loosely coupled services that communicate with each other.
+FlowGen is built using a **modular monolith** architecture, which offers the benefits of both monolithic and microservices architectures. This means the application is structured as a single deployable unit, but internally, it's composed of distinct, loosely coupled services that communicate with each other.
 
 **Components:**
 
@@ -39,7 +46,8 @@ FlowGen is built using a **distributed monolith** architecture, which offers the
 4.  **Static File Server:**
     - Serves the static files for the web UI.
     - Integrated within the FastAPI application.
-5.  **Mermaid library:** \* Used to render the mermaid diagram in the front end.
+5.  **Mermaid library:** _Used to render the mermaid diagram in the front end._
+
     **Benefits:**
 
 - **Simplicity:** Easier to develop, deploy, and manage compared to a complex microservices architecture.
@@ -53,7 +61,7 @@ FlowGen leverages a modern and powerful technology stack to provide a seamless u
 
 **Frontend (Web UI - `services/webui`)**
 
-- **Next.js 14:** A React framework for building performant web applications.
+- **Next.js:** A React framework for building performant web applications.
 - **TypeScript:** Adds static typing to JavaScript for improved code quality and maintainability.
 - **Tailwind CSS:** A utility-first CSS framework for rapid UI development.
 - **Shadcn/ui:** A collection of reusable, accessible UI components.
@@ -62,7 +70,7 @@ FlowGen leverages a modern and powerful technology stack to provide a seamless u
 
 **Backend (Mermaid Service - `services/mermaid`)**
 
-- **Python 3.13+:** A versatile programming language for building robust server-side applications.
+- **Python 3.13+:**
 - **FastAPI:** A modern, high-performance web framework for building APIs with Python.
 - **Google Generative AI (Gemini):** A state-of-the-art AI model for natural language understanding and code generation.
 - **Uvicorn:** An ASGI server used to run the FastAPI application.
@@ -93,9 +101,7 @@ This guide will help you set up your development environment for both frontend a
 
    ```bash
    cd services/mermaid
-   python -m venv venv
-   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-   pip install -r requirements.txt
+   uv sync
    ```
 
 3. **Configure Environment Variables:**
@@ -115,7 +121,7 @@ This guide will help you set up your development environment for both frontend a
 
 4. **Start Backend Server:**
    ```bash
-   uvicorn src.main:app --reload --port 8080
+   uv run -m src.main
    ```
    The API will be available at `http://localhost:8080`
 
@@ -131,15 +137,11 @@ This guide will help you set up your development environment for both frontend a
 
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
 3. **Start Development Server:**
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
    The frontend will be available at `http://localhost:3000`
 
@@ -181,7 +183,7 @@ npm test
 
 ## 📦 Deployment
 
-FlowGen follows a distributed monolith architecture pattern, where the application is deployed as a single unit but maintains clear internal service boundaries. The build process compiles the Next.js frontend into static files that are served by the FastAPI backend, creating an efficient and easily deployable package.
+FlowGen follows a modular monolith architecture pattern, where the application is deployed as a single unit but maintains clear internal service boundaries. The build process compiles the Next.js frontend into static files that are served by the FastAPI backend, creating an efficient and easily deployable package.
 
 ### Architecture Overview
 
@@ -288,7 +290,7 @@ The build process follows these steps:
 - Cloud Run deployments can be monitored through Google Cloud Console
 - Logs are available through Cloud Logging when deployed to Cloud Run
 
-## 📄 License
+## License
 
 This project is licensed under the [Apache License 2.0](https://opensource.org/licenses/Apache-2.0).
 

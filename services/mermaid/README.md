@@ -61,27 +61,24 @@ The Mermaid Service is built with a robust and efficient technology stack:
 3.  **Install Dependencies:**
 
     ```bash
-    pip install -r requirements.txt
+    uv sync
     ```
 
 4.  **Run the Application:**
 
     ```bash
-    uvicorn src.main:app --reload
+    uv run -m src.main
     ```
 
     This command starts the development server with hot reloading enabled. You can access the API documentation at `http://localhost:8080/docs`.
 
 ## 🧪 Testing
 
-While specific test setup details aren't provided, here are general recommendations:
+    ```bash
+    source run-tests.sh
+    ```
 
-- **pytest:** Use `pytest` to write and run unit tests and integration tests.
-- **Test Organization:** Create a `tests` directory within `services/mermaid` to organize your test files.
-- **Test Coverage:** Aim for high test coverage to ensure the reliability of your code.
-- **Mocking:** When testing your application, make sure to mock the call to the external model.
-
-## 📄 License
+## License
 
 This project is licensed under the [Apache License 2.0](https://opensource.org/licenses/Apache-2.0).
 

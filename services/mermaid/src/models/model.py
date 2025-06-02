@@ -49,7 +49,6 @@ def get_model(model_name="gemini-2.5-flash-preview-05-20", safety_settings=None)
     Configures the Generative AI API and returns a GenerativeModel instance.
 
     Args:
-        api_key: Your Google Cloud Generative AI API key.
         model_name: The name of the model to use (default: "gemini-2.5-flash-preview-05-20").
         safety_settings: A list of SafetySetting objects to configure content filtering.
 

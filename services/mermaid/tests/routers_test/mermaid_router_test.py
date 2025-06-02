@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
 from src.main import create_app
-from src.routers import mermaid_router
+from src.routers.mermaid import router as mermaid_router
 
 
 # Use the TestClient to interact with the FastAPI application

@@ -46,37 +46,7 @@ The FlowGen Web UI is built with a modern and powerful tech stack:
 
     This command starts the development server, and you can access the application in your browser at `http://localhost:3000`. The server supports hot reloading, so any changes you make to the code will be reflected in the browser automatically.
 
-## 🧪 Testing
-
-While specific test setup details aren't provided, it's recommended to add tests to the project. You can add test using:
-
-- **Jest**: is a JavaScript testing framework.
-- **React testing library**: a library that provide react specific utilities for testing.
-
-## 🤝 Contributing
-
-Contributions are welcome! There are two main ways to contribute:
-
-1.  **Contribute a Full Application UI:**
-
-    Create a new GenAI application user interface using the components in this template and add it to our list of example applications. This will help scale the team's technical assets and help others get started with building GenAI apps faster. Ensure your application:
-
-    - Uses the components provided in this template.
-    - Is well-documented, with clear instructions on how to run it.
-    - Includes a brief description of its functionality.
-
-2.  **Contribute a UI Component:**
-
-    Expand the template by adding new UI components that are useful for GenAI applications. Ensure your component:
-
-    - Is well-documented, following the style of the existing components.
-    - Is reusable and customizable.
-    - Includes clear usage examples.
-    - Is added to the `/components` directory with appropriate documentation.
-
-Please follow our [contribution guidelines](link-to-contributing-file-or-section) when submitting your pull request. If you don't have a separate `CONTRIBUTING.md`, consider adding a section here with more specific guidelines (e.g., coding style, commit message conventions, testing requirements).
-
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
