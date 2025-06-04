@@ -1,122 +1,152 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Manages configuration and interaction with the Generative AI model.
+
+This module provides functions to:
+- Configure the Google Generative AI API with an API key.
+- Retrieve a GenerativeModel instance.
+- Create formatted prompts for Mermaid.js code generation.
+- Generate Mermaid.js code using the model with a system prompt.
 """
-Module for configuring and retrieving a Generative AI model instance for Mermaid.js generation.
 
-This module provides functionality to configure the Google Generative AI API and
-create a GenerativeModel instance specifically tailored for generating Mermaid.js
-code from user-provided architectural descriptions. It leverages predefined system
-instructions to guide the model's behavior and includes a utility function for
-dynamically creating prompts.
+from __future__ import annotations
 
-The module handles API key configuration, model selection, and uses a system prompt
-defined in the `system_instructions` module to ensure consistent and high-quality
-Mermaid code generation.
-"""
-
-import os
+# Standard library imports
 import logging
+import os
+from typing import Any, Optional  # Used for safety_settings, consider more specific type
+
+# Third-party imports
 import google.generativeai as genai
 from dotenv import load_dotenv
+
+# Application-specific imports
 from src.models.system_instructions import SYSTEM_INSTRUCTIONS
 
+# Load environment variables once when the module is imported.
+# This is primarily for development convenience to load GEMINI_API_KEY.
+# In production, environment variables should be set directly.
 load_dotenv()
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def create_gemini_prompt(message: str, engine: str = "mermaid") -> str:
-    """
-    Creates a prompt for the Gemini model with specific instructions based on the engine.
+    """Creates a prompt for the Gemini model for diagram generation.
 
     Args:
-        message: The user's message.
-        engine: The diagram engine to use.
+        message: The user's description of the architecture or diagram.
+        engine: The diagram engine to use (e.g., "mermaid", "plantuml").
 
     Returns:
-        str: The formatted prompt for the model.
+        A formatted prompt string instructing the model to generate diagram code.
     """
-    base_prompt = f"""Please help create a {engine} diagram based on the following description.
-    Use {engine} syntax and wrap the response in a markdown code block with the {engine} language identifier.
-    Only respond with the diagram code, no explanations or additional text.
-
-    Description:
-    {message}
-    """
+    base_prompt = (
+        f"Please help create a {engine} diagram based on the following "
+        f"description.\nUse {engine} syntax and wrap the response in a "
+        f"markdown code block with the {engine} language identifier.\nOnly "
+        f"respond with the diagram code, no explanations or additional text.\n\n"
+        f"Description:\n{message}\n"
+    )
     return base_prompt
 
 
-def get_model(model_name="gemini-2.5-flash-preview-05-20", safety_settings=None):
-    """
-    Configures the Generative AI API and returns a GenerativeModel instance.
+def get_model(
+    model_name: str = "gemini-2.5-flash-preview-05-20",  # Restored original default
+    safety_settings: Optional[list[Any]] = None,
+) -> genai.GenerativeModel:
+    """Configures the Generative AI API and returns a GenerativeModel instance.
 
     Args:
-        model_name: The name of the model to use (default: "gemini-2.5-flash-preview-05-20").
-        safety_settings: A list of SafetySetting objects to configure content filtering.
+        model_name: The name of the model to use.
+        safety_settings: A list of safety setting objects to configure content
+                         filtering for the model. Defaults to None.
 
     Returns:
-        A GenerativeModel instance.
+        A configured `genai.GenerativeModel` instance.
 
     Raises:
-        ValueError: if the API Key is not valid.
-        RuntimeError: if the model configuration fails.
+        ValueError: If the `GEMINI_API_KEY` environment variable is not set.
+        RuntimeError: If there's an error configuring the API or model.
     """
-
     try:
-        _GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-        logger.debug("Environment variables loaded successfully.")
+        gemini_api_key = os.environ["GEMINI_API_KEY"]
+        _logger.debug("GEMINI_API_KEY loaded successfully.")
     except KeyError as e:
-        logger.error("Environment variables (GEMINI_API_KEY) must be set.")
-        raise ValueError("Environment variables (GEMINI_API_KEY) must be set.") from e
+        _logger.error("GEMINI_API_KEY environment variable must be set.")
+        raise ValueError("GEMINI_API_KEY environment variable must be set.") from e
 
     try:
-        genai.configure(api_key=_GEMINI_API_KEY)
-        model = genai.GenerativeModel(model_name)
+        genai.configure(api_key=gemini_api_key)
+        model = genai.GenerativeModel(model_name=model_name, safety_settings=safety_settings)
         return model
     except Exception as e:
+        _logger.exception('Error configuring or getting model "%s".', model_name)
         raise RuntimeError(f"Error configuring or getting model: {e}") from e
 
 
 def generate_mermaid_with_system_prompt(
-    model: genai.GenerativeModel, prompt: str, system_prompt: str = SYSTEM_INSTRUCTIONS
+    model: genai.GenerativeModel,
+    prompt: str,
+    system_prompt: str = SYSTEM_INSTRUCTIONS,
 ) -> str:
-    """
-    Generates Mermaid code with a system prompt.
+    """Generates Mermaid code using the model with a specific system prompt.
 
     Args:
-        model: The GenerativeModel instance.
-        prompt: The user prompt.
-        system_prompt: The system prompt to apply.
+        model: The `genai.GenerativeModel` instance to use for generation.
+        prompt: The user's prompt describing the desired diagram.
+        system_prompt: The system instructions to guide the model's generation.
+                       Defaults to `SYSTEM_INSTRUCTIONS`.
 
     Returns:
-        The generated Mermaid code.
+        The generated Mermaid code as a string.
+
+    Raises:
+        RuntimeError: If an error occurs during content generation.
     """
     try:
-        response = model.generate_content(
-            [
-                genai.types.content_types.Content(role="user", parts=[system_prompt]),
-                genai.types.content_types.Content(role="user", parts=[prompt]),
-            ]
-        )
-        response.resolve()
+        contents = [
+            genai.types.Content(role="user", parts=[genai.types.Part(text=system_prompt)]),
+            genai.types.Content(role="user", parts=[genai.types.Part(text=prompt)]),
+        ]
+        response = model.generate_content(contents)
+        if not response.parts:
+            _logger.warning("Model response did not contain any parts.")
+            return ""
         return response.text
     except Exception as e:
+        _logger.exception("Error during content generation.")
         raise RuntimeError(f"Error during generation: {e}") from e
 
 
-# Example usage (and testing - good practice to keep this!)
+# Example usage and testing block
 if __name__ == "__main__":
-    api_key = os.getenv("GEMINI_API_KEY")  # Replace with your actual API key
+    logging.basicConfig(level=logging.DEBUG)
 
     try:
-        model = get_model(api_key)
-        if model:
-            # Test the prompt creation
-            user_input = "A client application sends a request to an API gateway. The gateway forwards the request to Service A or Service B. Both services access a database."
-            full_prompt = create_gemini_prompt(user_input)
-            print("Generated Prompt:\n", full_prompt)
+        model_instance = get_model()  # Uses the default model_name from the function
+        if model_instance:
+            user_input_example = (
+                "A client application sends a request to an API gateway. "
+                "The gateway forwards the request to Service A or Service B. "
+                "Both services access a database."
+            )
+            full_prompt_example = create_gemini_prompt(user_input_example)
+            _logger.info("Generated Prompt:\n%s", full_prompt_example)
 
-            # response = model.generate_content(full_prompt)
-            response_text = generate_mermaid_with_system_prompt(model, full_prompt)
-            print("\nGenerated Mermaid Code:\n", response_text)
+            generated_code = generate_mermaid_with_system_prompt(model_instance, full_prompt_example)
+            _logger.info("\nGenerated Mermaid Code:\n%s", generated_code)
 
-    except Exception as e:
-        print(f"Main program caught an exception: {e}")
+    except (ValueError, RuntimeError) as e:
+        _logger.error("Main program caught an exception: %s", e)

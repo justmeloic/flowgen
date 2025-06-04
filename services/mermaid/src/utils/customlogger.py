@@ -1,12 +1,33 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Custom logging formatters and filters for structured logging."""
+
+from __future__ import annotations
+
+# Standard library imports
 import datetime as dt
 import json
 import logging
-from typing import Any
+import logging.handlers  # For QueueListener
+from typing import Any, Optional
 
-from typing_extensions import override
+# Third-party imports
+from typing_extensions import override  # For Python <3.12
 
-
-LOG_RECORD_BUILTIN_ATTRS = [  # Attributes to include in log records
+# List of LogRecord attributes that are built-in.
+# Used by MyJSONFormatter to differentiate standard fields from custom extras.
+LOG_RECORD_BUILTIN_ATTRS: list[str] = [
     "args",
     "asctime",
     "created",
@@ -32,116 +53,131 @@ LOG_RECORD_BUILTIN_ATTRS = [  # Attributes to include in log records
 
 
 class MyJSONFormatter(logging.Formatter):
-    """
-    A custom JSON formatter for log records.
+    """Custom logging.Formatter to output log records as JSON strings.
 
-    This formatter converts log records into JSON strings. It allows for
-    the inclusion of both standard log record attributes and user-defined
-    fields. The output JSON includes a message, timestamp, and optionally,
-    exception and stack information.
+    This formatter converts log records into JSON strings, allowing for structured
+    logging. It includes standard log record attributes and can incorporate
+    user-defined fields through `fmt_keys`.
     """
 
     def __init__(
         self,
         *,
-        fmt_keys: dict[str, str] | None = None,
+        fmt_keys: Optional[dict[str, str]] = None,
     ) -> None:
-        """
-        Initializes the MyJSONFormatter.
+        """Initializes the MyJSONFormatter.
 
         Args:
-            fmt_keys (dict[str, str], optional): A mapping from keys in the
-                final JSON output to attributes of the log record. This allows
-                for renaming or including specific attributes in the output.
-                Defaults to an empty dictionary, which will include only the
-                default fields ('message', 'timestamp', 'exc_info', 'stack_info').
+            fmt_keys: A mapping from keys in the final JSON output to attributes
+                of the LogRecord. This allows for renaming or selecting specific
+                attributes. Defaults to an empty dict, resulting in a default
+                set of fields ('message', 'timestamp', etc.).
         """
         super().__init__()
         self.fmt_keys = fmt_keys if fmt_keys is not None else {}
 
     @override
     def format(self, record: logging.LogRecord) -> str:
-        """
-        Formats a log record as a JSON string.
+        """Formats a LogRecord as a JSON string.
 
         Args:
-            record (logging.LogRecord): The log record to format.
+            record: The log record to format.
 
         Returns:
-            str: A JSON string representation of the log record.
+            A JSON string representation of the log record.
         """
-        message = self._prepare_log_dict(record)
-        return json.dumps(message, default=str)  # Convert to JSON string
+        message_dict = self._prepare_log_dict(record)
+        return json.dumps(message_dict, default=str)
 
     def _prepare_log_dict(self, record: logging.LogRecord) -> dict[str, Any]:
-        """
-        Prepares a dictionary representing the log record for JSON serialization.
+        """Prepares a dictionary from a LogRecord for JSON serialization.
 
-        The dictionary includes the formatted message, timestamp, and optionally,
-        exception and stack information. It applies any custom field mappings
-        specified during the formatter's initialization.
+        Includes the formatted message, timestamp, and optionally, exception
+        and stack information. Applies custom field mappings if provided.
 
         Args:
-            record (logging.LogRecord): The log record to prepare.
+            record: The LogRecord to prepare.
 
         Returns:
-            dict[str, Any]: A dictionary representing the log record.
+            A dictionary representing the log record.
         """
-        always_fields = {
+        log_dict = {
             "message": record.getMessage(),
             "timestamp": dt.datetime.fromtimestamp(
-                record.created, tz=dt.UTC
+                record.created,
+                tz=dt.timezone.utc,  # Use dt.timezone.utc
             ).isoformat(),
         }
 
-        if record.exc_info is not None:
-            always_fields["exc_info"] = self.formatException(record.exc_info)
+        if record.exc_info:
+            log_dict["exc_info"] = self.formatException(record.exc_info)
+        if record.stack_info:
+            log_dict["stack_info"] = self.formatStack(record.stack_info)
 
-        if record.stack_info is not None:
-            always_fields["stack_info"] = self.formatStack(record.stack_info)
+        # Apply custom formatting keys and include other record attributes
+        # that are not standard built-in ones (extras).
+        for key, val_attr_name in self.fmt_keys.items():
+            if hasattr(record, val_attr_name):
+                log_dict[key] = getattr(record, val_attr_name)
 
-        message = {  # Apply formatting keys
-            key: (
-                msg_val
-                if (msg_val := always_fields.pop(val, None)) is not None
-                else getattr(record, val)
-            )
-            for key, val in self.fmt_keys.items()
-        }
-
-        message.update(always_fields)  # Add remaining fields
-
-        return message
+        # Add any extra fields passed to the logger that aren't built-in
+        # and aren't already mapped by fmt_keys.
+        for key, value in record.__dict__.items():
+            if key not in LOG_RECORD_BUILTIN_ATTRS and key not in log_dict:
+                # Check if any fmt_key resulted in this 'key'
+                # This logic for extras could be refined further based on desired behavior
+                # with fmt_keys potentially overwriting extras or vice-versa.
+                # Current simple approach: if not already added by fmt_keys, add it.
+                is_already_mapped_by_fmt_keys_value = False
+                for fmt_val in self.fmt_keys.values():
+                    if fmt_val == key:
+                        is_already_mapped_by_fmt_keys_value = True
+                        break
+                if not is_already_mapped_by_fmt_keys_value:
+                    log_dict[key] = value
+        return log_dict
 
 
 class DataFilter(logging.Filter):
-    """
-    A filter that allows only log records starting with "[data]" through. This is for training data.
+    """A filter that allows only log records starting with "[data]".
+
+    This can be used to route specific log messages, such as those containing
+    training data, to particular handlers.
     """
 
-    def filter(self, record):
-        """
-        Determines if the specified record is to be logged.
+    def filter(self, record: logging.LogRecord) -> bool:
+        """Determines if the specified record should be logged.
 
-        Returns True if the record's message starts with "[data]", False otherwise.
+        Args:
+            record: The log record to check.
+
+        Returns:
+            True if the record's message starts with "[data]", False otherwise.
         """
         return record.getMessage().startswith("[data]")
 
 
 class AutoStartQueueListener(logging.handlers.QueueListener):
-    """
-    A QueueListener subclass that automatically starts the listener thread upon initialization.
+    """A QueueListener subclass that starts its thread upon initialization.
+
+    This simplifies setup by removing the need to manually call `start()`
+    on the listener instance after creating it.
     """
 
-    def __init__(self, queue, *handlers, respect_handler_level=False):
-        """
-        Initializes the AutoStartQueueListener and immediately starts its thread.
+    def __init__(
+        self,
+        queue: Any,  # Typically queue.Queue
+        *handlers: logging.Handler,
+        respect_handler_level: bool = False,
+    ) -> None:
+        """Initializes and starts the AutoStartQueueListener.
 
         Args:
             queue: The queue from which to receive log records.
-            *handlers: Handlers to use for processing log records.
-            respect_handler_level: Whether to respect the level of the handlers.
+            *handlers: A variable number of logging.Handler instances to process
+                       records from the queue.
+            respect_handler_level: Whether to respect the log level set on
+                                   individual handlers. Defaults to False.
         """
         super().__init__(queue, *handlers, respect_handler_level=respect_handler_level)
-        # Start the listener immediately.
-        self.start()
+        self.start()  # Start the listener thread immediately.
