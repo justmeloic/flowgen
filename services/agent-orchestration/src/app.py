@@ -11,51 +11,51 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""
-Application Entry Point Module
+"""Application Entry Point Module.
 
 This module initializes and configures the FastAPI application,
 sets up CORS middleware, includes the necessary routers,
 and serves the static frontend application.
 """
 
+from __future__ import annotations
+
+# Standard library imports
 import logging
 import os
 import signal
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Dict, NoReturn, Optional
+from typing import Any, Optional, Sequence
 
+# Third-party imports
 import uvicorn
 from absl import app as absl_app
 from absl import flags
-from dotenv import load_dotenv  # Add this import at the top
+from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from google.adk.sessions import InMemorySessionService
 
+# Application-specific imports
 from src.config.api import get_settings
 from src.middleware.session_middleware import SessionMiddleware
 from src.routers.root_agent.router import router as root_agent_router
 
-
-# Configure logging
+# Module-level constants and singletons
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-# Define flags
+_logger = logging.getLogger(__name__)
 FLAGS = flags.FLAGS
 
 
 def setup_logging(log_level: str) -> None:
-    """Set up logging configuration.
+    """Sets up the logging configuration for the application.
 
     Args:
-        log_level: The logging level to use
+        log_level: The logging level to use (e.g., 'INFO', 'DEBUG').
     """
     numeric_level = getattr(logging, log_level.upper(), None)
     if not isinstance(numeric_level, int):
@@ -64,81 +64,75 @@ def setup_logging(log_level: str) -> None:
 
 
 def configure_gcp_environment() -> None:
+    """Configures environment variables for Google Cloud Platform.
+
+    Loads environment variables from a .env file and ensures that
+    GCP-specific variables are set.
+
+    Raises:
+        ValueError: If required Google Cloud environment variables are missing.
     """
-    Configure environment variables and Google Cloud settings.
-    Raises ValueError if required Google Cloud variables are missing.
-    """
-    # Load environment variables
     load_dotenv()
 
-    # Configure Google Cloud environment
     try:
         os.environ['GOOGLE_CLOUD_PROJECT'] = os.getenv('GOOGLE_CLOUD_PROJECT', '')
         os.environ['GOOGLE_CLOUD_LOCATION'] = os.getenv('GOOGLE_CLOUD_LOCATION', '')
         if not all(
-            [os.environ['GOOGLE_CLOUD_PROJECT'], os.environ['GOOGLE_CLOUD_LOCATION']]
+            [
+                os.environ['GOOGLE_CLOUD_PROJECT'],
+                os.environ['GOOGLE_CLOUD_LOCATION'],
+            ]
         ):
-            # Kept original behavior of raising an error.
-            # If local testing without these is desired, change to logger.warning.
             raise ValueError(
-                'Missing required Google Cloud environment variables: GOOGLE_CLOUD_PROJECT and/or GOOGLE_CLOUD_LOCATION'
+                'Missing required GCP env vars: GOOGLE_CLOUD_PROJECT and/or'
+                ' GOOGLE_CLOUD_LOCATION'
             )
     except Exception as e:
-        logger.error(f'Environment configuration error: {str(e)}')
+        _logger.error('Environment configuration error: %s', e)
         raise
 
 
-def signal_handler(signum: int, frame: Optional[object]) -> None:
-    """Handle shutdown signals.
+def _signal_handler(signum: int, frame: Optional[object]) -> None:
+    """Handles shutdown signals for graceful termination.
 
     Args:
-        signum: Signal number
-        frame: Current stack frame
+        signum: The signal number received.
+        frame: The current stack frame.
     """
-    logger.info(f'Received signal {signum}. Initiating graceful shutdown...')
+    _logger.info('Received signal %d. Initiating graceful shutdown...', signum)
     sys.exit(0)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    logger.info('Starting up application...')
-    app.state.session_service = InMemorySessionService()  # Initialize immediately
-    yield
-    # Cleanup
-    logger.info('Shutting down application...')
-    # Remove or make conditional the cleanup call if the method doesn't exist:
-    # if hasattr(app.state, 'session_service') and hasattr(app.state.session_service, 'cleanup'):
-    #     try:
-    #         await app.state.session_service.cleanup() # Only call if it exists
-    #     except Exception as e:
-    #         logger.error(f'Error cleaning up session service: {e}')
-    # OR, if no cleanup is needed at all for InMemorySessionService, just remove the block.
-    # For now, let's assume no specific cleanup method is available for this ADK version.
+async def lifespan(app: FastAPI) -> None:
+    """Manages the application's startup and shutdown events.
 
-    if hasattr(app.state, 'runner'):  # Runner cleanup (already as you have it)
+    Args:
+        app: The FastAPI application instance.
+
+    Yields:
+        None, after startup logic is complete.
+    """
+    _logger.info('Starting up application...')
+    app.state.session_service = InMemorySessionService()
+    yield
+    _logger.info('Shutting down application...')
+    if hasattr(app.state, 'runner'):
         try:
             delattr(app.state, 'runner')
         except Exception as e:
-            logger.error(f'Error removing runner: {e}')
+            _logger.error('Error removing runner: %s', e)
 
 
 def create_app() -> FastAPI:
-    """Create and configure the FastAPI application.
+    """Creates and configures the FastAPI application instance.
 
     Returns:
-        FastAPI: Configured FastAPI application instance
+        A configured FastAPI application instance.
     """
-    # Ensure flags are parsed before accessing them
-    # if not FLAGS.is_parsed():
-    #    FLAGS(sys.argv)
-
-    # Configure environment before creating the app
     configure_gcp_environment()
-
     settings = get_settings()
 
-    # Initialize FastAPI app
     app = FastAPI(
         title=settings['api']['title'],
         description=settings['api']['description'],
@@ -146,20 +140,15 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # Configure CORS first - order matters!
     app.add_middleware(CORSMiddleware, **settings['cors'])
-
-    # Add session middleware after CORS
     app.add_middleware(SessionMiddleware)
 
     # --- API Routes ---
-    # Create API v1 router
     api_v1_router = APIRouter(prefix='/api/v1')
 
-    # (Optional) Move old root API info to a dedicated API endpoint
     @api_v1_router.get('/status', tags=['Server Info'])
-    async def api_status() -> Dict[str, str]:
-        """Provides API information."""
+    async def api_status() -> dict[str, str]:
+        """Provides API information and health status."""
         return {
             'title': settings['api']['title'],
             'description': settings['api']['description'],
@@ -167,72 +156,61 @@ def create_app() -> FastAPI:
             'status': 'healthy',
         }
 
-    # Register your API routers under API v1
     try:
         api_v1_router.include_router(root_agent_router)
-        # Add other API routers to api_v1_router if you have them
         app.include_router(api_v1_router)
-        logger.info('Successfully registered all API routers under /api/v1')
+        _logger.info('Successfully registered all API routers under /api/v1')
     except Exception as e:
-        logger.error(f'Failed to register API routers: {str(e)}')
+        _logger.error('Failed to register API routers: %s', e)
         raise
 
     # --- Static Frontend Files Configuration ---
-    # app.py is in services/agent-orchestration/src
-    # static_frontend is in services/agent-orchestration/static_frontend
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    STATIC_FILES_DIR = os.path.join(Path(__file__).parent.parent, 'static_frontend')
+    static_files_dir = Path(__file__).parent.parent / 'static_frontend'
 
-    if not os.path.exists(STATIC_FILES_DIR):
-        logger.warning(
-            f'Frontend static files directory not found at: {STATIC_FILES_DIR}'
+    if not static_files_dir.exists():
+        _logger.warning(
+            'Frontend static files directory not found at: %s', static_files_dir
         )
-        logger.warning("Frontend will not be served. Ensure 'static_frontend' exists.")
+        _logger.warning("Frontend will not be served. Ensure 'static_frontend' exists.")
     else:
-        logger.info(f'Serving frontend static files from: {STATIC_FILES_DIR}')
-
-        # Mount Next.js's internal static assets (e.g., /_next/static/...)
-        next_assets_path = os.path.join(STATIC_FILES_DIR, '_next')
-        if os.path.exists(next_assets_path):
+        _logger.info('Serving frontend static files from: %s', static_files_dir)
+        next_assets_path = static_files_dir / '_next'
+        if next_assets_path.exists():
             app.mount(
                 '/_next',
                 StaticFiles(directory=next_assets_path),
                 name='next-static-assets',
             )
-            logger.info(f'Mounted Next.js static assets from: {next_assets_path}')
+            _logger.info('Mounted Next.js static assets from: %s', next_assets_path)
         else:
-            logger.warning(
-                f"Next.js '_next' assets directory not found at: {next_assets_path}. Critical frontend assets might be missing."
+            _logger.warning(
+                "Next.js '_next' assets directory not found at: %s. Critical"
+                ' frontend assets might be missing.',
+                next_assets_path,
             )
 
-        # Catch-all route to serve index.html for client-side routing,
-        # or other static files from the root of STATIC_FILES_DIR (e.g., favicon.ico)
-        # This MUST be defined AFTER API routes and specific static mounts like /_next.
-        @app.get('/{full_path:path}')
-        async def serve_frontend_app(full_path: str):
-            file_path = os.path.join(STATIC_FILES_DIR, full_path)
-
-            # If the requested path is a file, serve it directly
-            if os.path.isfile(file_path):
+        @app.get('/{full_path:path}', response_class=FileResponse)
+        async def serve_frontend_app(full_path: str) -> FileResponse:
+            """Serves frontend files or index.html for client-side routing."""
+            file_path = static_files_dir / full_path
+            if file_path.is_file():
                 return FileResponse(file_path)
 
-            # If not a direct file, it's likely a client-side route. Serve index.html.
-            index_html_path = os.path.join(STATIC_FILES_DIR, 'index.html')
-            if os.path.exists(index_html_path):
+            index_html_path = static_files_dir / 'index.html'
+            if index_html_path.exists():
                 return FileResponse(index_html_path)
 
-            logger.warning(
-                f"Requested path '{full_path}' not found as a file, and index.html is missing from {STATIC_FILES_DIR}."
+            _logger.warning(
+                "Requested path '%s' not found, and index.html is missing.",
+                full_path,
             )
             raise HTTPException(status_code=404, detail='Not Found')
 
-        # Ensure root path serves index.html if it exists
-        # The catch-all above handles this, but this can be an explicit check.
-        @app.get('/', response_class=FileResponse)
-        async def serve_frontend_root():
-            """Serve the frontend's index.html from the root path."""
-            index_path = os.path.join(STATIC_FILES_DIR, 'index.html')
-            if not os.path.exists(index_path):
+        @app.get('/', response_class=FileResponse, include_in_schema=False)
+        async def serve_frontend_root() -> FileResponse:
+            """Serves the frontend's index.html from the root path."""
+            index_path = static_files_dir / 'index.html'
+            if not index_path.exists():
                 raise HTTPException(
                     status_code=404, detail='Frontend index.html not found'
                 )
@@ -241,59 +219,51 @@ def create_app() -> FastAPI:
     return app
 
 
-def run_server(
-    app_instance: FastAPI, host: str, port: int
-) -> None:  # Renamed app to app_instance to avoid conflict
-    """Run the uvicorn server.
+def run_server(app_instance: FastAPI, host: str, port: int) -> None:
+    """Runs the Uvicorn server.
 
     Args:
-        app_instance: FastAPI application instance
-        host: Server host
-        port: Server port
+        app_instance: The FastAPI application instance to run.
+        host: The server host to bind to.
+        port: The server port to bind to.
     """
     try:
         uvicorn.run(
-            app_instance, host=host, port=port, log_level=FLAGS.log_level.lower()
+            app_instance,
+            host=host,
+            port=port,
+            log_level=FLAGS.log_level.lower(),
         )
     except Exception as e:
-        logger.error(f'Failed to start server: {str(e)}')
+        _logger.error('Failed to start server: %s', e)
         raise
 
 
-def main(argv) -> NoReturn:
-    """Main function to run the application.
+def main(argv: Sequence[str]) -> None:
+    """Main function to create and run the application.
 
-    Args:
-        argv: Command line arguments
+    This function is called by `absl.app.run`, which handles flag parsing.
     """
-    # Set up signal handlers
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+    del argv  # Unused by main.
+    signal.signal(signal.SIGINT, _signal_handler)
+    signal.signal(signal.SIGTERM, _signal_handler)
 
-    # Set up logging
+    # Functions that depend on FLAGS can now be called safely.
     setup_logging(FLAGS.log_level)
-
-    # Get settings
-    settings = (
-        get_settings()
-    )  # settings is already fetched here, can be passed if needed
-
-    # Create and run application
-    # Renamed 'app' variable to 'fastapi_app' in this scope to avoid confusion
-    fastapi_app = create_app()
-    run_server(
-        fastapi_app, host=settings['server']['host'], port=settings['server']['port']
-    )
+    app = create_app()
+    settings = get_settings()  # Settings are needed here for run_server
+    run_server(app, host=settings['server']['host'], port=settings['server']['port'])
 
 
-# Create the FastAPI application instance for use by other modules
 if __name__ == '__main__':
-    # Let absl.app handle flag parsing and then call main()
+    # When run as a script, absl.app will parse flags and then call main().
     absl_app.run(main)
 else:
-    # When imported as a module (e.g. by tests), ensure flags are parsed
+    # When imported as a module (e.g., by an ASGI server like Uvicorn),
+    # flags are not parsed by default. We must parse them here to ensure
+    # that the `application` object can be created correctly.
     if not FLAGS.is_parsed():
-        FLAGS(sys.argv)  # Pass sys.argv for flag parsing
-    # Renamed 'app' variable to 'application' to avoid potential global/local scope issues
-    # or conflict if 'app' is expected to be a specific instance by importers.
+        # Pass sys.argv to allow flag overrides from the command line, e.g.:
+        # uvicorn src.app:application -- --port=9090
+        FLAGS(sys.argv)
     application = create_app()

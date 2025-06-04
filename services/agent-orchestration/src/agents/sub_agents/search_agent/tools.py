@@ -1,143 +1,153 @@
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Defines tools for the agent, including CBA datastore search.
+
+This module provides the core tool for searching Collective Bargaining
+Agreements (CBAs) using Google Cloud's Vertex AI Search. It also includes
+a callback function to handle the results of tool calls.
+"""
+# NOTE: Intentionally not using "from __future__ import annotations" here
+# as a test for ADK's introspection capabilities.
+
+# Standard library imports
+import json
+import logging
 import os
 import traceback
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional  # Using typing.Dict
 
-from dotenv import load_dotenv
+# Third-party imports
+from google.adk.tools import FunctionTool
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.cloud import discoveryengine_v1beta as discoveryengine
 
+_logger = logging.getLogger(__name__)
+
 
 def store_tool_result_callback(
     tool: BaseTool,
-    args: Dict[str, Any],
+    args: Dict[str, Any],  # Using typing.Dict
     tool_context: ToolContext,
-    tool_response: Dict[str, Any],
-) -> Optional[Dict[str, Any]]:
-    """Store raw results from google_search tool calls."""
+    tool_response: Dict[str, Any],  # Using typing.Dict
+) -> Optional[Dict[str, Any]]:  # Using typing.Dict
+    """Stores the raw response from the search tool in the agent state."""
     try:
         if tool.name == 'search_cba_datastore':
             tool_context.state['search_cba_datastore_tool_raw_output'] = tool_response
-            print(
-                '[store_tool_result_callback] Stored response for tool search_cba_datastore'
+            _logger.info(
+                '[store_tool_result_callback] Stored response for tool %s',
+                tool.name,
             )
         return None
     except Exception as e:
-        print(f'ERROR in store_tool_result_callback: {str(e)}')
-        print(traceback.format_exc())
+        _logger.error('Error in store_tool_result_callback: %s', e)
+        _logger.error(traceback.format_exc())
         return None
 
 
-def search_cba_datastore(query: str) -> Dict[str, Any]:
-    """Search CN's Collective Bargaining Agreements (CBAs) using Vertex AI Search.
-
-    This function searches through CBA documents using Google Cloud's Vertex AI Search
-    (formerly Enterprise Search) and returns both a generated summary and individual
-    document references. It requires proper Google Cloud authentication and environment
-    variables to be set.
-
-    Args:
-        query: The search query string to find relevant CBA information.
-
-    Returns:
-        Dict[str, Any]: A dictionary containing:
-            - query (str): The original search query
-            - summary (Optional[str]): A generated summary of the relevant documents,
-              or None if no summary could be generated
-            - documents (List[Dict]): List of relevant documents, each containing:
-                - id (str): Document ID
-                - name (str): Full resource name
-                - title (str): Document title
-                - link (str): Document link/path
-            - error (Optional[str]): Error message if an error occurred, otherwise not present
-
-    Required Environment Variables:
-        - GOOGLE_CLOUD_PROJECT: Google Cloud project ID
-        - DATA_STORE_ID: Vertex AI Search datastore ID (defaults to "cn-cba_1747357876332")
-    """
-    load_dotenv()
-
-    project_id = os.getenv('GOOGLE_CLOUD_PROJECT', '')
-    location = 'global'
-    data_store_id = os.getenv('DATA_STORE_ID', 'cn-cba_1747357876332')
-    summary_result_count = os.getenv('SUMMARY_RESULT_COUNT', 5)
-
-    client = discoveryengine.SearchServiceClient()
-
-    # Serving config format
-    serving_config = client.serving_config_path(
-        project=project_id,
-        location=location,
-        data_store=data_store_id,
-        serving_config='default_search',  # Or your specific serving config ID
-    )
-
-    # Content search spec for summary and citations
+def _build_search_request(
+    serving_config: str, query: str
+) -> discoveryengine.SearchRequest:
+    """Constructs the Vertex AI Search request object."""
+    summary_result_count = int(os.getenv('SUMMARY_RESULT_COUNT', 5))
     content_search_spec = discoveryengine.SearchRequest.ContentSearchSpec(
         summary_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec(
-            summary_result_count=int(
-                summary_result_count
-            ),  # Number of results to use for the summary
+            summary_result_count=summary_result_count,
             include_citations=True,
-            # You can customize the prompt if needed
-            # model_prompt_spec=discoveryengine.SearchRequest.ContentSearchSpec.SummarySpec.ModelPromptSpec(
-            #     preamble="Given the following documents, please summarize..."
-            # )
         ),
         snippet_spec=discoveryengine.SearchRequest.ContentSearchSpec.SnippetSpec(
             return_snippet=True
         ),
-        # Optional: if you want extractive answers in addition to summary
-        # extractive_content_spec=discoveryengine.SearchRequest.ContentSearchSpec.ExtractiveContentSpec(
-        #    max_extractive_answer_count=3
-        # )
     )
-
-    request = discoveryengine.SearchRequest(
+    # TODO(your-user): Replace 'YOUR_UNIQUE_USER_ID' with a real, unique
+    # user identifier for analytics and billing.
+    return discoveryengine.SearchRequest(
         serving_config=serving_config,
         query=query,
-        page_size=5,  # Number of search results to return
+        page_size=5,
         content_search_spec=content_search_spec,
-        # Ensure that user pseudo ID is set for analytics and billing.
-        # This can be any unique identifier for the end user.
-        # NOTE: This might be something we can use to associate a user with their user profile.
-        user_pseudo_id='YOUR_UNIQUE_USER_ID',  # Replace with a unique user identifier
+        user_pseudo_id='YOUR_UNIQUE_USER_ID',
     )
 
-    try:
-        response = client.search(request)
 
-        result = {'query': query, 'summary': None, 'documents': []}
-
-        if response.summary and response.summary.summary_text:
-            result['summary'] = response.summary.summary_text
-
-        if response.results:
-            for doc_result in response.results:
-                doc = doc_result.document
-                document_info = {
+def _parse_search_response(
+    response: discoveryengine.SearchResponse,
+) -> Dict[str, Any]:  # Using typing.Dict
+    """Parses the raw search response into a structured dictionary."""
+    documents = []
+    if response.results:
+        for doc_result in response.results:
+            doc = doc_result.document
+            documents.append(
+                {
                     'id': doc.id,
                     'name': doc.name,
                     'title': doc.derived_struct_data.get('title', 'N/A'),
                     'link': doc.derived_struct_data.get('link', 'N/A'),
                 }
-                result['documents'].append(document_info)
+            )
 
-        return result
+    return {
+        'summary': response.summary.summary_text if response.summary else None,
+        'documents': documents,
+    }
+
+
+def _search_cba_datastore_impl(query: str) -> Dict[str, Any]:  # Using typing.Dict
+    """Searches CN's Collective Bargaining Agreements (CBAs).
+
+    Args:
+        query: The search query string to find relevant CBA information.
+
+    Returns:
+        A dictionary containing the query, an optional summary, a list of
+        document references, and an optional error message.
+    """
+    try:
+        project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+        data_store_id = os.getenv('DATA_STORE_ID', 'cn-cba_1747357876332')
+
+        client = discoveryengine.SearchServiceClient()
+        serving_config = client.serving_config_path(
+            project=project_id,
+            location='global',
+            data_store=data_store_id,
+            serving_config='default_search',
+        )
+
+        request = _build_search_request(serving_config, query)
+        response = client.search(request)
+
+        parsed_response = _parse_search_response(response)
+        return {'query': query, **parsed_response}
 
     except Exception as e:
+        _logger.error('Vertex AI Search failed for query "%s": %s', query, e)
         return {'query': query, 'error': str(e), 'summary': None, 'documents': []}
 
 
+_search_cba_datastore_impl.__name__ = 'search_cba_datastore'
+search_cba_datastore = FunctionTool(func=_search_cba_datastore_impl)
+
+
 if __name__ == '__main__':
-    # --- CONFIGURATION ---
-    USER_QUERY = (
-        'What are the main topics in these documents?'  # Replace with your query
-    )
+    logging.basicConfig(level=logging.INFO)
+    from dotenv import load_dotenv
 
-    result = search_cba_datastore(query=USER_QUERY)
+    load_dotenv()
 
-    # Pretty print the result
-    import json
-
+    USER_QUERY = 'What are the main topics in these documents?'
+    result = _search_cba_datastore_impl(query=USER_QUERY)
     print(json.dumps(result, indent=2))
