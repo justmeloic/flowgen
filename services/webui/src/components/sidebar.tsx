@@ -3,7 +3,7 @@
 import type * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, Home } from 'lucide-react'
+import { Cloud, Home } from 'lucide-react'
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -34,7 +34,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   const agentLinks = [
     {
       title: 'Terraform',
-      icon: MessageSquare,
+      icon: Cloud,
       variant: 'default',
       href: '/terraform-agent',
     },
