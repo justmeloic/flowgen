@@ -31,6 +31,39 @@ Each service has its own README with specific setup instructions. Please refer t
 
 FlowGen is built using a **modular monolith** architecture, which offers the benefits of both monolithic and microservices architectures. This means the application is structured as a single deployable unit, but internally, it's composed of distinct, loosely coupled services that communicate with each other.
 
+```mermaid
+graph TD
+    subgraph "User Interaction"
+        UserInterface[Web UI （Frontend - Next.js, TypeScript, Tailwind, Shadcn/ui）]
+    end
+
+    subgraph "Application Core"
+        APIGateway[REST API]
+        MermaidService[Mermaid Service （Backend - Python, FastAPI）]
+        StaticServer[Static File Server （FastAPI）]
+        GeminiAI[Google Gemini AI Model]
+        MermaidJSLib[Mermaid.js Library （Frontend Rendering）]
+    end
+
+    UserInterface -- "Natural Language Input / Docs" --> APIGateway
+    APIGateway -- "Processed Input" --> MermaidService
+    MermaidService -- "Queries" --> GeminiAI
+    GeminiAI -- "Generates Mermaid Code" --> MermaidService
+    MermaidService -- "Returns Mermaid Code" --> APIGateway
+    APIGateway -- "Mermaid Code" --> UserInterface
+    UserInterface -- "Renders Diagram Using" --> MermaidJSLib
+    StaticServer -- "Serves Static UI Files" --> UserInterface
+
+    classDef frontend fill:#D6EAF8,stroke:#3498DB,stroke-width:2px;
+    classDef backend fill:#D1F2EB,stroke:#1ABC9C,stroke-width:2px;
+    classDef ai fill:#FCF3CF,stroke:#F1C40F,stroke-width:2px;
+    classDef lib fill:#EBDEF0,stroke:#8E44AD,stroke-width:2px;
+
+    class UserInterface,MermaidJSLib frontend;
+    class APIGateway,MermaidService,StaticServer backend;
+    class GeminiAI ai;
+```
+
 **Components:**
 
 1.  **Web UI (Frontend):**
