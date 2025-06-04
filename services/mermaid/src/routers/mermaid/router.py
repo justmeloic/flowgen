@@ -8,7 +8,8 @@ It uses a pre-initialized Gemini model to generate responses to user messages.
 import logging
 import os
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Annotated
+import google.generativeai as genai  # for type hinting
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 
 #
