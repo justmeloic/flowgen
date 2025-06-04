@@ -22,7 +22,7 @@ from typing import Sequence
 
 # Third-party imports
 import uvicorn
-from absl import app
+from absl import app as absl_app
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,6 +32,8 @@ from fastapi.staticfiles import StaticFiles
 from src.config.api import FLAGS  # Assuming FLAGS are defined here
 from src.routers.mermaid.router import router as mermaid_router
 
+# Module-level constants and singletons
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 _logger = logging.getLogger(__name__)
 
 
@@ -109,4 +111,4 @@ def main(argv: Sequence[str]) -> None:
 
 
 if __name__ == "__main__":
-    app.run(main)
+    absl_app.run(main)
