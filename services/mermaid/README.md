@@ -74,9 +74,9 @@ The Mermaid Service is built with a robust and efficient technology stack:
 
 ## 🧪 Testing
 
-    ```bash
-    source run-tests.sh
-    ```
+```bash
+source run-tests.sh
+```
 
 ## License
 
