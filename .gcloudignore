@@ -1,0 +1,26 @@
+.DS_Store
+*.pyc
+__pycache__/
+*.log
+
+# Node.js
+services/webui/node_modules/
+services/webui/.next/ 
+services/webui/npm-debug.log*
+services/webui/yarn-debug.log*
+services/webui/yarn-error.log*
+
+# Python
+services/mermaid/.venv/
+services/mermaid/.pytest_cache/
+services/mermaid/.ruff_cache/
+services/mermaid/.coverage
+services/mermaid/logs/ 
+
+# IDE/Editor specific
+.vscode/
+.idea/
+
+# Other
+.git/
+*.env
