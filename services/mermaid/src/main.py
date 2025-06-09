@@ -29,6 +29,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 # Application-specific imports
+from src.config.api import get_settings
 from src.config.api import FLAGS  # Assuming FLAGS are defined here
 from src.routers.mermaid.router import router as mermaid_router
 
@@ -45,28 +46,27 @@ def create_app() -> FastAPI:
     """
     _logger.info('Creating FastAPI application in "%s" mode...', FLAGS.app_env)
 
+    settings = get_settings()
+
     # Load .env file ONLY for local development. In production, environment
     # variables should be injected directly (e.g., by Cloud Run).
     if FLAGS.app_env == "development":
         load_dotenv()
         _logger.info("Loaded environment variables from .env file.")
 
-    fastapi_app = FastAPI(
-        title="Mermaid API",
-        description="API for interacting with a Gemini based Mermaid Model.",
-        version="0.1.0",
+    app = FastAPI(
+        title=settings["api"]["title"],
+        description=settings["api"]["description"],
+        version=settings["api"]["version"],
     )
 
-    fastapi_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],  # Or use a flag for more specific origins
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    # --- Register Middleware ---
+    app.add_middleware(CORSMiddleware, **settings["cors"])
 
-    fastapi_app.include_router(mermaid_router, prefix="/api/v1")
+    # --- API Routes ---
+    app.include_router(mermaid_router, prefix="/api/v1")
 
+    # --- Static Frontend Files Configuration ---
     static_dir = os.path.abspath(FLAGS.static_dir_name)
     _logger.info("Attempting to serve static files from: %s", static_dir)
 
@@ -76,11 +76,12 @@ def create_app() -> FastAPI:
             static_dir,
         )
     else:
-        fastapi_app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+        app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
         _logger.info("Successfully mounted static files directory.")
 
     _logger.info("FastAPI application configured successfully.")
-    return fastapi_app
+
+    return app
 
 
 def main(argv: Sequence[str]) -> None:
@@ -99,11 +100,11 @@ def main(argv: Sequence[str]) -> None:
         level=FLAGS.log_level.upper(),  # Use log_level from FLAGS
     )
 
-    fastapi_app_instance = create_app()
+    app_instance = create_app()
 
     _logger.info("Starting Uvicorn server on http://%s:%d", FLAGS.host, FLAGS.port)
     uvicorn.run(
-        fastapi_app_instance,
+        app_instance,
         host=FLAGS.host,
         port=FLAGS.port,
         log_level=FLAGS.log_level.lower(),

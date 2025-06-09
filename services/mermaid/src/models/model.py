@@ -80,6 +80,7 @@ def get_model(
         ValueError: If the `GEMINI_API_KEY` environment variable is not set.
         RuntimeError: If there's an error configuring the API or model.
     """
+    model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20")
     try:
         gemini_api_key = os.environ["GEMINI_API_KEY"]
         _logger.debug("GEMINI_API_KEY loaded successfully.")

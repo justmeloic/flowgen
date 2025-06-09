@@ -101,6 +101,12 @@ def get_settings() -> dict[str, Any]:
             "description": FLAGS.api_description,
             "version": FLAGS.api_version,
         },
+        "cors": {
+            "allow_origins": ["*"],
+            "allow_credentials": True,
+            "allow_methods": ["*"],
+            "allow_headers": ["*"],
+        },
         "model": {
             "gemini_version": FLAGS.gemini_model,
         },
