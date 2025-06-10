@@ -90,7 +90,7 @@ def before_model_callback(
 
 root_agent = Agent(
     name='root_agent',
-    model=os.getenv('GEMINI_MODEL', 'gemini-2.5-flash-preview-05-20'),
+    model=os.getenv('GEMINI_MODEL'),
     description=(
         'An agent that answers CN employee questions about their Collective '
         'Bargaining Agreements (CBAs). It gathers user context, searches '
