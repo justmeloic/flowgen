@@ -41,6 +41,9 @@ load_dotenv()
 
 _logger = logging.getLogger(__name__)
 
+# Constants
+_GEMINI_MODEL = os.getenv("GEMINI_MODEL")
+
 
 def create_gemini_prompt(message: str, engine: str = "mermaid") -> str:
     """Creates a prompt for the Gemini model for diagram generation.
@@ -63,7 +66,7 @@ def create_gemini_prompt(message: str, engine: str = "mermaid") -> str:
 
 
 def get_model(
-    model_name: str = "gemini-2.5-flash-preview-05-20",  # Restored original default
+    model_name: str = _GEMINI_MODEL,
     safety_settings: Optional[list[Any]] = None,
 ) -> genai.GenerativeModel:
     """Configures the Generative AI API and returns a GenerativeModel instance.
@@ -80,7 +83,6 @@ def get_model(
         ValueError: If the `GEMINI_API_KEY` environment variable is not set.
         RuntimeError: If there's an error configuring the API or model.
     """
-    model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20")
     try:
         gemini_api_key = os.environ["GEMINI_API_KEY"]
         _logger.debug("GEMINI_API_KEY loaded successfully.")
