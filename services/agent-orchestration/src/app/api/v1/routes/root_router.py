@@ -22,7 +22,7 @@ from __future__ import annotations
 
 # Standard library imports
 import logging
-from typing import Annotated, Any
+from typing import Annotated
 
 # Third-party imports
 from fastapi import APIRouter, Depends, Request
@@ -30,9 +30,10 @@ from google.adk.runners import Runner
 from google.adk.sessions import Session
 
 # Application-specific imports
-from src.routers.root_agent.agent_handler import process_agent_query
-from src.routers.root_agent.datamodels import AgentConfig, Query
-from src.routers.root_agent.dependencies import (
+from src.app.models import AgentConfig
+from src.app.schemas import AgentResponse, Query
+from src.app.services.agent_service import agent_service
+from src.app.utils.dependencies import (
     get_agent_config,
     get_or_create_session,
     get_runner,
@@ -41,19 +42,18 @@ from src.routers.root_agent.dependencies import (
 _logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix='/root_agent',
     tags=['root_agent'],
 )
 
 
-@router.post('/', response_model=dict[str, Any])
+@router.post('/', response_model=AgentResponse)
 async def agent_endpoint(
     request: Request,
     query: Query,
     config: Annotated[AgentConfig, Depends(get_agent_config)],
     session: Annotated[Session, Depends(get_or_create_session)],
     runner: Annotated[Runner, Depends(get_runner)],
-) -> dict[str, Any]:
+) -> AgentResponse:
     """Processes a user query via the root agent.
 
     Args:
@@ -64,10 +64,10 @@ async def agent_endpoint(
         runner: The ADK runner instance, injected as a dependency.
 
     Returns:
-        A dictionary containing the agent's response.
+        An AgentResponse object containing the agent's response and metadata.
     """
     _logger.info('Received query for root_agent: %s...', query.text[:50])
-    return await process_agent_query(
+    return await agent_service.process_query(
         request=request,
         query=query,
         config=config,

@@ -29,8 +29,7 @@ from google.adk.sessions import InMemorySessionService, Session
 
 # Application-specific imports
 from src.agents.agent import root_agent
-from src.config.api import get_settings
-from src.routers.root_agent.datamodels import AgentConfig
+from src.app.models import AgentConfig
 
 _logger = logging.getLogger(__name__)
 
@@ -42,10 +41,9 @@ def get_agent_config() -> AgentConfig:
     Returns:
         The agent configuration object.
     """
-    settings = get_settings()
     return AgentConfig(
-        app_name=settings.get('app_name', 'agent_app'),
-        user_id=settings.get('user_id', 'default_user'),
+        app_name='agent_app',  # You can add this to settings if needed
+        user_id='default_user',  # You can add this to settings if needed
     )
 
 

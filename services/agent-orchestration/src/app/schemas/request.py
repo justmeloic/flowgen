@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Pydantic models for the root agent API.
+"""Request schemas for the root agent API.
 
-This module defines the data structures and validation rules for the
-request and configuration objects used in the agent's router.
+This module defines the Pydantic models for validating incoming API requests.
 """
 
 from __future__ import annotations
@@ -25,7 +24,7 @@ from pydantic import BaseModel, Field, field_validator
 class Query(BaseModel):
     """Represents a query from a user to the agent."""
 
-    text: str = Field(..., min_length=1)
+    text: str = Field(..., min_length=1, description="The user's query text")
 
     @field_validator('text')
     @classmethod
@@ -35,9 +34,9 @@ class Query(BaseModel):
             raise ValueError('Text must not be empty or just whitespace')
         return v.strip()
 
+    class Config:
+        """Pydantic configuration."""
 
-class AgentConfig(BaseModel):
-    """Represents the configuration for an agent service."""
-
-    app_name: str = Field(default='agent_app')
-    user_id: str = Field(default='default_user')
+        json_schema_extra = {
+            'example': {'text': 'What are the overtime rules in my CBA?'}
+        }

@@ -26,9 +26,10 @@ import json
 import logging
 import os
 import traceback
-from typing import Any, Optional
+from typing import Optional
 
 # Third-party imports
+from dotenv import load_dotenv
 from google.adk.agents import Agent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmRequest, LlmResponse
@@ -40,6 +41,9 @@ from src.agents.prompts import (
     return_root_agent_instructions,
 )
 from src.agents.tools import search_cba_datastore, store_tool_result_callback
+
+# Load environment variables
+load_dotenv()
 
 _logger = logging.getLogger(__name__)
 

@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+*cache/
 *.py[cod]
 *$py.class
 *.so
@@ -49,6 +50,13 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Cache files
+*cache/
+*cache*
+.cache/
+.cache*
+*.cache
+
 # Logs
 logs
 *.log
@@ -56,4 +64,4 @@ logs
 # Coverage
 coverage/
 .coverage
-htmlcov/ 
+htmlcov/
