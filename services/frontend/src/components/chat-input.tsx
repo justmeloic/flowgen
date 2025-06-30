@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from "react";
-import { Mic, SendHorizontal, Plus, Square } from "lucide-react";
-import { FileChip } from "./file-chip";
-import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
+import { Mic, Plus, SendHorizontal, Square } from "lucide-react";
+import * as React from "react";
+import { FileChip } from "./file-chip";
 
 interface UploadedFile {
   id: string;
@@ -30,15 +30,34 @@ export function ChatInput({
   const [isRecording, setIsRecording] = React.useState(false);
   const [audioBlob, setAudioBlob] = React.useState<Blob | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
   const audioChunksRef = React.useRef<BlobPart[]>([]);
+
+  // Auto-resize textarea
+  React.useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.max(48, textarea.scrollHeight)}px`;
+    }
+  }, [message]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (message.trim() && !isLoading) {
       const userMessage = message;
       setMessage("");
-      onSend(userMessage, ""); // Clear input immediately
+      onSend(userMessage, "");
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      if (message.trim() && !isLoading) {
+        handleSubmit(event as any);
+      }
     }
   };
 
@@ -123,30 +142,32 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className={cn("relative w-full  max-w-[70%] mx-auto", className)}
+      className={cn("relative w-full max-w-[70%] mx-auto", className)}
       {...props}
     >
       <div
         className={cn(
-          "relative flex flex-col w-full h-28 rounded-3xl  border bg-white transition-shadow duration-300 ease-in-out ",
+          "relative flex flex-col w-full min-h-28 rounded-3xl border bg-white transition-shadow duration-300 ease-in-out",
           isFocused
             ? "shadow-[0_1px_6px_1px_rgba(32,33,36,0.12),0_1px_8px_2px_rgba(32,33,36,0.12),0_1px_12px_3px_rgba(32,33,36,0.2)]"
             : "shadow-none"
         )}
       >
-        {/* Top section with text input */}
-        <input
-          type="text"
+        {/* Top section with textarea input */}
+        <textarea
+          ref={textareaRef}
           placeholder="Ask Gemini"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="h-12 w-full rounded-full bg-transparent px-4 text-base outline-none placeholder:text-muted-foreground"
+          className="min-h-12 w-full rounded-t-3xl bg-transparent px-4 py-3 text-base outline-none placeholder:text-muted-foreground resize-none overflow-hidden"
+          rows={1}
         />
 
         {/* Bottom section with buttons */}
-        <div className="flex justify-between items-center mt-6  px-2">
+        <div className="flex justify-between items-center mt-auto mb-4 px-2">
           {/* File upload button */}
           <div className="flex items-center">
             <input
