@@ -96,7 +96,10 @@ class Settings(BaseSettings):
     def cors(self) -> CorsConfig:
         """Get CORS configuration."""
         return CorsConfig(
-            allow_origins=[self.FRONTEND_URL],
+            allow_origins=[
+                self.FRONTEND_URL,
+                'https://60c3-2607-fea8-760-8700-c84-fad6-ffc2-770f.ngrok-free.app',
+            ],
             allow_credentials=True,
             allow_methods=['*'],
             allow_headers=['*', 'X-Session-ID'],
