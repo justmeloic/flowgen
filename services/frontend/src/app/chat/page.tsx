@@ -1,20 +1,18 @@
 "use client";
 
-import * as React from "react";
-import { useState, useEffect, useRef, useCallback } from "react";
 import { ChatInput } from "@/components/chat-input";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { ModelSelector } from "@/components/model-selector";
 import { MessageActions } from "@/components/message-actions";
-import { Toaster } from "@/components/ui/toaster";
-import Link from "next/link";
-import { sendMessage } from "@/lib/api";
-import { toast } from "@/components/ui/use-toast";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkBreaks from "remark-breaks";
-import remarkParse from "remark-parse";
+import { ModelSelector } from "@/components/model-selector";
 import { ReferencesPanel } from "@/components/references-panel";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/use-toast";
+import { sendMessage } from "@/lib/api";
+import { useCallback, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
+import remarkParse from "remark-parse";
 
 interface ChatMessage {
   role: "user" | "bot";
@@ -126,22 +124,6 @@ export default function ChatPage() {
     <div className="flex flex-col flex-1 h-full">
       <div className="flex items-center justify-between">
         <ModelSelector />
-        <Link href="/" className="flex h-8 w-8 items-center justify-center">
-          <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-6 w-6 text-gray-900 dark:text-gray-100"
-          >
-            <path d="M3 10L12 3L21 10V20H14V14H10V20H3V10Z" />
-          </svg>
-        </Link>
         <div className="w-[110px]" />
       </div>
 

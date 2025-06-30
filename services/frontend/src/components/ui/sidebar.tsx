@@ -1,12 +1,11 @@
 "use client";
 
-import type * as React from "react";
+import { BookOpen, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Cloud, MessageSquare } from "lucide-react";
+import type * as React from "react";
 import { useState } from "react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -14,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean;
@@ -29,7 +29,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
       title: "CBA",
       icon: MessageSquare,
       variant: "default",
-      href: "/chat",
+      href: "/",
     },
   ] as const;
 
@@ -59,8 +59,59 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           </div>
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
-                {/* **New Title Added Here** */}
-                <div className="mb-2 mt-[300px] font-semibold text-gray-700 text-sm ">
+
+        {/* Documentation button at the top */}
+
+        <div className="mt-16">
+          <div
+            className={cn(
+              "mb-2 font-semibold text-gray-700 text-sm",
+              isCollapsed && !isHovered ? "text-center" : ""
+            )}
+          >
+            Docs
+          </div>
+          {isCollapsed && !isHovered ? (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/doc"
+                  className={cn(
+                    "flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-white/50",
+                    pathname === "/doc" &&
+                      "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90"
+                  )}
+                >
+                  <BookOpen className="h-5 w-5" />
+                  <span className="sr-only">Documentation</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="flex items-center gap-4">
+                Documentation
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Link
+              href="/doc"
+              className={cn(
+                "flex items-center gap-3 rounded-2xl px-3 py-2 text-muted-foreground hover:bg-white/50",
+                pathname === "/doc" &&
+                  "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90"
+              )}
+            >
+              <BookOpen className="h-5 w-5" />
+              Documentation
+            </Link>
+          )}
+        </div>
+
+        {/* **New Title Added Here** */}
+        <div
+          className={cn(
+            "mb-2 mt-[300px] font-semibold text-gray-700 text-sm",
+            isCollapsed && !isHovered ? "text-center" : ""
+          )}
+        >
           Agents
         </div>
         <nav className="grid gap-1">
