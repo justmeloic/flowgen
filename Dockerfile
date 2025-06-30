@@ -31,7 +31,7 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8080 
 ENV GOOGLE_GENAI_USE_VERTEXAI="TRUE"
-ENV GEMINI_MODEL="gemini-2.5-flash-preview-05-20"
+ENV GEMINI_MODEL="gemini-2.5-flash"
 ENV GOOGLE_CLOUD_PROJECT="technical-assets-loicmuhirwa"
 ENV GOOGLE_CLOUD_LOCATION="us-central1"
 ENV DATA_STORE_ID="cn-cba_1747357876332"
@@ -57,7 +57,7 @@ RUN pip install --no-cache-dir .
 # --- End Python Dependency Installation ---
 
 # Copy the built static frontend assets from the frontend-builder stage
-COPY --from=frontend-builder /app/frontend/out/ ./static_frontend/
+COPY --from=frontend-builder /app/frontend/out/ ./build/static_frontend/
 
 EXPOSE 8080 
 

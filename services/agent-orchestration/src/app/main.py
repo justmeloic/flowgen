@@ -70,7 +70,7 @@ async def health_check():
 
 
 # Set up static frontend files
-static_files_dir = Path(__file__).parent.parent.parent / 'static_frontend'
+static_files_dir = Path(__file__).parent.parent.parent / 'build/static_frontend'
 
 if static_files_dir.exists():
     # Mount Next.js static assets

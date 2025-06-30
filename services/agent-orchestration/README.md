@@ -79,3 +79,13 @@ cp .env.example .env
 For the Vertex AI configuration, ensure `GOOGLE_GENAI_USE_VERTEXAI=TRUE` is set in your `.env` file to use Vertex AI API through your GCP project.
 
 If you prefer to use the Google AI Studio API directly, set `GOOGLE_GENAI_USE_VERTEXAI=FALSE` and provide your `GOOGLE_API_KEY`.
+
+### Running the Server
+
+Start the development server:
+
+```bash
+uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+The server will be available at `http://localhost:8000`. The `--reload` flag enables auto-reloading when code changes are detected during development.

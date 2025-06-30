@@ -6,7 +6,7 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
-    "build-local": "rm -rf .next out && next build && rm -rf ../agent-orchestration/static_frontend && cp -R ./out ../agent-orchestration/static_frontend",
+    "build-local": "rm -rf .next out && next build && rm -rf ../agent-orchestration/build/static_frontend && cp -R ./out ../agent-orchestration/build/static_frontend",
     "build": "rm -rf .next out && next build"
   },
   "dependencies": {
