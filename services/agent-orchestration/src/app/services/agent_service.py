@@ -34,6 +34,7 @@ from src.agents.agent import root_agent
 from src.app.models import AgentConfig
 from src.app.schemas import AgentResponse, Query
 from src.app.utils.formatters import format_text_response
+from src.app.utils.sse import sse_manager
 
 _logger = logging.getLogger(__name__)
 
@@ -101,6 +102,7 @@ class AgentService:
         """
         final_response_text = 'Agent did not produce a final response.'
         references_json = {}
+        session_id = session.id
 
         async for event in runner.run_async(
             user_id=config.user_id,
@@ -109,11 +111,23 @@ class AgentService:
         ):
             await session_service.append_event(session, event)
 
+            # Check if this is a tool call event
+            if hasattr(event, 'actions') and event.actions:
+                if hasattr(event.actions, 'tool_call') and event.actions.tool_call:
+                    tool_name = getattr(event.actions.tool_call, 'name', 'unknown_tool')
+                    await sse_manager.send_tool_start(session_id, tool_name)
+                    self._logger.info(
+                        f'Tool started: {tool_name} for session {session_id}'
+                    )
+
             if event.is_final_response() and event.content and event.content.parts:
                 response_text = event.content.parts[0].text
                 final_response_text, references_json = format_text_response(
                     response_text=response_text, request=request
                 )
+
+                # Send final response via SSE
+                await sse_manager.send_final_response(session_id, final_response_text)
 
                 state_changes = {
                     'last_response': final_response_text,

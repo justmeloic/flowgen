@@ -17,8 +17,8 @@ This module provides the core tool for searching Collective Bargaining
 Agreements (CBAs) using Google Cloud's Vertex AI Search. It also includes
 a callback function to handle the results of tool calls.
 """
-# NOTE: Intentionally not using "from __future__ import annotations" here
-# as a test for ADK's introspection capabilities.
+
+from __future__ import annotations
 
 # Standard library imports
 import json
@@ -33,15 +33,7 @@ from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.cloud import discoveryengine_v1beta as discoveryengine
 
-# Local imports
-from .tools import _process_agreements_with_gemini
-
 _logger = logging.getLogger(__name__)
-
-
-# Create the FunctionTool for process_agreements_with_gemini
-_process_agreements_with_gemini.__name__ = 'process_agreements_with_gemini'
-process_agreements_with_gemini = FunctionTool(func=_process_agreements_with_gemini)
 
 
 def store_tool_result_callback(
@@ -156,11 +148,6 @@ if __name__ == '__main__':
 
     load_dotenv()
 
-    # Test the Gemini processing function
-    print('Testing _process_agreements_with_gemini:')
-    gemini_result = _process_agreements_with_gemini(
-        'What are the key points about overtime policies in this document?',
-        'Conductor',
-        'Calgary',
-    )
-    print(json.dumps(gemini_result, indent=2))
+    USER_QUERY = 'What are the main topics in these documents?'
+    result = _search_cba_datastore_impl(query=USER_QUERY)
+    print(json.dumps(result, indent=2))

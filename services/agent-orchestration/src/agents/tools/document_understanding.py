@@ -11,13 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Defines the root agent for the application.
 
-This module configures and instantiates the primary agent responsible for
-coordinating responses to user queries about Collective Bargaining Agreements
-(CBAs). It includes callback functions to process data before and after
-interacting with the LLM.
-"""
+
+from __future__ import annotations
 
 # Standard library imports
 import csv
@@ -28,68 +24,12 @@ import pathlib
 from typing import Dict, Optional
 
 # Third-party imports
-from dotenv import load_dotenv
 from google import genai
-from google.adk.agents import Agent
 from google.adk.tools import FunctionTool
 from google.genai import types
-
-# Application-specific imports
-try:
-    # from .tools.document_understanding import process_agreements
-    from .callbacks import (
-        before_model_callback,
-        before_tool_callback,
-        store_tool_result_callback,
-    )
-    from .system_instructions import (
-        return_global_instructions,
-        return_root_agent_instructions,
-    )
-except ImportError:
-    # Handle direct script execution (for quick testing)
-    # from tools.document_understanding import process_agreements
-    from callbacks import (
-        before_model_callback,
-        before_tool_callback,
-        store_tool_result_callback,
-    )
-    from system_instructions import (
-        return_global_instructions,
-        return_root_agent_instructions,
-    )
-
-# Load environment variables
-load_dotenv()
+from google.genai.types import Content, FunctionDeclaration, Part, Schema, Type
 
 _logger = logging.getLogger(__name__)
-
-
-# ========================= START:WORKAROUND FOR FUNCTION CALLING =========================
-"""
-NOTE[Loïc]:
-
-ISSUE: Automatic schema generation for function tools sometimes fails with error:
-"Automatic function calling works best with simpler function signature schema, 
-consider manually parsing your function declaration for function"
-
-SYMPTOMS:
-- Occurs when function signatures are complex or contain certain type hints
-- May happen even without 'Any' types in signatures
-- Prevents automatic function calling from working properly
-
-SOLUTIONS:
-1. Define FunctionDeclaration manually (implemented below)
-   - Explicitly specify the function schema using FunctionDeclaration
-   - Bypasses automatic schema generation entirely
-   - More verbose but guaranteed to work
-
-2. Alternative: Simplify function signatures
-   - Use basic types (str, int, bool) instead of complex types
-   - Avoid Union types, Optional with complex defaults, etc.
-
-TODO: Investigate if explicitly passing schema parameter resolves this issue
-"""
 
 
 def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str, str]:
@@ -130,10 +70,10 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
 
     # Base path to the agreements directory
     agreements_dir = os.path.join(
-        os.path.dirname(__file__), '..', '..', 'testdata', 'agreements'
+        os.path.dirname(__file__), '..', '..', '..', 'testdata', 'agreements'
     )
     locals_dir = os.path.join(
-        os.path.dirname(__file__), '..', '..', 'testdata', 'locals'
+        os.path.dirname(__file__), '..', '..', '..', 'testdata', 'locals'
     )
 
     # Process primary agreement
@@ -284,6 +224,7 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
         os.path.dirname(__file__),
         '..',
         '..',
+        '..',
         'testdata',
         'Agreement_Mapping_with_Filenames.csv',
     )
@@ -349,27 +290,38 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
         }
 
 
-# ========================= END:WORKAROUND FOR FUNCTION CALLING =========================
-
-
-root_agent = Agent(
-    name='root_agent',
-    model=os.getenv('GEMINI_MODEL'),
+# This tells the ADK exactly what the tool looks like, bypassing automatic parsing.
+process_agreements_declaration = FunctionDeclaration(
+    name='process_agreements',
     description=(
-        'An agent that answers CN employee questions about their Collective '
-        'Bargaining Agreements (CBAs). It gathers user context (role and '
-        'territory), analyzes relevant CBA documents, and provides accurate, '
-        'evidence-based responses.'
+        "Process agreement PDFs with Gemini based on a user's role and "
+        'territory to answer their question.'
     ),
-    instruction=return_global_instructions(),
-    global_instruction=return_root_agent_instructions(),
-    output_key='last_agent_response',
-    tools=[FunctionTool(func=_process_agreements_impl)],
-    after_tool_callback=store_tool_result_callback,
-    before_model_callback=before_model_callback,
+    parameters=Schema(
+        type=Type.OBJECT,
+        properties={
+            'prompt': Schema(
+                type=Type.STRING,
+                description="The user's question or prompt to apply to the documents",
+            ),
+            'role': Schema(
+                type=Type.STRING,
+                description="The user's role (e.g., 'Conductor', 'Engineer')",
+            ),
+            'territory': Schema(
+                type=Type.STRING,
+                description="The user's territory/location (e.g., 'Calgary', 'Toronto North')",
+            ),
+        },
+        # Specify which arguments are mandatory.
+        required=['prompt', 'role', 'territory'],
+    ),
 )
 
-
+process_agreements = FunctionTool(
+    func=_process_agreements_impl,
+    # function_declaration=process_agreements_declaration,
+)
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     from dotenv import load_dotenv
@@ -378,14 +330,14 @@ if __name__ == '__main__':
 
     # Test the agreement filename function
     print('Testing _get_agreement_filenames:')
-    result = _get_agreement_filenames('Engineer', 'Edmonton')
+    result = _get_agreement_filenames('Conductor', 'Calgary')
     print(json.dumps(result, indent=2))
 
     # Test the Gemini processing function
     print('\nTesting process_agreements:')
-    gemini_result = _process_agreements_impl(
-        'Please summarize the CBA.',
-        'Engineer',
-        'Edmonton',
-    )
-    print(json.dumps(gemini_result, indent=2))
+    # gemini_result = process_agreements(
+    #   'What are the key points about overtime policies in this document?',
+    #    'Conductor',
+    #    'Calgary',
+    # )
+    # print(json.dumps(gemini_result, indent=2))

@@ -36,20 +36,8 @@ def configure_gcp_environment() -> None:
     """
     Configure Google Cloud Platform environment variables.
 
-    Loads environment variables from .env file and validates that required
-    GCP configuration is present. Sets up the GOOGLE_CLOUD_PROJECT and
-    GOOGLE_CLOUD_LOCATION environment variables for use by GCP client libraries.
-
     This configuration is essential when GOOGLE_GENAI_USE_VERTEXAI=TRUE as the
     VertexAI service will be accessed through the GCP platform.
-
-    Raises:
-        ValueError: If required GCP environment variables (GOOGLE_CLOUD_PROJECT
-            or GOOGLE_CLOUD_LOCATION) are missing or empty.
-
-    Note:
-        This function must be called before initializing any GCP services
-        to ensure proper authentication and project configuration.
     """
     load_dotenv()
 

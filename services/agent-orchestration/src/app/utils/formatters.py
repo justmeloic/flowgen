@@ -104,8 +104,77 @@ def format_text_response(
 
     if references_text:
         session_id = getattr(request.state, 'actual_session_id', None)
-        references_json = _parse_references(references_text.strip(), session_id)
+
+        # Try to detect the type of references by attempting to parse as JSON
+        try:
+            parsed_data = json.loads(references_text.strip())
+
+            # Check if it's a list of strings (processed agreements)
+            if isinstance(parsed_data, list) and all(
+                isinstance(item, str) for item in parsed_data
+            ):
+                references_json = _parse_processed_agreements(
+                    references_text.strip(), session_id
+                )
+            # Check if it's a list of dicts (traditional document references)
+            elif isinstance(parsed_data, list) and all(
+                isinstance(item, dict) for item in parsed_data
+            ):
+                references_json = _parse_references(references_text.strip(), session_id)
+            else:
+                _logger.warning(
+                    'Unknown reference format for session %s. Using default parser.',
+                    session_id,
+                )
+                references_json = _parse_references(references_text.strip(), session_id)
+        except json.JSONDecodeError:
+            # Fallback to traditional reference parsing
+            references_json = _parse_references(references_text.strip(), session_id)
     else:
         references_json = {}
 
     return (formatted_text, references_json)
+
+
+def _parse_processed_agreements(
+    agreements_text: str, session_id: str | None
+) -> dict[str, Any]:
+    """Parses a JSON string of processed agreement filenames into a dict.
+
+    Args:
+        agreements_text: A string containing a JSON list of agreement filenames.
+        session_id: The session ID for logging purposes.
+
+    Returns:
+        A dictionary of formatted processed agreements or an empty dict on error.
+    """
+    try:
+        agreements_list = json.loads(agreements_text)
+        if not isinstance(agreements_list, list):
+            _logger.warning(
+                'Processed agreements text is not a JSON list for session %s.',
+                session_id,
+            )
+            return {}
+
+        return {
+            str(i + 1): {
+                'title': filename,
+                'link': (
+                    f'gs://cn-cba-docs/locals/{filename}'
+                    if filename.endswith('Locals.pdf')
+                    else f'gs://cn-cba-docs/agreements/{filename}'
+                ),
+                'text': f'Processed agreement: {filename}',
+            }
+            for i, filename in enumerate(agreements_list)
+            if isinstance(filename, str)
+        }
+    except json.JSONDecodeError as e:
+        _logger.error(
+            'Failed to parse processed agreements JSON for session %s: %s\nContent: %s',
+            session_id,
+            e,
+            agreements_text[:200],
+        )
+        return {}

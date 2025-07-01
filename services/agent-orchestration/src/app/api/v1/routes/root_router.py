@@ -26,6 +26,7 @@ from typing import Annotated
 
 # Third-party imports
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
 from google.adk.sessions import Session
 
@@ -38,6 +39,7 @@ from src.app.utils.dependencies import (
     get_or_create_session,
     get_runner,
 )
+from src.app.utils.sse import sse_manager
 
 _logger = logging.getLogger(__name__)
 
@@ -73,4 +75,28 @@ async def agent_endpoint(
         config=config,
         session=session,
         runner=runner,
+    )
+
+
+@router.get('/events/{session_id}')
+async def sse_endpoint(session_id: str) -> StreamingResponse:
+    """Server-Sent Events endpoint for real-time status updates.
+
+    Args:
+        session_id: The session ID to stream events for.
+
+    Returns:
+        A StreamingResponse that sends real-time updates to the frontend.
+    """
+    _logger.info('Starting SSE stream for session: %s', session_id)
+
+    return StreamingResponse(
+        sse_manager.generate_sse_stream(session_id),
+        media_type='text/plain',
+        headers={
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Cache-Control',
+        },
     )

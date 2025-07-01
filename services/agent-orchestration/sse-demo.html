@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CN CBA Agent - SSE Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+      .status.tool_running {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .status.tool_complete {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .response {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        border-left: 4px solid #007bff;
+      }
+      #messages {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      input[type="text"] {
+        width: 70%;
+        padding: 10px;
+        margin: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:disabled {
+        background-color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CN CBA Agent with Real-time Status</h1>
+
+    <div>
+      <input
+        type="text"
+        id="queryInput"
+        placeholder="Ask a question about CBAs..."
+      />
+      <button id="sendButton" onclick="sendQuery()">Send</button>
+    </div>
+
+    <div id="messages"></div>
+
+    <script>
+      let eventSource = null;
+      let currentSessionId = null;
+
+      function addMessage(content, className = "") {
+        const messages = document.getElementById("messages");
+        const message = document.createElement("div");
+        message.className = className;
+        message.innerHTML = content;
+        messages.appendChild(message);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function initSSE(sessionId) {
+        if (eventSource) {
+          eventSource.close();
+        }
+
+        // Initialize Server-Sent Events connection
+        eventSource = new EventSource(`/api/v1/root_agent/events/${sessionId}`);
+
+        eventSource.onmessage = function (event) {
+          const data = JSON.parse(event.data);
+
+          switch (data.type) {
+            case "status_update":
+              if (data.status === "tool_running") {
+                addMessage(`🔄 ${data.message}`, "status tool_running");
+              } else if (data.status === "tool_complete") {
+                addMessage(`✅ ${data.message}`, "status tool_complete");
+              }
+              break;
+
+            case "final_response":
+              addMessage(
+                `<strong>Agent Response:</strong><br>${data.response}`,
+                "response"
+              );
+              document.getElementById("sendButton").disabled = false;
+              break;
+
+            case "keep_alive":
+              // Just a keep-alive, no action needed
+              break;
+          }
+        };
+
+        eventSource.onerror = function (event) {
+          console.error("SSE error:", event);
+          addMessage("❌ Connection error. Please refresh the page.", "status");
+        };
+      }
+
+      async function sendQuery() {
+        const queryInput = document.getElementById("queryInput");
+        const query = queryInput.value.trim();
+
+        if (!query) return;
+
+        document.getElementById("sendButton").disabled = true;
+        addMessage(`<strong>You:</strong> ${query}`, "");
+
+        try {
+          // Generate a session ID if we don't have one
+          if (!currentSessionId) {
+            currentSessionId =
+              "session_" +
+              Date.now() +
+              "_" +
+              Math.random().toString(36).substr(2, 9);
+            initSSE(currentSessionId);
+          }
+
+          const response = await fetch("/api/v1/root_agent/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Session-ID": currentSessionId,
+            },
+            body: JSON.stringify({ text: query }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+
+          // The response will come via SSE, but we can show references here
+          if (result.references && Object.keys(result.references).length > 0) {
+            let referencesHtml = "<strong>References:</strong><ul>";
+            for (const [key, ref] of Object.entries(result.references)) {
+              referencesHtml += `<li><a href="${ref.link}" target="_blank">${ref.title}</a></li>`;
+            }
+            referencesHtml += "</ul>";
+            addMessage(referencesHtml, "response");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          addMessage(`❌ Error: ${error.message}`, "status");
+          document.getElementById("sendButton").disabled = false;
+        }
+
+        queryInput.value = "";
+      }
+
+      // Allow Enter key to send query
+      document
+        .getElementById("queryInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendQuery();
+          }
+        });
+
+      // Initialize with a session ID
+      document.addEventListener("DOMContentLoaded", function () {
+        currentSessionId =
+          "session_" +
+          Date.now() +
+          "_" +
+          Math.random().toString(36).substr(2, 9);
+        initSSE(currentSessionId);
+        addMessage(
+          "💡 Connected! You can now ask questions about Collective Bargaining Agreements.",
+          "status"
+        );
+      });
+    </script>
+  </body>
+</html>
