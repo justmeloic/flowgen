@@ -71,3 +71,6 @@ src/test.py
 
 # Builds
 static_frontend/
+
+# Test data
+testdata/
