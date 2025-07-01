@@ -1,0 +1,77 @@
+"""
+Router for serving the static frontend application.
+
+This module handles the logic for serving a static build of a web application,
+including mounting static asset directories and providing fallback routing
+for single-page applications (SPAs).
+"""
+
+from pathlib import Path
+
+from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+# Create a new router for the frontend
+frontend_router = APIRouter()
+
+# Define the path to the static build directory
+static_files_dir = Path(__file__).parent.parent.parent.parent / 'build/static_frontend'
+
+
+def register_frontend_routes(app: FastAPI):
+    """
+    Registers all routes necessary to serve the frontend application.
+
+    This function checks if the frontend build exists and then configures
+    the necessary routes and static file mounts on the main FastAPI app instance.
+
+    Args:
+        app: The main FastAPI application instance.
+    """
+    if not static_files_dir.is_dir():
+        # If the frontend directory doesn't exist, register a simple root endpoint
+        # and log a warning.
+        @app.get('/')
+        async def root():
+            return {
+                'message': 'API is running. Frontend not found.',
+                'docs_url': '/docs',
+            }
+
+        return  # Stop further frontend route registration
+
+    app.mount(
+        '/_next',
+        StaticFiles(directory=static_files_dir / '_next'),
+        name='next-static-assets',
+    )
+
+    # Serve the root index.html
+    @frontend_router.get('/', response_class=FileResponse, include_in_schema=False)
+    async def serve_root_index() -> FileResponse:
+        """Serves the main index.html file for the root path."""
+        index_path = static_files_dir / 'index.html'
+        if not index_path.is_file():
+            raise HTTPException(status_code=404, detail='Frontend index.html not found')
+        return FileResponse(index_path)
+
+    # Catch-all route to serve other frontend files or the main index.html
+    @frontend_router.get('/{full_path:path}', response_class=FileResponse)
+    async def serve_spa(full_path: str) -> FileResponse:
+        """
+        Serves static files for the SPA or falls back to index.html.
+
+        This allows the client-side router to handle application navigation.
+        """
+        file_path = static_files_dir / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+
+        index_html_path = static_files_dir / 'index.html'
+        if index_html_path.is_file():
+            return FileResponse(index_html_path)
+
+        raise HTTPException(status_code=404, detail='Not Found')
+
+    app.include_router(frontend_router)

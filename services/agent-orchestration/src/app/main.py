@@ -1,14 +1,27 @@
-"""Main FastAPI application entry point."""
+"""
+Main FastAPI application entry point.
+
+This module contains the core FastAPI application setup for the Agent Orchestration service.
+It handles application configuration, middleware setup, routing, and serves both API endpoints
+and static frontend files. The application integrates with Google Cloud Platform services
+and provides session management capabilities.
+
+Features:
+- RESTful API endpoints for agent orchestration
+- Static file serving for frontend applications
+- CORS middleware for cross-origin requests
+- Session management with in-memory storage
+- Health check endpoints
+- Comprehensive logging setup
+- GCP environment configuration
+"""
 
 import os
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 from google.adk.sessions import InMemorySessionService
 from loguru import logger
 
@@ -16,10 +29,28 @@ from src.app.api.v1.endpoints import api_router
 from src.app.core.config import settings
 from src.app.core.logging import setup_logging
 from src.app.middleware.session_middleware import SessionMiddleware
+from src.app.staticfrontend.router import register_frontend_routes
 
 
 def configure_gcp_environment() -> None:
-    """Configure Google Cloud Platform environment variables."""
+    """
+    Configure Google Cloud Platform environment variables.
+
+    Loads environment variables from .env file and validates that required
+    GCP configuration is present. Sets up the GOOGLE_CLOUD_PROJECT and
+    GOOGLE_CLOUD_LOCATION environment variables for use by GCP client libraries.
+
+    This configuration is essential when GOOGLE_GENAI_USE_VERTEXAI=TRUE as the
+    VertexAI service will be accessed through the GCP platform.
+
+    Raises:
+        ValueError: If required GCP environment variables (GOOGLE_CLOUD_PROJECT
+            or GOOGLE_CLOUD_LOCATION) are missing or empty.
+
+    Note:
+        This function must be called before initializing any GCP services
+        to ensure proper authentication and project configuration.
+    """
     load_dotenv()
 
     if not all([settings.GOOGLE_CLOUD_PROJECT, settings.GOOGLE_CLOUD_LOCATION]):
@@ -33,7 +64,23 @@ def configure_gcp_environment() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Handle application startup and shutdown events."""
+    """
+    Handle application startup and shutdown events.
+
+    This async context manager manages the application lifecycle, performing
+    necessary setup during startup and cleanup during shutdown. It configures
+    logging, validates GCP environment, and initializes the session service.
+
+    Args:
+        app (FastAPI): The FastAPI application instance.
+
+    Yields:
+        None: Control is yielded back to the application during its runtime.
+
+    Note:
+        This function is called automatically by FastAPI during application
+        startup and shutdown phases.
+    """
     setup_logging()
     logger.info('Starting Agent Orchestration API...')
     configure_gcp_environment()
@@ -51,7 +98,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Set up CORS
+# Set up middleware
 app.add_middleware(CORSMiddleware, **settings.cors.model_dump())
 app.add_middleware(SessionMiddleware)
 
@@ -65,49 +112,24 @@ app.include_router(api_v1_router)
 # Health check endpoint - must be before catch-all route
 @app.get('/health')
 async def health_check():
-    """Health check endpoint."""
+    """
+    Health check endpoint for application monitoring.
+
+    Provides a simple health status check that can be used by load balancers,
+    monitoring systems, or deployment pipelines to verify that the application
+    is running and responsive.
+
+    Returns:
+        dict: A dictionary containing the application status and version.
+            - status (str): Always "healthy" when the endpoint is reachable
+            - version (str): The current API version from settings
+
+    Example:
+        GET /health
+        Response: {"status": "healthy", "version": "1.0.0"}
+    """
     return {'status': 'healthy', 'version': settings.API_VERSION}
 
 
-# Set up static frontend files
-static_files_dir = Path(__file__).parent.parent.parent / 'build/static_frontend'
-
-if static_files_dir.exists():
-    # Mount Next.js static assets
-    next_assets_path = static_files_dir / '_next'
-    if next_assets_path.exists():
-        app.mount(
-            '/_next', StaticFiles(directory=next_assets_path), name='next-static-assets'
-        )
-
-    @app.get('/{full_path:path}', response_class=FileResponse)
-    async def serve_frontend_app(full_path: str) -> FileResponse:
-        """Serves frontend files or index.html for client-side routing."""
-        file_path = static_files_dir / full_path
-        if file_path.is_file():
-            return FileResponse(file_path)
-
-        index_html_path = static_files_dir / 'index.html'
-        if index_html_path.exists():
-            return FileResponse(index_html_path)
-
-        raise HTTPException(status_code=404, detail='Not Found')
-
-    @app.get('/', response_class=FileResponse, include_in_schema=False)
-    async def serve_frontend_root() -> FileResponse:
-        """Serves the frontend's index.html from the root path."""
-        index_path = static_files_dir / 'index.html'
-        if not index_path.exists():
-            raise HTTPException(status_code=404, detail='Frontend index.html not found')
-        return FileResponse(index_path)
-else:
-
-    @app.get('/')
-    async def root():
-        """Root endpoint for health check when no frontend is available."""
-        return {
-            'message': 'Agent Orchestration API is running',
-            'title': settings.API_TITLE,
-            'version': settings.API_VERSION,
-            'status': 'healthy',
-        }
+# Register frontend routes
+register_frontend_routes(app)
