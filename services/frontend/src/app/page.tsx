@@ -48,11 +48,28 @@ export default function ChatPage() {
   useEffect(() => {
     if (isLoading) {
       const intervalId = setInterval(() => {
-        setLoadingText((prevText) =>
-          prevText === "Generating..." ? "Thinking..." : "Generating..."
-        );
-      }, 1000);
-      return () => clearInterval(intervalId);
+        setLoadingText((prevText) => {
+          if (
+            prevText === "Please wait while I look for your document..." ||
+            prevText === "Analyzing your CBA to find the answer..."
+          ) {
+            return prevText === "Please wait while I look for your document..."
+              ? "Analyzing your CBA to find the answer..."
+              : "Please wait while I look for your document...";
+          }
+          return "Thinking...";
+        });
+      }, 3000); // alternation after 3 seconds
+
+      // Show longer messages after 5 seconds (this is when the Agent is executing a tool)
+      const timeoutId = setTimeout(() => {
+        setLoadingText("Please wait while I look for your document...");
+      }, 5000);
+
+      return () => {
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+      };
     }
   }, [isLoading]);
 
@@ -62,10 +79,11 @@ export default function ChatPage() {
         setIsFirstPrompt(false);
       }
       setIsLoading(true);
+      setLoadingText("Thinking..."); // Reset to initial state for each new request
       setChatHistory((prev) => [
         ...prev,
         { role: "user", content: userMessage },
-        { role: "bot", content: loadingText },
+        { role: "bot", content: "Thinking..." }, // Use hardcoded initial text
       ]);
       setTimeout(scrollToBottom, 0);
 
@@ -195,8 +213,8 @@ export default function ChatPage() {
                       >
                         {message.role === "bot" ? (
                           isLoading &&
-                          message.content === loadingText &&
-                          index === chatHistory.length - 1 ? (
+                          index === chatHistory.length - 1 &&
+                          message.role === "bot" ? (
                             <span className="italic">{loadingText}</span>
                           ) : (
                             <div className="prose prose-sm max-w-none">
