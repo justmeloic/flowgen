@@ -56,8 +56,8 @@ export function ReferencesPanel({ references }: ReferencesPanelProps) {
             className="relative"
           >
             <AccordionTrigger className="px-4 text-left">
-              <span className="mr-2">[{key}]</span>
-              {ref.title}
+              <span className="mr-2 flex-shrink-0">[{key}]</span>
+              <span className="text-left break-words min-w-0">{ref.title}</span>
             </AccordionTrigger>
             <AccordionContent className="px-4">
               <div className="flex justify-center w-full">

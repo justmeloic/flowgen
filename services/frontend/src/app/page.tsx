@@ -148,7 +148,7 @@ export default function ChatPage() {
       <div className="flex flex-1 overflow-hidden">
         <main
           className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${
-            Object.keys(references).length > 0 ? "mr-80" : ""
+            Object.keys(references).length > 0 ? "mr-[28rem]" : ""
           }`}
         >
           <div
@@ -197,7 +197,13 @@ export default function ChatPage() {
                   >
                     <div className="flex items-start gap-2.5 max-w-[85%] md:max-w-[80%]">
                       {message.role === "bot" && (
-                        <Avatar className="w-8 h-8 shrink-0">
+                        <Avatar
+                          className={`w-8 h-8 shrink-0 ${
+                            isLoading && index === chatHistory.length - 1
+                              ? "animate-bounce"
+                              : ""
+                          }`}
+                        >
                           <AvatarImage
                             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-avatar-icon-sp2bKzW5OCu4C1f64jSvrbY0bgCc8M.png"
                             alt="Bot Avatar"
@@ -237,6 +243,7 @@ export default function ChatPage() {
                     </div>
                     {message.role === "bot" &&
                       index === chatHistory.length - 1 &&
+                      !isLoading &&
                       !(isLoading && message.content === loadingText) && (
                         <div className="ml-10 mt-2">
                           <MessageActions message={message.content} />
@@ -275,7 +282,7 @@ export default function ChatPage() {
         {Object.keys(references).length > 0 && (
           <div
             data-references-panel
-            className={`fixed right-0 w-80 bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-1700 ease-in-out ${
+            className={`fixed right-0 w-[28rem] bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-1700 ease-in-out ${
               Object.keys(references).length > 0
                 ? "translate-x-0"
                 : "translate-x-[120%]"
