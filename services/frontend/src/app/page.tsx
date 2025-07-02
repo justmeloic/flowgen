@@ -34,6 +34,7 @@ export default function ChatPage() {
   const [isFirstPrompt, setIsFirstPrompt] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Thinking...");
+  const [isReferencesHidden, setIsReferencesHidden] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -138,6 +139,10 @@ export default function ChatPage() {
     scrollToBottom();
   }, [chatHistory, scrollToBottom]);
 
+  const toggleReferencesVisibility = () => {
+    setIsReferencesHidden((prev) => !prev);
+  };
+
   return (
     <div className="flex flex-col flex-1 h-full">
       <div className="flex items-center justify-between">
@@ -148,7 +153,9 @@ export default function ChatPage() {
       <div className="flex flex-1 overflow-hidden">
         <main
           className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${
-            Object.keys(references).length > 0 ? "mr-[28rem]" : ""
+            Object.keys(references).length > 0 && !isReferencesHidden
+              ? "mr-[28rem]"
+              : ""
           }`}
         >
           <div
@@ -280,16 +287,44 @@ export default function ChatPage() {
         </main>
 
         {Object.keys(references).length > 0 && (
-          <div
-            data-references-panel
-            className={`fixed right-0 w-[28rem] bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-1700 ease-in-out ${
-              Object.keys(references).length > 0
-                ? "translate-x-0"
-                : "translate-x-[120%]"
-            }`}
-          >
-            <ReferencesPanel references={references} />
-          </div>
+          <>
+            {/* Show references button when panel is hidden */}
+            {isReferencesHidden && (
+              <button
+                onClick={toggleReferencesVisibility}
+                className="fixed right-4 top-40 z-20 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
+                aria-label="Show references"
+              >
+                <svg
+                  className="w-5 h-5 text-gray-600 dark:text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+            )}
+
+            {/* References panel */}
+            <div
+              data-references-panel
+              className={`fixed right-0 w-[28rem] bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-700 ease-in-out shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] ${
+                isReferencesHidden ? "translate-x-[120%]" : "translate-x-0"
+              }`}
+            >
+              <ReferencesPanel
+                references={references}
+                isHidden={isReferencesHidden}
+                onToggleVisibility={toggleReferencesVisibility}
+              />
+            </div>
+          </>
         )}
       </div>
       <Toaster />

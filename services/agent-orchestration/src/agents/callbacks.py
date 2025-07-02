@@ -81,41 +81,6 @@ def store_tool_result_callback(
         return None
 
 
-def before_tool_callback(
-    tool: BaseTool,
-    args: Dict[str, Any],
-    tool_context: ToolContext,
-) -> Optional[Dict[str, Any]]:
-    """Callback executed before a tool runs to send SSE notifications."""
-    try:
-        # Get session ID from context if available
-        session_id = getattr(tool_context, 'session_id', None)
-
-        if session_id:
-            import asyncio
-
-            # Estimate duration based on tool type
-            estimated_duration = None
-            if tool.name == '_process_agreements_impl':
-                estimated_duration = 30  # Processing PDFs takes longer
-            elif tool.name == 'search_cba_datastore':
-                estimated_duration = 10  # Search is faster
-
-            try:
-                asyncio.create_task(
-                    sse_manager.send_tool_start(
-                        session_id, tool.name, estimated_duration
-                    )
-                )
-            except Exception as e:
-                _logger.warning(f'Could not send tool start SSE: {e}')
-
-        return None
-    except Exception as e:
-        _logger.error('Error in before_tool_callback: %s', e)
-        return None
-
-
 def before_model_callback(
     callback_context: CallbackContext, llm_request: LlmRequest
 ) -> Optional[LlmResponse]:

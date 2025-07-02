@@ -39,10 +39,10 @@ try:
     # from .tools.document_understanding import process_agreements
     from .callbacks import (
         before_model_callback,
-        before_tool_callback,
         store_tool_result_callback,
     )
     from .system_instructions import (
+        return_document_processing_instructions,
         return_global_instructions,
         return_root_agent_instructions,
     )
@@ -51,10 +51,10 @@ except ImportError:
     # from tools.document_understanding import process_agreements
     from callbacks import (
         before_model_callback,
-        before_tool_callback,
         store_tool_result_callback,
     )
     from system_instructions import (
+        return_document_processing_instructions,
         return_global_instructions,
         return_root_agent_instructions,
     )
@@ -142,7 +142,10 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
         if pdf_path.exists():
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash-exp',
+                    model=os.getenv('GEMINI_MODEL'),
+                    config=types.GenerateContentConfig(
+                        system_instruction=return_document_processing_instructions()
+                    ),
                     contents=[
                         types.Part.from_bytes(
                             data=pdf_path.read_bytes(),
@@ -184,6 +187,9 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
             try:
                 response = client.models.generate_content(
                     model='gemini-2.0-flash-exp',
+                    config=types.GenerateContentConfig(
+                        system_instruction=return_document_processing_instructions()
+                    ),
                     contents=[
                         types.Part.from_bytes(
                             data=pdf_path.read_bytes(),
@@ -226,6 +232,9 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
             try:
                 response = client.models.generate_content(
                     model='gemini-2.0-flash-exp',
+                    config=types.GenerateContentConfig(
+                        system_instruction=return_document_processing_instructions()
+                    ),
                     contents=[
                         types.Part.from_bytes(
                             data=pdf_path.read_bytes(),
