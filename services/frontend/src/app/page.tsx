@@ -179,13 +179,13 @@ export default function ChatPage() {
                       Hello!
                     </span>
                   </h1>
-                  <h3 className="text-center text-sm md:text-sm font-bold w-[460px]">
+                  <h3 className="text-center text-sm md:text-sm font-bold w-[450px]">
                     <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
                       I can help you with questions about your Collective
                       Bargaining Agreement (CBA). To find the most accurate
-                      information, could you please tell me your role (like
-                      engineer or conductor) and your region or the specific
-                      agreement you're referring to?
+                      information, could you please tell me your role
+                      (Conductor, Engineer, or Yard Coordinator) and your work
+                      territory/location?
                     </span>
                   </h3>
                 </div>

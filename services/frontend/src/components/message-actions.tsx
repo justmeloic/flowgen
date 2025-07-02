@@ -1,18 +1,11 @@
 import {
-  Copy,
-  ThumbsUp,
-  ThumbsDown,
-  MoreHorizontal,
-  VolumeIcon as VolumeUp,
-  Pause,
-} from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
+import { Copy, MoreHorizontal, Pause, Volume2 } from "lucide-react";
 import React from "react";
 
 interface MessageActionsProps {
@@ -20,7 +13,6 @@ interface MessageActionsProps {
 }
 
 export function MessageActions({ message }: MessageActionsProps) {
-  const { toast } = useToast();
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [audioRef, setAudioRef] =
     React.useState<SpeechSynthesisUtterance | null>(null);
@@ -33,7 +25,8 @@ export function MessageActions({ message }: MessageActionsProps) {
           title: "Copied to clipboard",
           description: "The message has been copied.",
           duration: 3000,
-          className: "bottom-0 left-0 fixed mb-4 ml-4",
+          className:
+            "bottom-0 left-0 fixed mb-4 ml-4 bg-blue-50 dark:bg-gray-800/80 rounded-3xl shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] text-gray-600 dark:text-gray-300",
         });
       })
       .catch((err) => {
@@ -43,7 +36,8 @@ export function MessageActions({ message }: MessageActionsProps) {
           description: "Failed to copy the message. Please try again.",
           variant: "destructive",
           duration: 3000,
-          className: "bottom-0 left-0 fixed mb-4 ml-4",
+          className:
+            "bottom-0 left-0 fixed mb-4 ml-4 bg-blue-50 dark:bg-gray-800/80 rounded-3xl shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] text-red-600 dark:text-red-300",
         });
       });
   };
@@ -65,7 +59,8 @@ export function MessageActions({ message }: MessageActionsProps) {
       title: "Audio playing",
       description: "The message is being read aloud.",
       duration: 3000,
-      className: "bottom-0 left-0 fixed mb-4 ml-4",
+      className:
+        "bottom-0 left-0 fixed mb-4 ml-4 bg-blue-50 dark:bg-gray-800/80 rounded-3xl shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] text-gray-600 dark:text-gray-300",
     });
   };
 
@@ -77,7 +72,8 @@ export function MessageActions({ message }: MessageActionsProps) {
         title: "Audio paused",
         description: "The audio has been paused.",
         duration: 3000,
-        className: "bottom-0 left-0 fixed mb-4 ml-4",
+        className:
+          "bottom-0 left-0 fixed mb-4 ml-4 bg-blue-50 dark:bg-gray-800/80 rounded-3xl shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] text-gray-600 dark:text-gray-300",
       });
     }
   };
@@ -90,7 +86,8 @@ export function MessageActions({ message }: MessageActionsProps) {
         type === "up" ? "positive" : "negative"
       } feedback.`,
       duration: 3000,
-      className: "bottom-0 left-0 fixed mb-4 ml-4",
+      className:
+        "bottom-0 left-0 fixed mb-4 ml-4 bg-blue-50 dark:bg-gray-800/80 rounded-3xl shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] text-gray-600 dark:text-gray-300",
     });
   };
 
@@ -102,10 +99,11 @@ export function MessageActions({ message }: MessageActionsProps) {
       >
         <Copy className="h-4 w-4 text-gray-600" />
       </button>
-      <button
+      {/*<button
         onClick={() => handleFeedback("up")}
         className="p-2 hover:bg-gray-200 rounded-full transition-colors"
       >
+         
         <ThumbsUp className="h-4 w-4 text-gray-600" />
       </button>
       <button
@@ -113,7 +111,7 @@ export function MessageActions({ message }: MessageActionsProps) {
         className="p-2 hover:bg-gray-200 rounded-full transition-colors"
       >
         <ThumbsDown className="h-4 w-4 text-gray-600" />
-      </button>
+      </button> */}
       {isPlaying ? (
         <button
           onClick={handlePause}
@@ -126,7 +124,7 @@ export function MessageActions({ message }: MessageActionsProps) {
           onClick={handlePlay}
           className="p-2 hover:bg-gray-200 rounded-full transition-colors"
         >
-          <VolumeUp className="h-4 w-4 text-gray-600" />
+          <Volume2 className="h-4 w-4 text-gray-600" />
         </button>
       )}
       <DropdownMenu>
