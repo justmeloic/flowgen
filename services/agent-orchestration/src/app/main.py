@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from google.adk.sessions import InMemorySessionService
 from loguru import logger
 
+from src.app.api.utility_router import router as utility_router
 from src.app.api.v1.endpoints import api_router
 from src.app.core.config import settings
 from src.app.core.logging import setup_logging
@@ -95,6 +96,9 @@ api_v1_router = APIRouter(prefix='/api/v1')
 
 api_v1_router.include_router(api_router)
 app.include_router(api_v1_router)
+
+# Set up utility routes (for PoC purposes)
+app.include_router(utility_router, prefix='/api/utils', tags=['utilities'])
 
 
 # Health check endpoint - must be before catch-all route

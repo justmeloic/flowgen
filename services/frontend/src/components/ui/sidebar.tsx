@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, MessageSquare } from "lucide-react";
+import { BookOpen, MessageSquare, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
@@ -23,6 +23,31 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
+  const [isRestarting, setIsRestarting] = useState(false);
+
+  const handleRestart = async () => {
+    setIsRestarting(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/utils/restart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        console.log("Server restart initiated");
+        // Show success feedback for a moment
+        setTimeout(() => setIsRestarting(false), 2000);
+      } else {
+        console.error("Failed to restart server");
+        setIsRestarting(false);
+      }
+    } catch (error) {
+      console.error("Error restarting server:", error);
+      setIsRestarting(false);
+    }
+  };
 
   const sidebarLinks = [
     {
@@ -108,7 +133,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         {/* **New Title Added Here** */}
         <div
           className={cn(
-            "mb-2 mt-[300px] font-semibold text-gray-700 text-sm",
+            "mb-2 mt-[240px] font-semibold text-gray-700 text-sm",
             isCollapsed && !isHovered ? "text-center" : ""
           )}
         >
@@ -155,6 +180,58 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
             );
           })}
         </nav>
+
+        {/* Restart Button at the bottom */}
+        <div className="mt-auto mb-24">
+          <div
+            className={cn(
+              "mb-2 font-semibold text-gray-700 text-sm",
+              isCollapsed && !isHovered ? "text-center" : ""
+            )}
+          >
+            Dev Tools
+          </div>
+          {isCollapsed && !isHovered ? (
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRestart}
+                  disabled={isRestarting}
+                  className={cn(
+                    "w-full flex items-center justify-center p-2 text-muted-foreground hover:text-white hover:bg-red-500/80  hover:border-red-400 rounded-3xl",
+                    isRestarting && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <RotateCcw
+                    className={cn("h-4 w-4", isRestarting && "animate-spin")}
+                  />
+                  <span className="sr-only">Restart Server</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" className="flex items-center gap-4">
+                Restart Server
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRestart}
+              disabled={isRestarting}
+              className={cn(
+                "w-full flex items-center gap-2 px-3 py-2 text-muted-foreground hover:text-white hover:bg-red-500/80  hover:border-red-400 rounded-3xl",
+                isRestarting && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <RotateCcw
+                className={cn("h-4 w-4", isRestarting && "animate-spin")}
+              />
+              {isRestarting ? "Restarting..." : "Restart Server"}
+            </Button>
+          )}
+        </div>
       </TooltipProvider>
     </div>
   );

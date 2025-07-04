@@ -51,6 +51,7 @@ cover/
 *.log
 logs/
 log/
+*nohup.out
 
 # Local development
 *.db
