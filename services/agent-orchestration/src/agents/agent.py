@@ -20,6 +20,7 @@ interacting with the LLM.
 """
 
 # Standard library imports
+import asyncio
 import csv
 import json
 import logging
@@ -65,7 +66,7 @@ load_dotenv()
 _logger = logging.getLogger(__name__)
 
 
-# ========================= START:WORKAROUND FOR FUNCTION CALLING =========================
+# ======================= START:WORKAROUND FOR FUNCTION CALLING =======================
 """
 NOTE[Loïc]:
 
@@ -93,7 +94,7 @@ TODO: Investigate if explicitly passing schema parameter resolves this issue
 
 
 def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str, str]:
-    """Process agreement PDFs with Gemini based on role and territory.
+    """Process agreement PDFs with Gemini based on role and territory in parallel.
 
     Args:
         prompt (str): The prompt to apply to the PDF documents
@@ -124,69 +125,89 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
             'processed_agreements': [],
         }
 
-    client = genai.Client()
-    results = {}
-    processed_agreements = []
+    # Check if we're already in an async context
+    # This is because our application might ve already
+    # running in an async context (FastAPI/uvicorn),
+    # so we shouldn't try to create a new event loop with asyncio.run().
 
-    # Base path to the agreements directory
+    try:
+        asyncio.get_running_loop()
+        # We're in an async context, create a task
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(
+                lambda: asyncio.run(
+                    _process_documents_async(prompt, role, territory, agreement_info)
+                )
+            )
+            return future.result()
+    except RuntimeError:
+        # No running loop, safe to use asyncio.run()
+        return asyncio.run(
+            _process_documents_async(prompt, role, territory, agreement_info)
+        )
+
+
+async def _process_documents_async(
+    prompt: str, role: str, territory: str, agreement_info: Dict[str, Optional[str]]
+) -> Dict[str, str]:
+    """Process multiple agreement documents in parallel using asyncio."""
+    client = genai.Client()
+
+    # Base paths
+    testdata_dir = os.getenv('TESTDATA_DIR', 'testdata')
     agreements_dir = os.path.join(
-        os.path.dirname(__file__), '..', '..', 'testdata', 'agreements'
+        os.path.dirname(__file__), '..', '..', testdata_dir, 'agreements'
     )
     locals_dir = os.path.join(
-        os.path.dirname(__file__), '..', '..', 'testdata', 'locals'
+        os.path.dirname(__file__), '..', '..', testdata_dir, 'locals'
     )
 
-    # Process primary agreement
-    if agreement_info['primary_agreement']:
-        pdf_path = pathlib.Path(agreements_dir) / agreement_info['primary_agreement']
-        if pdf_path.exists():
-            try:
-                response = client.models.generate_content(
-                    model=os.getenv('GEMINI_MODEL'),
-                    config=types.GenerateContentConfig(
-                        system_instruction=return_document_processing_instructions()
-                    ),
-                    contents=[
-                        types.Part.from_bytes(
-                            data=pdf_path.read_bytes(),
-                            mime_type='application/pdf',
-                        ),
-                        f'{prompt}\n\nDocument: {agreement_info["primary_agreement"]}',
-                    ],
-                )
-                results['primary_agreement'] = {
-                    'filename': agreement_info['primary_agreement'],
-                    'response': response.text,
-                    'status': 'success',
-                }
-                processed_agreements.append(agreement_info['primary_agreement'])
-            except Exception as e:
-                _logger.error(
-                    'Error processing primary agreement %s: %s',
-                    agreement_info['primary_agreement'],
-                    e,
-                )
-                results['primary_agreement'] = {
-                    'filename': agreement_info['primary_agreement'],
-                    'error': str(e),
-                    'status': 'error',
-                }
-        else:
-            results['primary_agreement'] = {
-                'filename': agreement_info['primary_agreement'],
+    # Define agreement types to process
+    agreement_types = [
+        {
+            'key': 'primary_agreement',
+            'base_dir': agreements_dir,
+            'model': os.getenv('GEMINI_MODEL'),
+        },
+        {
+            'key': 'subsequent_agreements',
+            'base_dir': agreements_dir,
+            'model': os.getenv('GEMINI_MODEL'),
+        },
+        {
+            'key': 'local_agreements',
+            'base_dir': locals_dir,
+            'model': os.getenv('GEMINI_MODEL'),
+        },
+    ]
+
+    async def process_document(agreement_type):
+        """Process a single document asynchronously."""
+        key = agreement_type['key']
+        filename = agreement_info[key]
+
+        if not filename:
+            return None
+
+        pdf_path = pathlib.Path(agreement_type['base_dir']) / filename
+
+        if not pdf_path.exists():
+            return {
+                'key': key,
+                'filename': filename,
                 'error': 'File not found',
                 'status': 'not_found',
             }
 
-    # Process subsequent agreements
-    if agreement_info['subsequent_agreements']:
-        pdf_path = (
-            pathlib.Path(agreements_dir) / agreement_info['subsequent_agreements']
-        )
-        if pdf_path.exists():
-            try:
-                response = client.models.generate_content(
-                    model='gemini-2.0-flash-exp',
+        try:
+            # Run Gemini API call in thread pool
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                lambda: client.models.generate_content(
+                    model=agreement_type['model'],
                     config=types.GenerateContentConfig(
                         system_instruction=return_document_processing_instructions()
                     ),
@@ -195,76 +216,82 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
                             data=pdf_path.read_bytes(),
                             mime_type='application/pdf',
                         ),
-                        (
-                            f'{prompt}\n\nDocument: '
-                            f'{agreement_info["subsequent_agreements"]}'
-                        ),
+                        f'{prompt}\n\nDocument: {filename}',
                     ],
-                )
-                results['subsequent_agreements'] = {
-                    'filename': agreement_info['subsequent_agreements'],
-                    'response': response.text,
-                    'status': 'success',
-                }
-                processed_agreements.append(agreement_info['subsequent_agreements'])
-            except Exception as e:
-                _logger.error(
-                    'Error processing subsequent agreement %s: %s',
-                    agreement_info['subsequent_agreements'],
-                    e,
-                )
-                results['subsequent_agreements'] = {
-                    'filename': agreement_info['subsequent_agreements'],
-                    'error': str(e),
-                    'status': 'error',
-                }
-        else:
-            results['subsequent_agreements'] = {
-                'filename': agreement_info['subsequent_agreements'],
-                'error': 'File not found',
-                'status': 'not_found',
+                ),
+            )
+
+            return {
+                'key': key,
+                'filename': filename,
+                'response': response.text,
+                'status': 'success',
             }
 
-    # Process local agreements
-    if agreement_info['local_agreements']:
-        pdf_path = pathlib.Path(locals_dir) / agreement_info['local_agreements']
-        if pdf_path.exists():
-            try:
-                response = client.models.generate_content(
-                    model='gemini-2.0-flash-exp',
-                    config=types.GenerateContentConfig(
-                        system_instruction=return_document_processing_instructions()
-                    ),
-                    contents=[
-                        types.Part.from_bytes(
-                            data=pdf_path.read_bytes(),
-                            mime_type='application/pdf',
-                        ),
-                        f'{prompt}\n\nDocument: {agreement_info["local_agreements"]}',
-                    ],
-                )
-                results['local_agreements'] = {
-                    'filename': agreement_info['local_agreements'],
-                    'response': response.text,
-                    'status': 'success',
-                }
-                processed_agreements.append(agreement_info['local_agreements'])
-            except Exception as e:
-                _logger.error(
-                    'Error processing local agreement %s: %s',
-                    agreement_info['local_agreements'],
-                    e,
-                )
-                results['local_agreements'] = {
-                    'filename': agreement_info['local_agreements'],
-                    'error': str(e),
-                    'status': 'error',
-                }
-        else:
-            results['local_agreements'] = {
-                'filename': agreement_info['local_agreements'],
-                'error': 'File not found',
-                'status': 'not_found',
+        except (IOError, OSError) as e:
+            # File reading errors
+            _logger.error(
+                'Error reading file %s for %s: %s',
+                filename,
+                key.replace('_', ' '),
+                e,
+            )
+            return {
+                'key': key,
+                'filename': filename,
+                'error': f'File reading error: {str(e)}',
+                'status': 'error',
+            }
+        except (ValueError, TypeError) as e:
+            # API configuration or data type errors
+            _logger.error(
+                'Error processing %s %s (configuration/data error): %s',
+                key.replace('_', ' '),
+                filename,
+                e,
+            )
+            return {
+                'key': key,
+                'filename': filename,
+                'error': f'Configuration error: {str(e)}',
+                'status': 'error',
+            }
+        except Exception as e:
+            # Catch-all for unexpected errors (re-raising context preserved)
+            _logger.error(
+                'Unexpected error processing %s %s: %s',
+                key.replace('_', ' '),
+                filename,
+                e,
+            )
+            return {
+                'key': key,
+                'filename': filename,
+                'error': f'Unexpected error: {str(e)}',
+                'status': 'error',
+            }
+
+    # Execute all tasks in parallel
+    tasks = [process_document(at) for at in agreement_types]
+    results = await asyncio.gather(*tasks)
+
+    # Process results
+    final_results = {}
+    processed_agreements = []
+
+    for result in results:
+        if result and result['status'] == 'success':
+            final_results[result['key']] = {
+                'filename': result['filename'],
+                'response': result['response'],
+                'status': 'success',
+            }
+            processed_agreements.append(result['filename'])
+        elif result:
+            final_results[result['key']] = {
+                'filename': result['filename'],
+                'error': result.get('error', 'Unknown error'),
+                'status': result['status'],
             }
 
     return {
@@ -272,7 +299,7 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
         'territory': territory,
         'region': agreement_info['region'],
         'prompt': prompt,
-        'results': results,
+        'results': final_results,
         'processed_agreements': processed_agreements,
     }
 
@@ -293,8 +320,8 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
         os.path.dirname(__file__),
         '..',
         '..',
-        'testdata',
-        'Agreement_Mapping_with_Filenames.csv',
+        os.getenv('TESTDATA_DIR', 'testdata'),
+        os.getenv('AGREEMENT_MAPPING_CSV', 'Agreement_Mapping_with_Filenames.csv'),
     )
 
     try:
@@ -348,7 +375,7 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
             'local_agreements': None,
             'region': None,
         }
-    except Exception as e:
+    except (csv.Error, IOError, UnicodeDecodeError) as e:
         _logger.error('Error reading agreement mapping CSV: %s', e)
         return {
             'primary_agreement': None,
@@ -358,17 +385,17 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
         }
 
 
-# ========================= END:WORKAROUND FOR FUNCTION CALLING =========================
+# ======================== END:WORKAROUND FOR FUNCTION CALLING ========================
 
 
 root_agent = Agent(
     name='root_agent',
     model=os.getenv('GEMINI_MODEL'),
     description=(
-        'An agent that answers CN employee questions about their Collective '
-        'Bargaining Agreements (CBAs). It gathers user context (role and '
-        'territory), analyzes relevant CBA documents, and provides accurate, '
-        'evidence-based responses.'
+        'An agent that answers CN employee questions about their '
+        'Collective Bargaining Agreements (CBAs). It gathers user '
+        'context (role and territory), analyzes relevant CBA documents, '
+        'and provides accurate, evidence-based responses.'
     ),
     instruction=return_global_instructions(),
     global_instruction=return_root_agent_instructions(),
@@ -387,7 +414,7 @@ if __name__ == '__main__':
 
     # Test the agreement filename function
     print('Testing _get_agreement_filenames:')
-    result = _get_agreement_filenames('Engineer', 'Edmonton')
+    result = _get_agreement_filenames('Engineer', 'Tronton North')
     print(json.dumps(result, indent=2))
 
     # Test the Gemini processing function
