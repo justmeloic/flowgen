@@ -205,6 +205,99 @@ The session management flow works as follows:
 
 This stateful approach ensures conversation continuity and context preservation across multiple interactions.
 
+## Authentication
+
+This is a simple client-side authentication system implemented for the CBA Agent PoC. It provides basic access control using a secret code.
+
+## How it Works
+
+1. **Login Page**: Users are redirected to `/login` when they try to access any protected page
+2. **Secret Code**: Users must enter the correct access code to gain access
+3. **Session Storage**: Authentication state is stored in the browser's sessionStorage
+4. **Session Expiry**: Authentication expires after 24 hours
+5. **Logout**: Users can logout using the logout button in the header
+
+## Configuration
+
+The authentication is configured in `src/lib/auth-config.ts` and uses environment variables:
+
+```typescript
+export const AUTH_CONFIG = {
+  SECRET: process.env.NEXT_PUBLIC_AUTH_SECRET || "cn-cba-2025",
+  SESSION_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+  STORAGE_KEYS: {
+    AUTHENTICATED: "cba_authenticated",
+    TIMESTAMP: "cba_auth_timestamp",
+    REDIRECT: "cba_redirect_after_login",
+  },
+};
+```
+
+## Environment Variables
+
+Add the following to your `.env.local` file:
+
+```bash
+NEXT_PUBLIC_AUTH_SECRET=your-secret-here
+```
+
+For different environments, you can set different secrets:
+
+- `.env.development.local` - for development
+- `.env.local` - for production build
+- `.env.production.local` - for production
+
+## Usage
+
+### Default Secret Code
+
+The default secret code is: `cn-cba-2025`
+
+### Changing the Secret Code
+
+To change the secret code, update the `NEXT_PUBLIC_AUTH_SECRET` environment variable in your `.env.local` file
+
+### Session Duration
+
+To change how long the session lasts, modify the `SESSION_DURATION` value (in milliseconds)
+
+## Components
+
+- **Login Page**: `/src/app/login/page.tsx` - The login form
+- **useAuth Hook**: `/src/hooks/useAuth.ts` - Authentication logic
+- **ProtectedRoute**: `/src/components/protected-route.tsx` - Wrapper for protected pages
+- **Header**: `/src/components/header.tsx` - Updated to include logout button
+
+## Security Notes
+
+⚠️ **This is a PoC authentication system and should not be used in production!**
+
+- The secret is hardcoded in the client-side code
+- No server-side validation
+- Uses sessionStorage which can be manipulated by users
+- No rate limiting or brute force protection
+
+For production use, consider implementing:
+
+- Server-side authentication
+- JWT tokens
+- Database user management
+- Password hashing
+- Rate limiting
+- HTTPS enforcement
+- Security headers
+
+## Building and Deploying
+
+After making changes to the frontend, remember to build the static files:
+
+```bash
+cd services/frontend
+npm run build-static
+```
+
+The build output will be in the `out/` directory and needs to be copied to the backend's static folder for deployment.
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
