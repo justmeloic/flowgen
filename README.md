@@ -289,12 +289,145 @@ For production use, consider implementing:
 
 ## Building and Deploying
 
-After making changes to the frontend, remember to build the static files:
+This project uses a streamlined deployment model where the frontend is pre-rendered into static files and served by the FastAPI backend as a single deployable unit. The build is packaged and transferred via Google Cloud Storage for deployment on air-gapped environments.
+
+### Deployment Strategy Overview
+
+The deployment process follows these key principles:
+
+1. **Static Frontend Build**: The Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
+2. **Single Service Deployment**: The FastAPI backend serves both API endpoints and static frontend files
+3. **Air-Gapped Deployment**: Build artifacts are transferred via GCS bucket since deployment servers may not have internet access to clone repositories
+
+### Build Process
+
+#### Automated Build & Upload
+
+Use the automated build script to build the frontend and upload to GCS:
+
+```bash
+# From project root
+source scripts/build.sh
+```
+
+This script performs the following steps:
+
+1. 🎨 **Frontend Build**: Runs `npm install` (if needed) and `npm run build-static` in the frontend service
+2. 📦 **Archive Creation**: Creates a timestamped zip archive of the agent-orchestration service (including static frontend)
+3. 🧹 **GCS Cleanup**: Removes any existing build archives from the GCS bucket
+4. ☁️ **Upload**: Uploads the new build archive to `gs://cn-cba-usecase/`
+5. 🗑️ **Local Cleanup**: Removes the local zip file after upload
+
+#### Manual Frontend Build
+
+If you need to build just the frontend manually:
 
 ```bash
 cd services/frontend
-npm run build-static
+npm install                    # Install dependencies if needed
+npm run build-static          # Build and copy to backend
 ```
+
+The `build-static` script performs:
+
+```bash
+rm -rf .next out && next build && rm -rf ../agent-orchestration/build/static_frontend && cp -R ./out ../agent-orchestration/build/static_frontend
+```
+
+### Deployment Process
+
+#### Automated Deployment
+
+Deploy the latest build from GCS to your server:
+
+```bash
+# From project root (on target server)
+source scripts/deploy-vm.sh
+```
+
+This script performs the following steps:
+
+1. 📁 **Setup**: Creates deployment directory at `$PROJECT_ROOT/test_serving`
+2. 🔍 **Discovery**: Finds the latest build archive in the GCS bucket
+3. ⬇️ **Download**: Downloads and extracts the build archive
+4. 🐍 **Environment**: Sets up Python virtual environment and installs dependencies
+5. 🛑 **Cleanup**: Kills any existing processes using port 8000 or running uvicorn
+6. 📺 **Server**: Starts the FastAPI server in a detached screen session
+7. 📊 **Summary**: Provides deployment summary and screen session commands
+
+#### Deployment Architecture
+
+```mermaid
+graph LR
+    A[Developer Machine] -->|build.sh| B[GCS Bucket]
+    B -->|deploy-vm.sh| C[Target Server]
+
+    subgraph "Build Process"
+        A1[Frontend Build] --> A2[Static Files]
+        A2 --> A3[Zip Archive]
+        A3 --> A4[Upload to GCS]
+    end
+
+    subgraph "Deploy Process"
+        C1[Download from GCS] --> C2[Extract Archive]
+        C2 --> C3[Setup Environment]
+        C3 --> C4[Start Server]
+    end
+```
+
+#### Why This Approach?
+
+**Single Service Deployment**:
+
+- Simplifies deployment by having one FastAPI service that handles both API and frontend
+- Reduces operational complexity compared to managing separate frontend/backend services
+- Better performance due to reduced network hops
+
+**GCS-Based Transfer**:
+
+- Target deployment servers often lack internet access for security reasons
+- GCS provides reliable, versioned artifact storage
+- Enables deployment to air-gapped environments
+- Supports rollback by keeping previous build archives
+
+**Static Frontend Benefits**:
+
+- Faster page loads with pre-rendered content
+- Better SEO with server-side rendering at build time
+- Reduced server load as static files are served directly
+- Simplified deployment with no Node.js runtime required on the server
+
+### Server Management
+
+After deployment, use these commands to manage the server:
+
+```bash
+# Attach to the running server (see logs in real-time)
+screen -r agent-orchestration
+
+# Detach from screen session (server keeps running)
+# Press: Ctrl+A, then D
+
+# List all screen sessions
+screen -list
+
+# Kill the server session
+screen -S agent-orchestration -X quit
+```
+
+### Environment Configuration
+
+The deployment uses these key directories:
+
+- **Deploy Directory**: `$PROJECT_ROOT/test_serving` - Where builds are extracted and run
+- **Log Directory**: `$PROJECT_ROOT/logs` - Build and deployment logs
+- **Static Frontend**: `build/static_frontend/` - Pre-rendered frontend files served by FastAPI
+
+### Build Artifacts
+
+- **Build Archive**: `build-YYYYMMDD_HHMMSS.zip` in GCS bucket
+- **Log Files**: `build_YYYYMMDD_HHMMSS.log` and `deploy_YYYYMMDD_HHMMSS.log`
+- **Server URL**: `http://0.0.0.0:8000` (accessible on deployment server)
 
 The build output will be in the `out/` directory and needs to be copied to the backend's static folder for deployment.
 

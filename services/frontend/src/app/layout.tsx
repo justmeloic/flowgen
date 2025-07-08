@@ -44,6 +44,7 @@ export default function RootLayout({
                       <Sidebar
                         isCollapsed={isCollapsed}
                         onToggle={() => setIsCollapsed(!isCollapsed)}
+                        className="sticky top-0 h-screen"
                       />
                       <main className="flex-1 p-8">{children}</main>
                     </div>

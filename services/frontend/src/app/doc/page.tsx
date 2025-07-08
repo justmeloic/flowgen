@@ -45,7 +45,7 @@ export default function HomePage() {
               alt="Architecture Diagram"
               width={1000}
               height={600}
-              className="rounded-lg shadow-lg"
+              className="rounded-2xl shadow-lg"
             />
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function HomePage() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">Services</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 p-6 rounded-lg">
+            <div className="bg-gray-50 p-6 rounded-2xl">
               <h3 className="text-xl font-semibold mb-3">Frontend Client</h3>
               <p className="text-gray-700 mb-4">
                 A Next.js web application that provides the user interface for
@@ -67,7 +67,7 @@ export default function HomePage() {
                 <li>• Session management</li>
               </ul>
             </div>
-            <div className="bg-gray-50 p-6 rounded-lg">
+            <div className="bg-gray-50 p-6 rounded-2xl">
               <h3 className="text-xl font-semibold mb-3">
                 Agent Orchestration API
               </h3>
@@ -169,7 +169,7 @@ export default function HomePage() {
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 p-6 rounded-lg">
+            <div className="bg-blue-50 p-6 rounded-2xl">
               <h3 className="text-xl font-semibold mb-3">
                 1. Independent Services (Microservice-Style)
               </h3>
@@ -177,7 +177,7 @@ export default function HomePage() {
                 The Next.js frontend and FastAPI backend are deployed and
                 managed as separate, independent services.
               </p>
-              <div className="bg-gray-800 text-green-400 p-3 rounded text-sm font-mono">
+              <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono">
                 <div>cd services/frontend/</div>
                 <div>npm run dev</div>
                 <div className="mt-2">cd services/agent-orchestration/src/</div>
@@ -185,7 +185,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-green-50 p-6 rounded-lg">
+            <div className="bg-green-50 p-6 rounded-2xl">
               <h3 className="text-xl font-semibold mb-3">
                 2. Modular Monolith (Combined Deployment)
               </h3>
@@ -193,7 +193,7 @@ export default function HomePage() {
                 The FastAPI backend serves static assets from the Next.js
                 frontend, creating a single deployable unit.
               </p>
-              <div className="bg-gray-800 text-green-400 p-3 rounded text-sm font-mono">
+              <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono">
                 <div>cd services/frontend/</div>
                 <div>npm run build-local</div>
                 <div className="mt-2">cd ../agent-orchestration/src/</div>
@@ -230,8 +230,8 @@ export default function HomePage() {
               <ul className="text-sm text-gray-700 space-y-2">
                 <li>
                   1. Users are redirected to{" "}
-                  <code className="bg-gray-100 px-1 rounded">/login</code> when
-                  accessing protected pages
+                  <code className="bg-gray-100 px-1 rounded-2xl">/login</code>{" "}
+                  when accessing protected pages
                 </li>
                 <li>2. Must enter the correct access code to gain access</li>
                 <li>
@@ -246,12 +246,14 @@ export default function HomePage() {
 
             <div>
               <h3 className="text-lg font-semibold mb-3">Configuration</h3>
-              <div className="bg-gray-800 text-green-400 p-3 rounded text-sm font-mono">
+              <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono">
                 <div>NEXT_PUBLIC_AUTH_SECRET=your-secret-here</div>
               </div>
               <p className="text-sm text-gray-600 mt-2">
                 Default secret code:{" "}
-                <code className="bg-gray-100 px-1 rounded">cn-cba-2025</code>
+                <code className="bg-gray-100 px-1 rounded-2xl">
+                  cn-cba-2025
+                </code>
               </p>
             </div>
           </div>
@@ -265,7 +267,7 @@ export default function HomePage() {
             context preservation across multiple interactions.
           </p>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-gray-50 p-4 rounded-2xl">
             <h3 className="text-lg font-semibold mb-3">Session Flow</h3>
             <ul className="text-sm text-gray-700 space-y-2">
               <li>
@@ -298,7 +300,7 @@ export default function HomePage() {
         {/* Repository Structure */}
         <div>
           <h2 className="text-2xl font-semibold mb-4">Repository Structure</h2>
-          <div className="bg-gray-800 text-green-400 p-4 rounded font-mono text-sm">
+          <div className="bg-gray-800 text-green-400 p-4 rounded-2xl font-mono text-sm">
             <div>.</div>
             <div>├── docs</div>
             <div>├── scripts</div>
@@ -318,6 +320,106 @@ export default function HomePage() {
             <div> ├── src</div>
             <div> ├── tailwind.config.js</div>
             <div> └── tsconfig.json</div>
+          </div>
+        </div>
+
+        {/* Build & Deploy Section */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Build & Deploy</h2>
+          <div className="bg-blue-50 p-6 rounded-2xl mb-6">
+            <h3 className="text-lg font-semibold mb-2">
+              Single Service, Static Frontend
+            </h3>
+            <p className="text-gray-700 mb-2">
+              The frontend is pre-rendered into static HTML, CSS, and JS files
+              using Next.js. These static files are then mounted and served by
+              the FastAPI backend, so you only need to deploy one service. This
+              approach improves performance, simplifies deployment, and reduces
+              operational complexity.
+            </p>
+            <p className="text-gray-700 mb-2">
+              <strong>Why GCS?</strong> The build is zipped and uploaded to a
+              Google Cloud Storage bucket because the deployment host server may
+              not have internet access to clone or pull the repository. Using
+              GCS allows you to reliably transfer the build artifact to
+              air-gapped or restricted environments.
+            </p>
+          </div>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">
+              Automated Build & Upload
+            </h3>
+            <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono mb-2">
+              <div># From project root</div>
+              <div>source scripts/build.sh</div>
+            </div>
+            <ul className="text-sm text-gray-700 list-disc pl-5 mb-2">
+              <li>
+                Builds frontend static files and copies them to the backend
+              </li>
+              <li>
+                Creates a zip archive of the backend (with static frontend)
+              </li>
+              <li>Uploads the archive to a GCS bucket</li>
+            </ul>
+          </div>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Automated Deployment</h3>
+            <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono mb-2">
+              <div># On the deployment server</div>
+              <div>source scripts/deploy-vm.sh</div>
+            </div>
+            <ul className="text-sm text-gray-700 list-disc pl-5 mb-2">
+              <li>Downloads the latest build from GCS</li>
+              <li>Extracts and sets up the environment</li>
+              <li>Kills any process using port 8000 or running uvicorn</li>
+              <li>Starts the FastAPI server in a screen session</li>
+            </ul>
+          </div>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Deployment Pipeline</h3>
+            <div className="overflow-x-auto">
+              <pre className="bg-gray-100 p-3 rounded text-xs font-mono whitespace-pre">
+                {`Build Process:           Deploy Process:
+[Frontend Build]          [Download from GCS]
+      ↓                         ↓
+[Static Files]            [Extract Archive]
+      ↓                         ↓
+[Zip Archive]             [Setup Environment]
+      ↓                         ↓
+[Upload to GCS]           [Start Server]
+`}
+              </pre>
+            </div>
+          </div>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Server Management</h3>
+            <ul className="text-sm text-gray-700 list-disc pl-5 mb-2">
+              <li>
+                Attach to server:{" "}
+                <code className="bg-gray-100 px-1 rounded-2xl">
+                  screen -r agent-orchestration
+                </code>
+              </li>
+              <li>
+                Detach:{" "}
+                <span className="bg-gray-100 px-1 rounded-2xl">
+                  Ctrl+A, then D
+                </span>
+              </li>
+              <li>
+                List sessions:{" "}
+                <code className="bg-gray-100 px-1 rounded-2xl">
+                  screen -list
+                </code>
+              </li>
+              <li>
+                Kill session:{" "}
+                <code className="bg-gray-100 px-1 rounded-2xl">
+                  screen -S agent-orchestration -X quit
+                </code>
+              </li>
+            </ul>
           </div>
         </div>
 
