@@ -301,22 +301,3 @@ The build output will be in the `out/` directory and needs to be copied to the b
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
-
-[core]
-repositoryformatversion = 0
-filemode = true
-bare = false
-logallrefupdates = true
-ignorecase = true
-precomposeunicode = true
-[remote "origin"]
-url = https://github.com/justmeloic/cn-cba-agent.git
-fetch = +refs/heads/_:refs/remotes/origin/_
-pushurl = https://github.com/justmeloic/cn-cba-agent.git
-pushurl = git@gitlab.com:google-cloud-ce/communities/genai-fsa/northam/expert_requests/canadian-national-railway/cba-agent.git
-[branch "main"]
-remote = origin
-merge = refs/heads/main
-[pull]
-ff = only
-rebase = true
