@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AUTH_CONFIG } from "@/lib/auth-config";
-import { AlertCircle, Lock } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [secret, setSecret] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,16 +72,32 @@ export default function LoginPage() {
         <CardContent className="px-10 pb-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Input
-                id="secret"
-                type="password"
-                value={secret}
-                onChange={(e) => setSecret(e.target.value)}
-                placeholder="Enter your access code"
-                className="w-full h-11 px-6 bg-white  rounded-xl  focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out"
-                required
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <Input
+                  id="secret"
+                  type={showPassword ? "text" : "password"}
+                  value={secret}
+                  onChange={(e) => setSecret(e.target.value)}
+                  placeholder="Enter your access code"
+                  className="w-full h-11 px-6 pr-12 bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out"
+                  required
+                  disabled={isLoading}
+                />
+                {secret && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    disabled={isLoading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
 
             {error && (
