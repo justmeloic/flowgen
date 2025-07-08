@@ -26,6 +26,8 @@ import json
 import logging
 import os
 import pathlib
+import re
+from difflib import SequenceMatcher
 from typing import Dict, Optional
 
 # Third-party imports
@@ -64,6 +66,88 @@ except ImportError:
 load_dotenv()
 
 _logger = logging.getLogger(__name__)
+
+
+def _normalize_text(text: str) -> str:
+    """Normalize text for fuzzy matching by removing extra spaces and case."""
+    if not text:
+        return ''
+    # Remove extra whitespace, convert to lowercase
+    normalized = ' '.join(text.strip().split()).lower()
+    return normalized
+
+
+def _fuzzy_match(input_text: str, target_text: str, threshold: float = 0.8) -> bool:
+    """
+    Perform fuzzy string matching between input and target text.
+
+    Args:
+        input_text: The user-provided text to match
+        target_text: The canonical text to match against
+        threshold: Minimum similarity score (0.0 to 1.0) to consider a match
+
+    Returns:
+        True if the texts match above the threshold, False otherwise
+    """
+    if not input_text or not target_text:
+        return False
+
+    # Normalize both strings
+    norm_input = _normalize_text(input_text)
+    norm_target = _normalize_text(target_text)
+
+    # Exact match after normalization
+    if norm_input == norm_target:
+        return True
+
+    # Calculate similarity using SequenceMatcher
+    similarity = SequenceMatcher(None, norm_input, norm_target).ratio()
+
+    # Also check if input is contained in target or vice versa (for abbreviations)
+    contains_match = (
+        norm_input in norm_target
+        or norm_target in norm_input
+        or
+        # Handle cases like "north toronto" vs "toronto north"
+        all(word in norm_target for word in norm_input.split())
+        or all(word in norm_input for word in norm_target.split())
+    )
+
+    return similarity >= threshold or contains_match
+
+
+def _find_best_match(
+    input_text: str, valid_options: list, threshold: float = 0.8
+) -> Optional[str]:
+    """
+    Find the best matching option from a list of valid choices.
+
+    Args:
+        input_text: The user input to match
+        valid_options: List of valid options to match against
+        threshold: Minimum similarity threshold
+
+    Returns:
+        The best matching option, or None if no good match is found
+    """
+    if not input_text or not valid_options:
+        return None
+
+    best_match = None
+    best_score = 0
+
+    for option in valid_options:
+        if _fuzzy_match(input_text, option, threshold):
+            # Calculate exact score for ranking
+            norm_input = _normalize_text(input_text)
+            norm_option = _normalize_text(option)
+            score = SequenceMatcher(None, norm_input, norm_option).ratio()
+
+            if score > best_score:
+                best_score = score
+                best_match = option
+
+    return best_match
 
 
 # ======================= START:WORKAROUND FOR FUNCTION CALLING =======================
@@ -327,33 +411,30 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
     try:
         with open(csv_path, 'r', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
-            for row in reader:
+            rows = list(reader)
+
+            # First, try exact matching (for performance)
+            for row in rows:
                 if (
                     row['Role'].strip() == role.strip()
                     and row['Territory'].strip() == territory.strip()
                 ):
-                    primary_agreement = (
-                        row['Primary Agreement'].strip()
-                        if row['Primary Agreement'].strip()
-                        else None
+                    return _extract_agreement_data(row)
+
+            # If no exact match, try fuzzy matching
+            for row in rows:
+                role_match = _fuzzy_match(role, row['Role'].strip())
+                territory_match = _fuzzy_match(territory, row['Territory'].strip())
+
+                if role_match and territory_match:
+                    _logger.info(
+                        'Fuzzy match found: "%s" -> "%s", "%s" -> "%s"',
+                        role,
+                        row['Role'].strip(),
+                        territory,
+                        row['Territory'].strip(),
                     )
-                    subsequent_agreements = (
-                        row['Subsequent Agreements'].strip()
-                        if row['Subsequent Agreements'].strip()
-                        else None
-                    )
-                    local_agreements = (
-                        row['Local Agreements'].strip()
-                        if row['Local Agreements'].strip()
-                        else None
-                    )
-                    region = row['Region'].strip() if row['Region'].strip() else None
-                    return {
-                        'primary_agreement': primary_agreement,
-                        'subsequent_agreements': subsequent_agreements,
-                        'local_agreements': local_agreements,
-                        'region': region,
-                    }
+                    return _extract_agreement_data(row)
 
         _logger.warning(
             'No agreement mapping found for role "%s" and territory "%s"',
@@ -385,6 +466,79 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
         }
 
 
+def _extract_agreement_data(row: Dict[str, str]) -> Dict[str, Optional[str]]:
+    """Extract agreement data from a CSV row."""
+    primary_agreement = (
+        row['Primary Agreement'].strip() if row['Primary Agreement'].strip() else None
+    )
+    subsequent_agreements = (
+        row['Subsequent Agreements'].strip()
+        if row['Subsequent Agreements'].strip()
+        else None
+    )
+    local_agreements = (
+        row['Local Agreements'].strip() if row['Local Agreements'].strip() else None
+    )
+    region = row['Region'].strip() if row['Region'].strip() else None
+    return {
+        'primary_agreement': primary_agreement,
+        'subsequent_agreements': subsequent_agreements,
+        'local_agreements': local_agreements,
+        'region': region,
+    }
+
+
+def get_valid_roles_and_territories() -> Dict[str, list]:
+    """Get all valid roles and territories from the CSV mapping file.
+
+    Returns:
+        Dictionary with 'roles' and 'territories' keys containing lists of valid values
+    """
+    csv_path = os.path.join(
+        os.path.dirname(__file__),
+        '..',
+        '..',
+        os.getenv('TESTDATA_DIR', 'testdata'),
+        os.getenv('AGREEMENT_MAPPING_CSV', 'Agreement_Mapping_with_Filenames.csv'),
+    )
+
+    roles = set()
+    territories = set()
+
+    try:
+        with open(csv_path, 'r', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['Role'].strip():
+                    roles.add(row['Role'].strip())
+                if row['Territory'].strip():
+                    territories.add(row['Territory'].strip())
+    except (FileNotFoundError, csv.Error, IOError, UnicodeDecodeError) as e:
+        _logger.error('Error reading valid roles/territories from CSV: %s', e)
+
+    return {'roles': sorted(list(roles)), 'territories': sorted(list(territories))}
+
+
+def suggest_closest_matches(role: str, territory: str) -> Dict[str, Optional[str]]:
+    """Suggest the closest valid matches for role and territory.
+
+    Args:
+        role: The input role to match
+        territory: The input territory to match
+
+    Returns:
+        Dictionary with suggested 'role' and 'territory' matches, or None if no match
+    """
+    valid_data = get_valid_roles_and_territories()
+
+    suggested_role = _find_best_match(role, valid_data['roles'], threshold=0.6)
+    suggested_territory = _find_best_match(
+        territory, valid_data['territories'], threshold=0.6
+    )
+
+    return {'role': suggested_role, 'territory': suggested_territory}
+
+
 # ======================== END:WORKAROUND FOR FUNCTION CALLING ========================
 
 
@@ -412,10 +566,29 @@ if __name__ == '__main__':
 
     load_dotenv()
 
-    # Test the agreement filename function
-    print('Testing _get_agreement_filenames:')
-    result = _get_agreement_filenames('Engineer', 'Tronton North')
+    # Test the fuzzy matching function
+    print('Testing fuzzy matching:')
+    test_cases = [
+        ('north toronto', 'Toronto North'),
+        ('eng', 'Engineer'),
+        ('conductor', 'Conductor'),
+        ('calgary', 'Calgary'),
+        ('yard coord', 'Yard Coordinator'),
+    ]
+
+    for input_text, target_text in test_cases:
+        match = _fuzzy_match(input_text, target_text)
+        print(f'  "{input_text}" -> "{target_text}": {match}')
+
+    # Test the agreement filename function with fuzzy matching
+    print('\nTesting _get_agreement_filenames with fuzzy matching:')
+    result = _get_agreement_filenames('eng', 'north toronto')
     print(json.dumps(result, indent=2))
+
+    # Test suggestion function
+    print('\nTesting suggest_closest_matches:')
+    suggestions = suggest_closest_matches('eng', 'north toronto')
+    print(json.dumps(suggestions, indent=2))
 
     # Test the Gemini processing function
     print('\nTesting process_agreements:')
