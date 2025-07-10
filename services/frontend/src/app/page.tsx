@@ -176,7 +176,10 @@ export default function ChatPage() {
                 <div className="flex flex-col items-center justify-center h-[500px] space-y-10">
                   <h1 className="text-center text-4xl md:text-5xl font-bold">
                     <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                      Hello!
+                      {typeof window !== "undefined" &&
+                      sessionStorage.getItem("user_name")
+                        ? `Hello ${sessionStorage.getItem("user_name")}!`
+                        : "Hello!"}
                     </span>
                   </h1>
                   <h3 className="text-center text-sm md:text-sm font-bold w-[450px]">

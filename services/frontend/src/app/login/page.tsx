@@ -17,6 +17,7 @@ import { useState } from "react";
 
 export default function LoginPage() {
   const [secret, setSecret] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +29,8 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      // Store name in sessionStorage (not used for authentication)
+      sessionStorage.setItem("user_name", name);
       // Simple validation
       if (secret === AUTH_CONFIG.SECRET) {
         // Store authentication in sessionStorage
@@ -72,6 +75,16 @@ export default function LoginPage() {
         <CardContent className="px-10 pb-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name (optional)"
+                className="w-full h-11 px-6 bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out"
+                disabled={isLoading}
+                autoComplete="name"
+              />
               <div className="relative">
                 <Input
                   id="secret"
