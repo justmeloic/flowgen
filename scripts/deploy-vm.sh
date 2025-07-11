@@ -14,6 +14,10 @@ SCREEN_NAME="agent-orchestration"
 PYTHON_VERSION="3.10"
 VENV_NAME=".venv"
 
+# Server Configuration
+SERVER_HOST=0.0.0.0
+SERVER_PORT=8081
+
 # Profile Cnnfigurations
 export PATH="$PATH:$HOME/.local/bin"
 
@@ -25,7 +29,7 @@ export AGENT_STAGING_BUCKET="gs://cn-agent-staging"
 # Handy aliases
 alias gs='git status'
 alias auth='gcloud auth login --update-adc'
-alias dev='uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8081'
+alias dev='uvicorn src.app.main:app --reload --host 0.0.0.0 --port $SERVER_PORT'
 
 
 # Create logs directory if it doesn't exist
@@ -37,6 +41,8 @@ log() {
 }
 
 log "🚀 Starting VM deployment process at $(date)..."
+
+gcloud auth login --update-adc
 
 # Check gcloud authentication
 log "🔐 Checking gcloud authentication..."
@@ -169,15 +175,15 @@ if screen -list | grep -q "$SCREEN_NAME"; then
 fi
 
 # Kill any processes using port 8081
-log "🔍 Checking for processes using port 8081..."
-PORT_PROCESS=$(lsof -ti:8081 2>/dev/null || true)
+log "🔍 Checking for processes using port $SERVER_PORT..."
+PORT_PROCESS=$(lsof -ti:$SERVER_PORT 2>/dev/null || true)
 if [ -n "$PORT_PROCESS" ]; then
-    log "🛑 Found process using port 8081 (PID: $PORT_PROCESS), killing it..."
+    log "🛑 Found process using port $SERVER_PORT (PID: $PORT_PROCESS), killing it..."
     kill -9 $PORT_PROCESS 2>/dev/null || true
     sleep 2
-    log "✅ Port 8081 cleared"
+    log "✅ Port $SERVER_PORT cleared"
 else
-    log "✅ Port 8081 is available"
+    log "✅ Port $SERVER_PORT is available"
 fi
 
 # Kill any uvicorn processes (additional safety)
@@ -193,8 +199,8 @@ fi
 
 # Create new screen session and start the server
 log "🖥️  Creating screen session: $SCREEN_NAME"
-UVICORN_CMD="uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8081"
-GUNICORN_CMD="$VENV_NAME/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker src.app.main:app --bind 0.0.0.0:8081"
+UVICORN_CMD="uvicorn src.app.main:app --reload --host 0.0.0.0 --port $SERVER_PORT"
+GUNICORN_CMD="$VENV_NAME/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker src.app.main:app --bind 0.0.0.0:$SERVER_PORT"
 
 # Create screen session with the server commandscre
 screen -dmS "$SCREEN_NAME" bash -c "
@@ -204,7 +210,7 @@ screen -dmS "$SCREEN_NAME" bash -c "
     echo '📍 Working directory: \$(pwd)'
     echo '🐍 Python: \$(which python)'
     echo '⚡ Command: $UVICORN_CMD'
-    echo '🌐 Server will be available at: http://0.0.0.0:8081'
+    echo '🌐 Server will be available at: http://0.0.0.0:$SERVER_PORT'
     echo '📺 Screen session: $SCREEN_NAME'
     echo ''
     $UVICORN_CMD
@@ -218,7 +224,7 @@ sleep 3
 # Check if screen session is running
 if screen -list | grep -q "$SCREEN_NAME"; then
     log "✅ Screen session '$SCREEN_NAME' created and running"
-    log "🌐 Server should be starting at http://0.0.0.0:8081"
+    log "🌐 Server should be starting at http://0.0.0.0:$SERVER_PORT"
 else
     log "❌ Error: Failed to create screen session"
 fi
@@ -232,7 +238,7 @@ log "   📁 Deploy directory: $DEPLOY_DIR"
 log "   🐍 Python command: $PYTHON_CMD"
 log "   🔧 Virtual environment: $PWD/$VENV_NAME"
 log "   📺 Screen session: $SCREEN_NAME"
-log "   🌐 Server URL: http://0.0.0.0:8081"
+log "   🌐 Server URL: http://0.0.0.0:$SERVER_PORT"
 log "   📋 Log file: $LOG_FILE"
 
 log "🎉 VM deployment process completed at $(date)!"
