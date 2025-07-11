@@ -28,7 +28,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   const handleRestart = async () => {
     setIsRestarting(true);
     try {
-      const response = await fetch("http://localhost:8000/api/utils/restart", {
+      const response = await fetch("http://localhost:8081/api/utils/restart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
