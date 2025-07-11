@@ -5,9 +5,9 @@
 # uploads it to GCS, and cleans up the local zip file.
 
 # Configuration
-PROJECT_ROOT="/Users/justloic/Desktop/projects/google/solutions/cn-cba-agent"
+PROJECT_ROOT="/home/txt36456/codebase/cn-cba-agent"
 SERVICE_DIR="$PROJECT_ROOT/services/agent-orchestration"
-GCS_BUCKET="gs://cn-cba-usecase/" 
+GCS_BUCKET="gs://cn-agent-deployment/" 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 ZIP_NAME="build-${TIMESTAMP}.zip"
 ZIP_PATH="$PROJECT_ROOT/$ZIP_NAME"

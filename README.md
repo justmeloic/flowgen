@@ -434,3 +434,8 @@ The build output will be in the `out/` directory and needs to be copied to the b
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
