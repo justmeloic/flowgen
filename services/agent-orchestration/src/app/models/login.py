@@ -1,0 +1,23 @@
+from pydantic import BaseModel
+
+
+class LoginRequest(BaseModel):
+    """Request model for login endpoint."""
+
+    secret: str
+    name: str = ''
+
+
+class LoginResponse(BaseModel):
+    """Response model for login endpoint."""
+
+    success: bool
+    message: str
+    session_id: str
+
+
+class LogoutResponse(BaseModel):
+    """Response model for logout endpoint."""
+
+    success: bool
+    message: str

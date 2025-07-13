@@ -7,36 +7,14 @@ session middleware.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from google.adk.sessions import InMemorySessionService, Session
+from google.adk.sessions import Session
 from loguru import logger
-from pydantic import BaseModel
 
 from src.app.core.config import settings
-from src.app.utils.dependencies import get_or_create_session, get_session_service
+from src.app.models.login import LoginRequest, LoginResponse, LogoutResponse
+from src.app.utils.dependencies import get_or_create_session
 
 router = APIRouter(prefix='/auth', tags=['authentication'])
-
-
-class LoginRequest(BaseModel):
-    """Request model for login endpoint."""
-
-    secret: str
-    name: str = ''
-
-
-class LoginResponse(BaseModel):
-    """Response model for login endpoint."""
-
-    success: bool
-    message: str
-    session_id: str
-
-
-class LogoutResponse(BaseModel):
-    """Response model for logout endpoint."""
-
-    success: bool
-    message: str
 
 
 @router.post('/login', response_model=LoginResponse)
