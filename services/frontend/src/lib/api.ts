@@ -1,7 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 
-// Use environment variable with fallback
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost/:8081';
+// Use environment variable with fallback; 
+// setting the fallback to an empty string will cause the frontend 
+// to use relative paths for API requests.
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''; 
 
 interface Reference {
   id: string;

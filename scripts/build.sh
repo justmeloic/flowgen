@@ -61,7 +61,7 @@ if [ -d "$FRONTEND_DIR" ]; then
         
         # Run the static build
         log "🏗️  Running npm run build-static..."
-        if npm run build-static >> "$LOG_FILE" 2>&1; then
+        if NEXT_PUBLIC_API_BASE_URL= npm run build-static >> "$LOG_FILE" 2>&1; then
             log "✅ Frontend static build completed successfully"
         else
             log "❌ Error: Failed to build frontend static files"

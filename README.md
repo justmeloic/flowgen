@@ -223,7 +223,7 @@ The authentication is configured in `src/lib/auth-config.ts` and uses environmen
 
 ```typescript
 export const AUTH_CONFIG = {
-  SECRET: process.env.NEXT_PUBLIC_AUTH_SECRET || "cn-cba-2025",
+  SECRET: process.env.AUTH_SECRET,
   SESSION_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
   STORAGE_KEYS: {
     AUTHENTICATED: "cba_authenticated",
@@ -238,7 +238,7 @@ export const AUTH_CONFIG = {
 Add the following to your `.env.local` file:
 
 ```bash
-NEXT_PUBLIC_AUTH_SECRET=your-secret-here
+AUTH_SECRET=your-secret-here
 ```
 
 For different environments, you can set different secrets:
@@ -249,13 +249,9 @@ For different environments, you can set different secrets:
 
 ## Usage
 
-### Default Secret Code
-
-The default secret code is: `cn-cba-2025`
-
 ### Changing the Secret Code
 
-To change the secret code, update the `NEXT_PUBLIC_AUTH_SECRET` environment variable in your `.env.local` file
+To change the secret code, update the `AUTH_SECRET` environment variable in your `.env.local` file
 
 ### Session Duration
 
@@ -437,5 +433,4 @@ This project is licensed under the Apache License, Version 2.0 - see the [LICENS
 <<<<<<< Updated upstream
 =======
 
-
->>>>>>> Stashed changes
+> > > > > > > Stashed changes

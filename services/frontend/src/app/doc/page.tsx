@@ -246,15 +246,10 @@ export default function HomePage() {
 
             <div>
               <h3 className="text-lg font-semibold mb-3">Configuration</h3>
-              <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono">
-                <div>NEXT_PUBLIC_AUTH_SECRET=your-secret-here</div>
-              </div>
-              <p className="text-sm text-gray-600 mt-2">
-                Default secret code:{" "}
-                <code className="bg-gray-100 px-1 rounded-2xl">
-                  cn-cba-2025
-                </code>
-              </p>
+              <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto">
+                <div>NEXT_PUBLIC_API_BASE_URL=your-api-url-here</div>
+                <div>AUTH_SECRET=your-secret-here</div>
+              </pre>
             </div>
           </div>
         </div>
