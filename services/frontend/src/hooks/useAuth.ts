@@ -1,5 +1,6 @@
 "use client";
 
+import { logout as apiLogout } from "@/lib/api";
 import { AUTH_CONFIG } from "@/lib/auth-config";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -43,22 +44,18 @@ export function useAuth() {
     checkAuth();
   }, []);
 
-  const login = (secret: string) => {
-    if (secret === AUTH_CONFIG.SECRET) {
-      sessionStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.AUTHENTICATED, "true");
-      sessionStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.TIMESTAMP, Date.now().toString());
-      setIsAuthenticated(true);
-      return true;
+  const logout = async () => {
+    try {
+      await apiLogout();
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.AUTHENTICATED);
+      sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.TIMESTAMP);
+      sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.REDIRECT);
+      setIsAuthenticated(false);
+      router.push("/login");
     }
-    return false;
-  };
-
-  const logout = () => {
-    sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.AUTHENTICATED);
-    sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.TIMESTAMP);
-    sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.REDIRECT);
-    setIsAuthenticated(false);
-    router.push("/login");
   };
 
   const redirectToLogin = () => {
@@ -72,7 +69,6 @@ export function useAuth() {
   return {
     isAuthenticated,
     isLoading,
-    login,
     logout,
     redirectToLogin,
   };

@@ -211,8 +211,8 @@ export default function HomePage() {
               <div className="ml-3">
                 <p className="text-sm text-yellow-700">
                   <strong>
-                    ⚠️ This is a PoC authentication system and should not be
-                    used in production!
+                    ⚠️ This is a simple authentication system suitable for a
+                    proof-of-concept and should not be used in production!
                   </strong>
                 </p>
               </div>
@@ -220,8 +220,8 @@ export default function HomePage() {
           </div>
 
           <p className="text-gray-700 mb-4">
-            A simple client-side authentication system that provides basic
-            access control using a secret code.
+            A simple header-based authentication system that provides basic
+            access control using a secret code validated on the server.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -231,24 +231,31 @@ export default function HomePage() {
                 <li>
                   1. Users are redirected to{" "}
                   <code className="bg-gray-100 px-1 rounded-2xl">/login</code>{" "}
-                  when accessing protected pages
+                  when accessing protected pages.
                 </li>
-                <li>2. Must enter the correct access code to gain access</li>
+                <li>2. Must enter the correct access code to gain access.</li>
                 <li>
-                  3. Authentication state stored in browser's sessionStorage
+                  3. The frontend sends the secret to the backend for
+                  validation.
                 </li>
-                <li>4. Authentication expires after 24 hours</li>
                 <li>
-                  5. Users can logout using the logout button in the header
+                  4. The backend creates an authenticated session and returns a
+                  session ID.
+                </li>
+                <li>
+                  5. The frontend stores the session ID and sends it in the
+                  header of subsequent requests.
                 </li>
               </ul>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold mb-3">Configuration</h3>
+              <p className="text-sm text-gray-700 mb-2">
+                The secret is configured in the backend's `.env` file:
+              </p>
               <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto">
-                <div>NEXT_PUBLIC_API_BASE_URL=your-api-url-here</div>
-                <div>AUTH_SECRET=your-secret-here</div>
+                <div>AUTH_SECRET=your-super-secret-key</div>
               </pre>
             </div>
           </div>

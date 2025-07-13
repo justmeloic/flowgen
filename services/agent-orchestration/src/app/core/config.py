@@ -63,6 +63,10 @@ class Settings(BaseSettings):
     # Model settings
     GEMINI_MODEL: str = 'gemini-2.5-flash'
 
+    # Authentication settings
+    AUTH_SECRET: str
+    SESSION_TIMEOUT_HOURS: int = 24
+
     model_config = ConfigDict(env_file='.env', case_sensitive=True, extra='ignore')
 
     @field_validator('LOG_LEVEL', mode='before')

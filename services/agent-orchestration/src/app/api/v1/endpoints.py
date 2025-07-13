@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from src.app.api.v1 import auth
 from src.app.api.v1.routes import root_router
 from src.app.core.config import settings
 
@@ -22,3 +23,4 @@ async def api_status() -> dict[str, str]:
 
 # Include route modules
 api_router.include_router(root_router.router, prefix='/root_agent', tags=['root-agent'])
+api_router.include_router(auth.router)

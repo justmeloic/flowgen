@@ -64,10 +64,17 @@ def register_frontend_routes(app: FastAPI):
 
         This allows the client-side router to handle application navigation.
         """
+        # First, check for a direct file match (e.g., for assets)
         file_path = static_files_dir / full_path
-        if file_path.is_file():
+        if file_path.is_file() and full_path != 'index.html':
             return FileResponse(file_path)
 
+        # Next, check for an HTML file with the same name as the path
+        html_path = static_files_dir / f'{full_path}.html'
+        if html_path.is_file():
+            return FileResponse(html_path)
+
+        # Fallback to serving the main index.html for SPA routing
         index_html_path = static_files_dir / 'index.html'
         if index_html_path.is_file():
             return FileResponse(index_html_path)

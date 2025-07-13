@@ -1,4 +1,3 @@
-
 // Use environment variable with fallback; 
 // setting the fallback to an empty string will cause the frontend 
 // to use relative paths for API requests.
@@ -51,4 +50,45 @@ export const sendMessage = async (message: string): Promise<MessageResponse> => 
 
 export const hasExistingSession = (): boolean => {
   return !!localStorage.getItem('chatSessionId');
+};
+
+export const login = async (secret: string, name: string) => {
+  const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ secret, name }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Login failed');
+  }
+
+  const newSessionId = response.headers.get('x-session-id');
+  if (newSessionId) {
+    localStorage.setItem('chatSessionId', newSessionId);
+  }
+
+  return response.json();
+};
+
+export const logout = async () => {
+  const storedSessionId = localStorage.getItem('chatSessionId');
+  const response = await fetch(`${BASE_URL}/api/v1/auth/logout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Session-ID': storedSessionId || '',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Logout failed');
+  }
+
+  localStorage.removeItem('chatSessionId');
+  return response.json();
 };

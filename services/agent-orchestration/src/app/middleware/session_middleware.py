@@ -11,37 +11,111 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Middleware for managing user session IDs via HTTP headers.
+"""Middleware for managing user session IDs and authentication via HTTP headers.
 
 This module provides a Starlette/FastAPI middleware that intercepts requests
-to API paths, retrieves or generates a session ID, and makes it available
-to downstream application logic via the request state. It also ensures the
-session ID is returned in the response headers.
+to API paths, retrieves or generates a session ID, handles authentication,
+and makes session data available to downstream application logic via the
+request state. It also ensures the session ID is returned in the response headers.
 """
 
 from __future__ import annotations
 
 import logging
 import uuid
+from datetime import datetime, timedelta
 
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import RedirectResponse, Response
+from starlette.status import HTTP_401_UNAUTHORIZED
+
+from src.app.models import AgentConfig
+from src.app.utils.dependencies import get_or_create_session
 
 _logger = logging.getLogger(__name__)
 
 
 class SessionMiddleware(BaseHTTPMiddleware):
-    """Middleware to manage a session ID for API requests.
+    """Middleware to manage a session ID and authentication for requests.
 
-    This middleware performs the following steps for paths under `/api/v1/`:
-    1. Looks for an existing session ID in the `X-Session-ID` request header.
-    2. If no ID is found, generates a new UUIDv4.
-    3. Stores this ID in `request.state.candidate_session_id`.
-    4. After the request is handled, it ensures the final session ID is
-       present in the `X-Session-ID` response header and that this header is
-       exposed to the browser via `Access-Control-Expose-Headers`.
+    This middleware performs the following steps:
+    1. For paths under `/api/v1/`: Manages session IDs and authentication state
+    2. For static frontend paths: Checks authentication for protected routes
+    3. Looks for existing session ID in the `X-Session-ID` request header
+    4. If no ID is found, generates a new UUIDv4
+    5. Stores session data in `request.state` for downstream use
+    6. Ensures session ID is present in response headers
     """
+
+    def __init__(self, app):
+        super().__init__(app)
+        # Paths that don't require authentication
+        self.public_paths = {
+            '/health',
+            '/docs',
+            '/redoc',
+            '/openapi.json',
+            '/api/v1/auth/login',
+            '/api/v1/auth/logout',
+            '/login',
+            '/login.html',
+            '/_next',  # Next.js static assets
+        }
+
+    def _is_public_path(self, path: str) -> bool:
+        """Check if a path is public and doesn't require authentication."""
+        # Check for common static file extensions
+        if any(
+            path.endswith(ext)
+            for ext in [
+                '.css',
+                '.js',
+                '.svg',
+                '.png',
+                '.jpg',
+                '.jpeg',
+                '.gif',
+                '.ico',
+                '.woff',
+                '.woff2',
+                '.txt',
+                '.json',
+            ]
+        ):
+            return True
+
+        # Check exact matches
+        if path in self.public_paths:
+            return True
+
+        # Check path prefixes for static assets
+        for public_path in self.public_paths:
+            if path.startswith(public_path):
+                return True
+
+        return False
+
+    async def _is_authenticated(self, request: Request) -> bool:
+        """Check if the current session is authenticated."""
+        try:
+            # Create a dummy response object to satisfy the dependency
+            dummy_response = Response(status_code=200)
+
+            # Create the agent config dependency
+            agent_config = AgentConfig(app_name='agent_app', user_id='default_user')
+
+            session = await get_or_create_session(request, dummy_response, agent_config)
+
+            # Check if authenticated flag is set in session state
+            return session.state.get('authenticated', False)
+
+        except Exception as e:
+            session_id = getattr(request.state, 'candidate_session_id', 'N/A')
+            _logger.warning(
+                f'Error checking authentication for session {session_id}: {e}'
+            )
+            return False
 
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint
@@ -55,32 +129,54 @@ class SessionMiddleware(BaseHTTPMiddleware):
         Returns:
             The Starlette response.
         """
-        if not request.url.path.startswith('/api/v1/'):
-            # Not an API path that needs session management, pass through.
-            return await call_next(request)
-
+        # Handle session ID for all requests
         candidate_session_id = request.headers.get('X-Session-ID')
 
         if not candidate_session_id:
             candidate_session_id = str(uuid.uuid4())
             _logger.info(
-                'Generated new session ID: %s for API path: %s',
+                'Generated new session ID: %s for path: %s',
                 candidate_session_id,
                 request.url.path,
             )
         else:
             _logger.info(
-                'Using existing session ID: %s for API path: %s',
+                'Using existing session ID: %s for path: %s',
                 candidate_session_id,
                 request.url.path,
             )
 
-        # Store the session ID on the request state for access in dependencies.
+        # Store the session ID on the request state for access in dependencies
         request.state.candidate_session_id = candidate_session_id
+
+        # Check authentication for protected routes
+        path = request.url.path
+
+        # Skip auth check for public paths
+        if not self._is_public_path(path):
+            # For non-API routes (frontend), redirect to login if not authenticated
+            if not path.startswith('/api/'):
+                if not await self._is_authenticated(request):
+                    _logger.info(
+                        f'Redirecting unauthenticated user from {path} to /login'
+                    )
+                    from starlette.responses import RedirectResponse
+
+                    return RedirectResponse(url='/login', status_code=302)
+
+            # For API routes (except auth endpoints), return 401 if not authenticated
+            elif path.startswith('/api/v1/') and not path.startswith('/api/v1/auth/'):
+                if not await self._is_authenticated(request):
+                    _logger.info(f'Blocking unauthenticated API request to {path}')
+                    from starlette.responses import JSONResponse
+
+                    return JSONResponse(
+                        status_code=401, content={'detail': 'Authentication required'}
+                    )
 
         response = await call_next(request)
 
-        # Ensure the final session ID from the request lifecycle is in the header.
+        # Ensure the final session ID from the request lifecycle is in the header
         actual_session_id = getattr(
             request.state, 'actual_session_id', candidate_session_id
         )
@@ -102,7 +198,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
             response.headers['Access-Control-Expose-Headers'] = 'X-Session-ID'
 
         _logger.info(
-            'Set session ID in response headers: %s for API path: %s',
+            'Set session ID in response headers: %s for path: %s',
             actual_session_id,
             request.url.path,
         )

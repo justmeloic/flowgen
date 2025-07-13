@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { login } from "@/lib/api";
 import { AUTH_CONFIG } from "@/lib/auth-config";
 import { AlertCircle, Eye, EyeOff, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -29,28 +30,26 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      await login(secret, name);
+
       // Store name in sessionStorage (not used for authentication)
       sessionStorage.setItem("user_name", name);
-      // Simple validation
-      if (secret === AUTH_CONFIG.SECRET) {
-        // Store authentication in sessionStorage
-        sessionStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.AUTHENTICATED, "true");
-        sessionStorage.setItem(
-          AUTH_CONFIG.STORAGE_KEYS.TIMESTAMP,
-          Date.now().toString()
-        );
 
-        // Redirect to the page they were trying to access or home
-        const redirectTo =
-          sessionStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.REDIRECT) || "/";
-        sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.REDIRECT);
+      // Store authentication in sessionStorage
+      sessionStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.AUTHENTICATED, "true");
+      sessionStorage.setItem(
+        AUTH_CONFIG.STORAGE_KEYS.TIMESTAMP,
+        Date.now().toString()
+      );
 
-        router.push(redirectTo);
-      } else {
-        setError("Invalid access code. Please try again.");
-      }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
+      // Redirect to the page they were trying to access or home
+      const redirectTo =
+        sessionStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.REDIRECT) || "/";
+      sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.REDIRECT);
+
+      router.push(redirectTo);
+    } catch (err: any) {
+      setError(err.message || "Invalid access code. Please try again.");
     } finally {
       setIsLoading(false);
     }

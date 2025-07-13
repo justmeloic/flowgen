@@ -207,75 +207,39 @@ This stateful approach ensures conversation continuity and context preservation 
 
 ## Authentication
 
-This is a simple client-side authentication system implemented for the CBA Agent PoC. It provides basic access control using a secret code.
+This application uses a simple header-based authentication system. It provides basic access control using a secret code that is validated on the server.
 
-## How it Works
+### How it Works
 
-1. **Login Page**: Users are redirected to `/login` when they try to access any protected page
-2. **Secret Code**: Users must enter the correct access code to gain access
-3. **Session Storage**: Authentication state is stored in the browser's sessionStorage
-4. **Session Expiry**: Authentication expires after 24 hours
-5. **Logout**: Users can logout using the logout button in the header
+1.  **Login Page**: Users are redirected to `/login` when they try to access any protected page.
+2.  **Secret Code**: Users must enter the correct access code to gain access.
+3.  **Authentication Endpoint**: The frontend sends the secret to the `/api/v1/auth/login` endpoint on the backend.
+4.  **Session Management**: If the secret is correct, the backend creates an authenticated session and returns a session ID to the frontend.
+5.  **Session ID**: The frontend stores the session ID in local storage and includes it in the `X-Session-ID` header of all subsequent requests.
+6.  **Middleware**: A middleware on the backend validates the session ID on all protected routes.
+7.  **Logout**: When a user logs out, the frontend calls the `/api/v1/auth/logout` endpoint to invalidate the session on the server.
 
-## Configuration
+### Configuration
 
-The authentication is configured in `src/lib/auth-config.ts` and uses environment variables:
-
-```typescript
-export const AUTH_CONFIG = {
-  SECRET: process.env.AUTH_SECRET,
-  SESSION_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-  STORAGE_KEYS: {
-    AUTHENTICATED: "cba_authenticated",
-    TIMESTAMP: "cba_auth_timestamp",
-    REDIRECT: "cba_redirect_after_login",
-  },
-};
-```
-
-## Environment Variables
-
-Add the following to your `.env.local` file:
+The authentication is configured in the backend's `.env` file:
 
 ```bash
-AUTH_SECRET=your-secret-here
+# Authentication
+AUTH_SECRET=your-super-secret-key
 ```
 
-For different environments, you can set different secrets:
+### Components
 
-- `.env.development.local` - for development
-- `.env.local` - for production build
-- `.env.production.local` - for production
+- **Login Page**: `services/frontend/src/app/login/page.tsx` - The login form.
+- **Authentication API**: `services/agent-orchestration/src/app/api/v1/auth.py` - The login and logout endpoints.
+- **Session Middleware**: `services/agent-orchestration/src/app/middleware/session_middleware.py` - The middleware that protects routes.
+- **useAuth Hook**: `services/frontend/src/hooks/useAuth.ts` - The frontend logic for handling authentication state.
+- **ProtectedRoute**: `services/frontend/src/components/protected-route.tsx` - The component that wraps protected pages.
 
-## Usage
+### Security Notes
 
-### Changing the Secret Code
+This is a simple authentication system suitable for a proof-of-concept. For production use, consider implementing more robust security measures such as:
 
-To change the secret code, update the `AUTH_SECRET` environment variable in your `.env.local` file
-
-### Session Duration
-
-To change how long the session lasts, modify the `SESSION_DURATION` value (in milliseconds)
-
-## Components
-
-- **Login Page**: `/src/app/login/page.tsx` - The login form
-- **useAuth Hook**: `/src/hooks/useAuth.ts` - Authentication logic
-- **ProtectedRoute**: `/src/components/protected-route.tsx` - Wrapper for protected pages
-- **Header**: `/src/components/header.tsx` - Updated to include logout button
-
-## Security Notes
-
-⚠️ **This is a PoC authentication system and should not be used in production!**
-
-- The secret is hardcoded in the client-side code
-- No server-side validation
-- Uses sessionStorage which can be manipulated by users
-- No rate limiting or brute force protection
-
-For production use, consider implementing:
-
-- Server-side authentication
 - JWT tokens
 - Database user management
 - Password hashing
@@ -430,7 +394,3 @@ The build output will be in the `out/` directory and needs to be copied to the b
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
-<<<<<<< Updated upstream
-=======
-
-> > > > > > > Stashed changes

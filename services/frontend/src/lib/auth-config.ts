@@ -6,9 +6,6 @@
  */
 
 export const AUTH_CONFIG = {
-  // The secret code required to access the application
-  SECRET: process.env.AUTH_SECRET || "cn-cba-2025",
-  
   // Session duration in milliseconds (24 hours)
   SESSION_DURATION: 24 * 60 * 60 * 1000,
   
