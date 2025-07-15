@@ -68,3 +68,9 @@ htmlcov/
 
 # Deployment 
 test_serving/
+
+# Test data
+testdata/
+testdata*/
+testdata.zip
+testdata*.zip

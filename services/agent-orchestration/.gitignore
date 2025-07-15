@@ -76,3 +76,5 @@ static_frontend/
 # Test data
 testdata/
 testdata*/
+testdata.zip
+testdata*.zip
