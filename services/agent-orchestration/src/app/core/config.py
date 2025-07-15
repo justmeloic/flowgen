@@ -57,7 +57,7 @@ class Settings(BaseSettings):
 
     # Server settings
     HOST: str = '0.0.0.0'
-    PORT: int = 8080
+    PORT: int = 8081
     LOG_LEVEL: str = 'INFO'
     DEBUG: bool = False
     ENVIRONMENT: str = 'development'
