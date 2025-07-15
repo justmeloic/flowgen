@@ -20,7 +20,7 @@ import { BookOpen, MessageSquare, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,20 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHovered(true);
+    }, 150);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setIsHovered(false);
+  };
 
   const handleRestart = async () => {
     setIsRestarting(true);
@@ -81,8 +95,8 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         isCollapsed && !isHovered ? "w-[80px]" : "w-[250px]",
         className
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <TooltipProvider>
         <Button
@@ -112,38 +126,37 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           >
             Docs
           </div>
-          {isCollapsed && !isHovered ? (
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Link
-                  href="/doc"
-                  className={cn(
-                    "flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-white/50",
-                    pathname === "/doc" &&
-                      "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90"
-                  )}
-                >
-                  <BookOpen className="h-5 w-5" />
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Link
+                href="/doc"
+                className={cn(
+                  "flex items-center text-muted-foreground hover:bg-white/50",
+                  pathname === "/doc" &&
+                    "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90",
+                  !isCollapsed || isHovered
+                    ? "gap-3 rounded-2xl px-3 py-2"
+                    : "justify-center rounded-md p-2"
+                )}
+              >
+                <BookOpen className="h-5 w-5" />
+                {!isCollapsed || isHovered ? (
+                  "Documentation"
+                ) : (
                   <span className="sr-only">Documentation</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="flex items-center gap-4">
-                Documentation
+                )}
+              </Link>
+            </TooltipTrigger>
+            {isCollapsed && (
+              <TooltipContent
+                side="right"
+                className="flex items-center gap-4 max-w-xs rounded-2xl bg-[#f0f4f8] px-3 py-1.5 shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)]"
+              >
+                Access detailed project documentation, including code, system
+                architecture, and more.
               </TooltipContent>
-            </Tooltip>
-          ) : (
-            <Link
-              href="/doc"
-              className={cn(
-                "flex items-center gap-3 rounded-2xl px-3 py-2 text-muted-foreground hover:bg-white/50",
-                pathname === "/doc" &&
-                  "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90"
-              )}
-            >
-              <BookOpen className="h-5 w-5" />
-              Documentation
-            </Link>
-          )}
+            )}
+          </Tooltip>
         </div>
 
         {/* **New Title Added Here** */}
@@ -158,40 +171,25 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         <nav className="grid gap-1">
           {sidebarLinks.map((link, index) => {
             const Icon = link.icon;
-            return isCollapsed && !isHovered ? (
-              <Tooltip key={index} delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={link.href}
-                    className={cn(
-                      "flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-white/50",
-                      pathname === link.href &&
-                        "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90"
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="sr-only">{link.title}</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="right"
-                  className="flex items-center gap-4"
-                >
-                  {link.title}
-                </TooltipContent>
-              </Tooltip>
-            ) : (
+            return (
               <Link
                 key={index}
                 href={link.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl px-3 py-2 text-muted-foreground hover:bg-white/50",
+                  "flex items-center text-muted-foreground hover:bg-white/50",
                   pathname === link.href &&
-                    "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90"
+                    "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90",
+                  !isCollapsed || isHovered
+                    ? "gap-3 rounded-2xl px-3 py-2"
+                    : "justify-center rounded-md p-2"
                 )}
               >
                 <Icon className="h-5 w-5" />
-                {link.title}
+                {!isCollapsed || isHovered ? (
+                  link.title
+                ) : (
+                  <span className="sr-only">{link.title}</span>
+                )}
               </Link>
             );
           })}
@@ -207,46 +205,45 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           >
             Dev Tools
           </div>
-          {isCollapsed && !isHovered ? (
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRestart}
-                  disabled={isRestarting}
-                  className={cn(
-                    "w-full flex items-center justify-center p-2 text-muted-foreground hover:text-white hover:bg-red-500/80  hover:border-red-400 rounded-3xl",
-                    isRestarting && "opacity-50 cursor-not-allowed"
-                  )}
-                >
-                  <RotateCcw
-                    className={cn("h-4 w-4", isRestarting && "animate-spin")}
-                  />
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRestart}
+                disabled={isRestarting}
+                className={cn(
+                  "w-full flex items-center text-muted-foreground hover:text-white hover:bg-red-500/80  hover:border-red-400 rounded-3xl",
+                  isRestarting && "opacity-50 cursor-not-allowed",
+                  !isCollapsed || isHovered
+                    ? "gap-2 px-3 py-2"
+                    : "justify-center p-2"
+                )}
+              >
+                <RotateCcw
+                  className={cn("h-4 w-4", isRestarting && "animate-spin")}
+                />
+                {!isCollapsed || isHovered ? (
+                  isRestarting ? (
+                    "Restarting..."
+                  ) : (
+                    "Restart Server"
+                  )
+                ) : (
                   <span className="sr-only">Restart Server</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="flex items-center gap-4">
-                Restart Server
+                )}
+              </Button>
+            </TooltipTrigger>
+            {isCollapsed && (
+              <TooltipContent
+                side="right"
+                className="flex items-center gap-4 max-w-xs rounded-2xl bg-red-500/80 text-white border-red-400 px-3 py-1.5 shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)]"
+              >
+                Restart Server. Warning: This is a last resort and will restart
+                the server for all users.
               </TooltipContent>
-            </Tooltip>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRestart}
-              disabled={isRestarting}
-              className={cn(
-                "w-full flex items-center gap-2 px-3 py-2 text-muted-foreground hover:text-white hover:bg-red-500/80  hover:border-red-400 rounded-3xl",
-                isRestarting && "opacity-50 cursor-not-allowed"
-              )}
-            >
-              <RotateCcw
-                className={cn("h-4 w-4", isRestarting && "animate-spin")}
-              />
-              {isRestarting ? "Restarting..." : "Restart Server"}
-            </Button>
-          )}
+            )}
+          </Tooltip>
         </div>
       </TooltipProvider>
     </div>
