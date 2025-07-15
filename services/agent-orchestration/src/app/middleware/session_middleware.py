@@ -149,31 +149,6 @@ class SessionMiddleware(BaseHTTPMiddleware):
         # Store the session ID on the request state for access in dependencies
         request.state.candidate_session_id = candidate_session_id
 
-        # Check authentication for protected routes
-        path = request.url.path
-
-        # Skip auth check for public paths
-        if not self._is_public_path(path):
-            # For non-API routes (frontend), redirect to login if not authenticated
-            if not path.startswith('/api/'):
-                if not await self._is_authenticated(request):
-                    _logger.info(
-                        f'Redirecting unauthenticated user from {path} to /login'
-                    )
-                    from starlette.responses import RedirectResponse
-
-                    return RedirectResponse(url='/login', status_code=302)
-
-            # For API routes (except auth endpoints), return 401 if not authenticated
-            elif path.startswith('/api/v1/') and not path.startswith('/api/v1/auth/'):
-                if not await self._is_authenticated(request):
-                    _logger.info(f'Blocking unauthenticated API request to {path}')
-                    from starlette.responses import JSONResponse
-
-                    return JSONResponse(
-                        status_code=401, content={'detail': 'Authentication required'}
-                    )
-
         response = await call_next(request)
 
         # Ensure the final session ID from the request lifecycle is in the header
