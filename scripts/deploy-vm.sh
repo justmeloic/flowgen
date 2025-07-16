@@ -4,14 +4,14 @@
 # This script downloads the latest build, sets up environment, and runs the server
 
 # Configuration
-PROJECT_ROOT="/home/txt36456_cn_ca/cn-cba-agent"
+PROJECT_ROOT="/home/txt36456/cn-cba-agent"
 GCS_BUCKET="gs://cn-agent-deployment/"
 DEPLOY_DIR="$PROJECT_ROOT/latest-deployment"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 LOG_DIR="$PROJECT_ROOT/logs"
 LOG_FILE="$LOG_DIR/deploy_${TIMESTAMP}.log"
 SCREEN_NAME="agent-orchestration"
-PYTHON_VERSION="3.10"
+PYTHON_VERSION="3.11"
 VENV_NAME=".venv"
 
 # Server Configuration
@@ -83,7 +83,7 @@ else
         fi
         
         # Extract with overwrite and verbose logging
-        if unzip -o "$BUILD_FILE" >> "$LOG_FILE" 2>&1; then
+        if unzip -o "$BUILD_FILE" -d . >> "$LOG_FILE" 2>&1; then
             log "✅ Build extracted successfully"
             rm "$BUILD_FILE"
             log "🗑️  Cleaned up zip file"
@@ -91,7 +91,7 @@ else
             log "❌ Error: Failed to extract build (timeout or extraction error)"
             log "🔄 Continuing with deployment anyway..."
             # Clean up the zip file even if extraction failed
-            rm -f "$BUILD_FILE" 2>/dev/null || true
+            #rm -f "$BUILD_FILE" 2>/dev/null || true
         fi
     else
         log "❌ Error: Failed to download build from GCS"
