@@ -52,6 +52,20 @@ if ! gcloud auth list --filter="status:ACTIVE" --format="value(account)" | grep 
 fi
 log "✅ Gcloud authentication check passed"
 
+# Install necessary packages (standard GCP VMs don't have come with unzip, python3.11-venv pre-installed)
+log "🔧 Updating package list..."
+if ! sudo apt-get update -y >> "$LOG_FILE" 2>&1; then
+    log "❌ Error: Failed to update package list."
+    log "🔄 Continuing with deployment anyway..."
+fi
+
+log "🔧 Installing required packages (unzip, python3.11-venv)..."
+if ! sudo apt-get install -y unzip python3.11-venv >> "$LOG_FILE" 2>&1; then
+    log "❌ Error: Failed to install dependencies (unzip, python3.11-venv)."
+    log "🔄 Continuing with deployment anyway..."
+fi
+log "✅ System dependencies checked/installed."
+
 # Create deployment directory
 log "📁 Creating deployment directory: $DEPLOY_DIR"
 mkdir -p "$DEPLOY_DIR"
