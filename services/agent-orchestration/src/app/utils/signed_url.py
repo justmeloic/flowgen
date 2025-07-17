@@ -72,6 +72,6 @@ def generate_download_signed_url(
         _logger.info('Successfully generated signed URL for %s', uri)
         return signed_url
 
-    except Exception:
-        _logger.exception('Error generating signed URL for %s', uri)
+    except Exception as e:
+        _logger.exception('Error generating signed URL for %s: %s', uri, e)
         return None
