@@ -57,7 +57,7 @@ def generate_download_signed_url(
         storage_client = storage.Client()
         data_bucket = storage_client.bucket(bucket_name)
         blob = data_bucket.blob(blob_name)
-        expiration = datetime.now() + timedelta(minutes=signed_url_lifetime)
+        expiration = timedelta(minutes=signed_url_lifetime)
         signing_credentials = impersonated_credentials.Credentials(
             source_credentials=credentials,
             target_principal=service_account_email,
@@ -66,7 +66,8 @@ def generate_download_signed_url(
         )
 
         signed_url = blob.generate_signed_url(
-            expiration=expiration, credentials=signing_credentials
+            expiration=expiration,
+            credentials=signing_credentials,
         )
         _logger.info('Successfully generated signed URL for %s', uri)
         return signed_url
