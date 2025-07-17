@@ -55,7 +55,14 @@ class ModelConfig(BaseModel):
 class Settings(BaseSettings):
     """Core application settings."""
 
-    # Server settings
+    # Loïc: perhaps confusingly, The "model" in model_config refers to the
+    # Pydantic data model Unfortunately, we can't rename model_config
+    # because it's the specific name Pydantic V2 looks for to apply its configuration.
+    model_config = ConfigDict(env_file='.env', case_sensitive=True, extra='ignore')
+
+    # Pydantic's BaseSettings automatically treats
+    # variables with no default values as required
+
     HOST: str = '0.0.0.0'
     PORT: int = 8081
     LOG_LEVEL: str = 'INFO'
@@ -71,8 +78,11 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = 'http://localhost:3000'
 
     # Google Cloud settings
-    GOOGLE_CLOUD_PROJECT: str = ''
-    GOOGLE_CLOUD_LOCATION: str = ''
+    GOOGLE_CLOUD_PROJECT: str
+    GOOGLE_CLOUD_LOCATION: str
+    GCS_BUCKET_NAME: str
+    SERVICE_ACCOUNT_EMAIL: str
+    SIGNED_URL_LIFETIME: int
 
     # Model settings
     GEMINI_MODEL: str = 'gemini-2.5-flash'
@@ -80,8 +90,6 @@ class Settings(BaseSettings):
     # Authentication settings
     AUTH_SECRET: str
     SESSION_TIMEOUT_HOURS: int = 24
-
-    model_config = ConfigDict(env_file='.env', case_sensitive=True, extra='ignore')
 
     @field_validator('LOG_LEVEL', mode='before')
     @classmethod

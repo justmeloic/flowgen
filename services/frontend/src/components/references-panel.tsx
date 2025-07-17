@@ -42,16 +42,7 @@ export function ReferencesPanel({
   const referenceEntries = Object.entries(references);
 
   const handleViewDocument = (link: string) => {
-    // Convert GCS URL to actual viewable URL
-    const gsUrl = new URL(link);
-    const bucket = gsUrl.host;
-    const path = gsUrl.pathname
-      .substring(1)
-      .split("/")
-      .map((segment) => segment.replace(/ /g, "%20"))
-      .join("/");
-    const publicUrl = `https://storage.cloud.google.com/${bucket}/${path}`;
-    window.open(publicUrl, "_blank");
+    window.open(link, "_blank");
   };
 
   if (!referenceEntries.length) {

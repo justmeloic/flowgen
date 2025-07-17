@@ -24,6 +24,10 @@ from typing import Any
 # Third-party imports
 from fastapi import Request
 
+# Local application imports
+from src.app.core.config import settings
+from src.app.utils.signed_url import generate_download_signed_url
+
 _logger = logging.getLogger(__name__)
 
 # Constants
@@ -80,6 +84,62 @@ def _format_citations(text: str) -> str:
     return _CITATION_PATTERN.sub(r'**\1**', text)
 
 
+def _parse_processed_agreements(
+    agreements_text: str, session_id: str | None
+) -> dict[str, Any]:
+    """Parses a JSON string of processed agreement filenames into a dict.
+
+    Args:
+        agreements_text: A string containing a JSON list of agreement filenames.
+        session_id: The session ID for logging purposes.
+
+    Returns:
+        A dictionary of formatted processed agreements or an empty dict on error.
+    """
+    try:
+        agreements_list = json.loads(agreements_text)
+        if not isinstance(agreements_list, list):
+            _logger.warning(
+                'Processed agreements text is not a JSON list for session %s.',
+                session_id,
+            )
+            return {}
+
+        gcs_bucket = settings.GCS_BUCKET_NAME
+        processed_agreements_references = {
+            str(i + 1): {
+                'title': filename,
+                'link': (
+                    f'gs://{gcs_bucket}/locals/{filename}'
+                    if filename.endswith('Locals.pdf')
+                    else f'gs://{gcs_bucket}/agreements/{filename}'
+                ),
+                'text': f'Processed agreement: {filename}',
+            }
+            for i, filename in enumerate(agreements_list)
+            if isinstance(filename, str)
+        }
+
+        for ref in processed_agreements_references.values():
+            uri = ref['link']
+            signed_url = generate_download_signed_url(
+                uri,
+                settings.SERVICE_ACCOUNT_EMAIL,
+                settings.SIGNED_URL_LIFETIME,
+            )
+            ref['link'] = signed_url or uri
+
+        return processed_agreements_references
+    except json.JSONDecodeError as e:
+        _logger.error(
+            'Failed to parse processed agreements JSON for session %s: %s\nContent: %s',
+            session_id,
+            e,
+            agreements_text[:200],
+        )
+        return {}
+
+
 def format_text_response(
     response_text: str, request: Request
 ) -> tuple[str, dict[str, Any]]:
@@ -134,47 +194,3 @@ def format_text_response(
         references_json = {}
 
     return (formatted_text, references_json)
-
-
-def _parse_processed_agreements(
-    agreements_text: str, session_id: str | None
-) -> dict[str, Any]:
-    """Parses a JSON string of processed agreement filenames into a dict.
-
-    Args:
-        agreements_text: A string containing a JSON list of agreement filenames.
-        session_id: The session ID for logging purposes.
-
-    Returns:
-        A dictionary of formatted processed agreements or an empty dict on error.
-    """
-    try:
-        agreements_list = json.loads(agreements_text)
-        if not isinstance(agreements_list, list):
-            _logger.warning(
-                'Processed agreements text is not a JSON list for session %s.',
-                session_id,
-            )
-            return {}
-
-        return {
-            str(i + 1): {
-                'title': filename,
-                'link': (
-                    f'gs://cn-cba-docs/locals/{filename}'
-                    if filename.endswith('Locals.pdf')
-                    else f'gs://cn-cba-docs/agreements/{filename}'
-                ),
-                'text': f'Processed agreement: {filename}',
-            }
-            for i, filename in enumerate(agreements_list)
-            if isinstance(filename, str)
-        }
-    except json.JSONDecodeError as e:
-        _logger.error(
-            'Failed to parse processed agreements JSON for session %s: %s\nContent: %s',
-            session_id,
-            e,
-            agreements_text[:200],
-        )
-        return {}
