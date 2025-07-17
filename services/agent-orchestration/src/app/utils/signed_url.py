@@ -62,7 +62,7 @@ def generate_download_signed_url(
             source_credentials=credentials,
             target_principal=service_account_email,
             target_scopes=['https://www.googleapis.com/auth/devstorage.read_only'],
-            lifetime=signed_url_lifetime * 60,
+            lifetime=signed_url_lifetime,
         )
 
         signed_url = blob.generate_signed_url(

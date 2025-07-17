@@ -15,10 +15,11 @@
 """
 Main FastAPI application entry point.
 
-This module contains the core FastAPI application setup for the Agent Orchestration service.
-It handles application configuration, middleware setup, routing, and serves both API endpoints
-and static frontend files. The application integrates with Google Cloud Platform services
-and provides session management capabilities.
+This module contains the core FastAPI application setup for the Agent
+Orchestration service. It handles application configuration, middleware setup,
+routing, and serves both API endpoints and static frontend files. The
+application integrates with Google Cloud Platform services and provides session
+management capabilities.
 
 Features:
 - RESTful API endpoints for agent orchestration
@@ -41,6 +42,7 @@ from loguru import logger
 
 from src.app.api.utility_router import router as utility_router
 from src.app.api.v1.endpoints import api_router
+from src.app.api.v1.routes.files_router import router as files_router
 from src.app.core.config import settings
 from src.app.core.logging import setup_logging
 from src.app.middleware.session_middleware import SessionMiddleware
@@ -105,14 +107,13 @@ app = FastAPI(
 app.add_middleware(CORSMiddleware, **settings.cors.model_dump())
 app.add_middleware(SessionMiddleware)
 
-# Set up API routes
-api_v1_router = APIRouter(prefix='/api/v1')
+# Include the API router
+root_router = APIRouter(prefix='/api/v1')
+root_router.include_router(api_router)
+root_router.include_router(files_router)
 
-api_v1_router.include_router(api_router)
-app.include_router(api_v1_router)
-
-# Set up utility routes (for PoC purposes)
-app.include_router(utility_router, prefix='/api/utils', tags=['utilities'])
+app.include_router(root_router)
+app.include_router(utility_router)
 
 
 # Health check endpoint - must be before catch-all route

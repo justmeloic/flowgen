@@ -105,29 +105,43 @@ def _parse_processed_agreements(
             )
             return {}
 
+        processed_agreements_references = {}
         gcs_bucket = settings.GCS_BUCKET_NAME
-        processed_agreements_references = {
-            str(i + 1): {
-                'title': filename,
-                'link': (
+
+        for i, filename in enumerate(agreements_list):
+            if not isinstance(filename, str):
+                continue
+
+            key = str(i + 1)
+            title = filename
+            text = f'Processed agreement: {filename}'
+            link = ''
+
+            if settings.FILE_ACCESS_METHOD.lower() == 'gcs':
+                uri = (
                     f'gs://{gcs_bucket}/locals/{filename}'
                     if filename.endswith('Locals.pdf')
                     else f'gs://{gcs_bucket}/agreements/{filename}'
-                ),
-                'text': f'Processed agreement: {filename}',
-            }
-            for i, filename in enumerate(agreements_list)
-            if isinstance(filename, str)
-        }
+                )
+                signed_url = generate_download_signed_url(
+                    uri,
+                    settings.SERVICE_ACCOUNT_EMAIL,
+                    settings.SIGNED_URL_LIFETIME,
+                )
+                link = signed_url or uri
+            else:  # Local file access
+                relative_path = (
+                    f'locals/{filename}'
+                    if filename.endswith('Locals.pdf')
+                    else f'agreements/{filename}'
+                )
+                link = f'/api/v1/files/{relative_path}'
 
-        for ref in processed_agreements_references.values():
-            uri = ref['link']
-            signed_url = generate_download_signed_url(
-                uri,
-                settings.SERVICE_ACCOUNT_EMAIL,
-                settings.SIGNED_URL_LIFETIME,
-            )
-            ref['link'] = signed_url or uri
+            processed_agreements_references[key] = {
+                'title': title,
+                'link': link,
+                'text': text,
+            }
 
         return processed_agreements_references
     except json.JSONDecodeError as e:
