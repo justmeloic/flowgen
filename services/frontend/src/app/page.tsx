@@ -231,7 +231,7 @@ export default function ChatPage() {
                           }`}
                         >
                           <AvatarImage
-                            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-avatar-icon-sp2bKzW5OCu4C1f64jSvrbY0bgCc8M.png"
+                            src="/gemini-logo-new.png"
                             alt="Bot Avatar"
                           />
                         </Avatar>
