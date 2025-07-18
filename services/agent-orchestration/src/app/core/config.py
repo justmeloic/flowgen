@@ -95,6 +95,9 @@ class Settings(BaseSettings):
     FILE_ACCESS_METHOD: str = 'GCS'
     TESTDATA_DIR: str = 'testdata'
 
+    # Development settings
+    RESTART_SCRIPT_PATH: str = './scripts/restart-server.sh'
+
     @field_validator('LOG_LEVEL', mode='before')
     @classmethod
     def validate_log_level(cls, v: str) -> str:

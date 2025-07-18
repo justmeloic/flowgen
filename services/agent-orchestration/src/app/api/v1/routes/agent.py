@@ -21,7 +21,6 @@ handles agent interactions through FastAPI endpoints.
 from __future__ import annotations
 
 # Standard library imports
-import logging
 from typing import Annotated
 
 # Third-party imports
@@ -29,6 +28,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
 from google.adk.sessions import Session
+from loguru import logger as _logger
 
 # Application-specific imports
 from src.app.models import AgentConfig
@@ -41,11 +41,7 @@ from src.app.utils.dependencies import (
 )
 from src.app.utils.sse import sse_manager
 
-_logger = logging.getLogger(__name__)
-
-router = APIRouter(
-    tags=['root_agent'],
-)
+router = APIRouter()
 
 
 @router.post('/', response_model=AgentResponse)

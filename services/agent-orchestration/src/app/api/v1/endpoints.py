@@ -16,25 +16,35 @@
 
 from fastapi import APIRouter
 
-from src.app.api.v1 import auth
-from src.app.api.v1.routes import root_router
-from src.app.core.config import settings
+from src.app.api.v1.routes import (
+    agent,
+    auth,
+    files,
+    utility,
+)
 
-api_router = APIRouter()
-
-
-# Status endpoint for API v1
-@api_router.get('/status', tags=['Server Info'])
-async def api_status() -> dict[str, str]:
-    """Provides API information and health status."""
-    return {
-        'title': settings.API_TITLE,
-        'description': settings.API_DESCRIPTION,
-        'version': settings.API_VERSION,
-        'status': 'healthy',
-    }
+main_v1_router = APIRouter(prefix='/api/v1')
 
 
-# Include route modules
-api_router.include_router(root_router.router, prefix='/root_agent', tags=['root-agent'])
-api_router.include_router(auth.router)
+main_v1_router.include_router(
+    agent.router,
+    prefix='/root_agent',
+    tags=['root_agent'],
+)
+
+main_v1_router.include_router(
+    auth.router,
+    prefix='/auth',
+    tags=['authentication'],
+)
+
+main_v1_router.include_router(
+    files.router,
+    prefix='/files',
+    tags=['files'],
+)
+
+main_v1_router.include_router(
+    utility.router,
+    tags=['utility', 'system'],
+)

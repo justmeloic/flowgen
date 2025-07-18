@@ -38,11 +38,9 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from google.adk.sessions import InMemorySessionService
-from loguru import logger
+from loguru import logger as _logger
 
-from src.app.api.utility_router import router as utility_router
-from src.app.api.v1.endpoints import api_router
-from src.app.api.v1.routes.files_router import router as files_router
+from src.app.api.v1.endpoints import main_v1_router
 from src.app.core.config import settings
 from src.app.core.logging import setup_logging
 from src.app.middleware.session_middleware import SessionMiddleware
@@ -87,11 +85,11 @@ async def lifespan(app: FastAPI):
         startup and shutdown phases.
     """
     setup_logging()
-    logger.info('Starting Agent Orchestration API...')
+    _logger.info('Starting Agent Orchestration API...')
     configure_gcp_environment()
     app.state.session_service = InMemorySessionService()
     yield
-    logger.info('Shutting down Agent Orchestration API...')
+    _logger.info('Shutting down Agent Orchestration API...')
 
 
 app = FastAPI(
@@ -108,34 +106,10 @@ app.add_middleware(CORSMiddleware, **settings.cors.model_dump())
 app.add_middleware(SessionMiddleware)
 
 # Include the API router
-root_router = APIRouter(prefix='/api/v1')
-root_router.include_router(api_router)
-root_router.include_router(files_router)
+main_router = APIRouter()
+main_router.include_router(main_v1_router)
 
-app.include_router(root_router)
-app.include_router(utility_router)
-
-
-# Health check endpoint - must be before catch-all route
-@app.get('/health')
-async def health_check():
-    """
-    Health check endpoint for application monitoring.
-
-    Provides a simple health status check that can be used by load balancers,
-    monitoring systems, or deployment pipelines to verify that the application
-    is running and responsive.
-
-    Returns:
-        dict: A dictionary containing the application status and version.
-            - status (str): Always "healthy" when the endpoint is reachable
-            - version (str): The current API version from settings
-
-    Example:
-        GET /health
-        Response: {"status": "healthy", "version": "1.0.0"}
-    """
-    return {'status': 'healthy', 'version': settings.API_VERSION}
+app.include_router(main_router)
 
 
 # Register frontend routes

@@ -22,13 +22,13 @@ session middleware.
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from google.adk.sessions import Session
-from loguru import logger
+from loguru import logger as _logger
 
 from src.app.core.config import settings
 from src.app.models.login import LoginRequest, LoginResponse, LogoutResponse
 from src.app.utils.dependencies import get_or_create_session
 
-router = APIRouter(prefix='/auth', tags=['authentication'])
+router = APIRouter()
 
 
 @router.post('/login', response_model=LoginResponse)
@@ -56,7 +56,7 @@ async def login(
     try:
         # Validate the secret
         if login_data.secret != settings.AUTH_SECRET:
-            logger.warning('Failed login attempt with invalid secret from session')
+            _logger.warning('Failed login attempt with invalid secret from session')
             raise HTTPException(status_code=401, detail='Invalid access code')
 
         # Set authentication flag in session state
@@ -66,7 +66,7 @@ async def login(
         )
         session.state['login_timestamp'] = str(__import__('datetime').datetime.now())
 
-        logger.info(
+        _logger.info(
             f"Successful login for user '{session.state['user_name']}' with session {session.id}"
         )
 
@@ -80,7 +80,7 @@ async def login(
         # Re-raise HTTP exceptions
         raise
     except Exception as e:
-        logger.error(f'Unexpected error during login: {e}')
+        _logger.error(f'Unexpected error during login: {e}')
         raise HTTPException(
             status_code=500, detail='Internal server error during authentication'
         )
@@ -101,7 +101,7 @@ async def logout(
     """
     try:
         user_name = session.state.get('user_name', 'Unknown')
-        logger.info(f"Logging out user '{user_name}' with session {session.id}")
+        _logger.info(f"Logging out user '{user_name}' with session {session.id}")
 
         # Clear authentication but keep session for potential re-login
         session.state['authenticated'] = False
@@ -110,7 +110,7 @@ async def logout(
         return LogoutResponse(success=True, message='Logout successful')
 
     except Exception as e:
-        logger.error(f'Error during logout: {e}')
+        _logger.error(f'Error during logout: {e}')
         # Return success anyway - logout should be forgiving
         return LogoutResponse(success=True, message='Logout completed')
 
@@ -137,7 +137,7 @@ async def auth_status(
         }
 
     except Exception as e:
-        logger.error(f'Error checking auth status: {e}')
+        _logger.error(f'Error checking auth status: {e}')
         return {
             'authenticated': False,
             'session_id': None,

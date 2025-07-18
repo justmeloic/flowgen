@@ -13,20 +13,15 @@
 # limitations under the License.
 """Router for serving local files."""
 
-import logging
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import FileResponse
+from loguru import logger as _logger
 
 from src.app.core.config import settings
 
-_logger = logging.getLogger(__name__)
-
-router = APIRouter(
-    prefix='/files',
-    tags=['files'],
-)
+router = APIRouter()
 
 
 @router.get('/{file_path:path}', response_class=FileResponse)

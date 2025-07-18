@@ -29,14 +29,13 @@ from google.adk.events import Event, EventActions
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService, Session
 from google.genai import types as genai_types
+from loguru import logger as _logger
 
 from src.agents.agent import root_agent
 from src.app.models import AgentConfig
 from src.app.schemas import AgentResponse, Query
 from src.app.utils.formatters import format_text_response
 from src.app.utils.sse import sse_manager
-
-_logger = logging.getLogger(__name__)
 
 
 class AgentService:

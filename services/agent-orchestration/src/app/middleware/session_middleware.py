@@ -25,6 +25,7 @@ import logging
 import uuid
 from datetime import datetime, timedelta
 
+from loguru import logger as _logger
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
@@ -32,8 +33,6 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 
 from src.app.models import AgentConfig
 from src.app.utils.dependencies import get_or_create_session
-
-_logger = logging.getLogger(__name__)
 
 
 class SessionMiddleware(BaseHTTPMiddleware):

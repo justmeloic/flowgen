@@ -18,7 +18,7 @@ import logging
 import sys
 from pathlib import Path
 
-from loguru import logger
+from loguru import logger as _logger
 
 from src.app.core.config import settings
 
@@ -30,7 +30,7 @@ class InterceptHandler(logging.Handler):
         """Emit log record."""
         # Get corresponding Loguru level if it exists
         try:
-            level = logger.level(record.levelname).name
+            level = _logger.level(record.levelname).name
         except ValueError:
             level = record.levelno
 
@@ -40,7 +40,7 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).log(
+        _logger.opt(depth=depth, exception=record.exc_info).log(
             level, record.getMessage()
         )
 
@@ -48,10 +48,10 @@ class InterceptHandler(logging.Handler):
 def setup_logging() -> None:
     """Setup logging configuration."""
     # Remove default handlers
-    logger.remove()
+    _logger.remove()
 
     # Add console handler
-    logger.add(
+    _logger.add(
         sys.stdout,
         colorize=True,
         format='<green>{time:YYYY-MM-DD HH:mm:ss}</green> | '
@@ -67,7 +67,7 @@ def setup_logging() -> None:
         logs_dir = Path('logs')
         logs_dir.mkdir(exist_ok=True)
 
-        logger.add(
+        _logger.add(
             'logs/app.log',
             rotation='500 MB',
             retention='10 days',
