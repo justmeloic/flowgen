@@ -36,6 +36,7 @@ from google import genai
 from google.adk.agents import Agent
 from google.adk.tools import FunctionTool
 from google.genai import types
+from loguru import logger as _logger
 
 # Application-specific imports
 try:
@@ -64,8 +65,6 @@ except ImportError:
 
 # Load environment variables
 load_dotenv()
-
-_logger = logging.getLogger(__name__)
 
 
 def _normalize_text(text: str) -> str:

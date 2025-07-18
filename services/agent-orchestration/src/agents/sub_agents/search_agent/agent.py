@@ -32,16 +32,15 @@ from google.adk.agents import Agent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmRequest, LlmResponse
 from google.genai.types import Content, Part
+from loguru import logger as _logger
 
-from src.app.agents.sub_agents.search_agent.prompts import (
+from src.agents.sub_agents.search_agent.prompts import (
     return_search_agent_instructions,
 )
 
 # Application-specific imports
 # Note: This agent reuses the tools and callbacks defined at the higher agents level.
-from src.app.agents.tools import search_cba_datastore, store_tool_result_callback
-
-_logger = logging.getLogger(__name__)
+from src.agents.tools import search_cba_datastore, store_tool_result_callback
 
 
 def before_model_callback(

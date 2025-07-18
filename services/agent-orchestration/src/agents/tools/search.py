@@ -32,8 +32,7 @@ from google.adk.tools import FunctionTool
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.cloud import discoveryengine_v1beta as discoveryengine
-
-_logger = logging.getLogger(__name__)
+from loguru import logger as _logger
 
 
 def store_tool_result_callback(

@@ -28,8 +28,7 @@ from google import genai
 from google.adk.tools import FunctionTool
 from google.genai import types
 from google.genai.types import Content, FunctionDeclaration, Part, Schema, Type
-
-_logger = logging.getLogger(__name__)
+from loguru import logger as _logger
 
 
 def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str, str]:

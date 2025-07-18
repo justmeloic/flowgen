@@ -32,12 +32,10 @@ from google.adk.tools import FunctionTool
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.cloud import discoveryengine_v1beta as discoveryengine
+from loguru import logger as _logger
 
 # Local imports
 from .tools import _process_agreements_with_gemini
-
-_logger = logging.getLogger(__name__)
-
 
 # Create the FunctionTool for process_agreements_with_gemini
 _process_agreements_with_gemini.__name__ = 'process_agreements_with_gemini'

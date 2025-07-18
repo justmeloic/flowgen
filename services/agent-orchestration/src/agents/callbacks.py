@@ -33,11 +33,10 @@ from google.adk.models import LlmRequest, LlmResponse
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.genai.types import Content, Part
+from loguru import logger as _logger
 
 # Additional imports for SSE
 from src.app.utils.sse import sse_manager
-
-_logger = logging.getLogger(__name__)
 
 
 def store_tool_result_callback(
