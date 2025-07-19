@@ -30,6 +30,9 @@ from google.genai import types
 from google.genai.types import Content, FunctionDeclaration, Part, Schema, Type
 from loguru import logger as _logger
 
+# Application-specific imports
+from src.app.core.config import settings
+
 
 def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str, str]:
     """Process agreement PDFs with Gemini based on role and territory.
@@ -81,7 +84,7 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
         if pdf_path.exists():
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash-exp',
+                    model=settings.GEMINI_MODEL,
                     contents=[
                         types.Part.from_bytes(
                             data=pdf_path.read_bytes(),
@@ -122,7 +125,7 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
         if pdf_path.exists():
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash-exp',
+                    model=settings.GEMINI_MODEL,
                     contents=[
                         types.Part.from_bytes(
                             data=pdf_path.read_bytes(),
@@ -164,7 +167,7 @@ def _process_agreements_impl(prompt: str, role: str, territory: str) -> Dict[str
         if pdf_path.exists():
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash-exp',
+                    model=settings.GEMINI_MODEL,
                     contents=[
                         types.Part.from_bytes(
                             data=pdf_path.read_bytes(),

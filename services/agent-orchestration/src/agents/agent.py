@@ -41,6 +41,8 @@ from loguru import logger as _logger
 # Application-specific imports
 try:
     # from .tools.document_understanding import process_agreements
+
+    from ..app.core.config import settings
     from .callbacks import (
         before_model_callback,
         store_tool_result_callback,
@@ -62,6 +64,9 @@ except ImportError:
         return_global_instructions,
         return_root_agent_instructions,
     )
+
+    from src.app.core.config import settings
+
 
 # Load environment variables
 load_dotenv()
@@ -543,7 +548,7 @@ def suggest_closest_matches(role: str, territory: str) -> Dict[str, Optional[str
 
 root_agent = Agent(
     name='root_agent',
-    model=os.getenv('GEMINI_MODEL'),
+    model=settings.GEMINI_MODEL,
     description=(
         'An agent that answers CN employee questions about their '
         'Collective Bargaining Agreements (CBAs). It gathers user '
