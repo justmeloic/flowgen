@@ -30,6 +30,7 @@ export AGENT_STAGING_BUCKET="gs://cn-agent-staging"
 alias gs='git status'
 alias auth='gcloud auth login --update-adc'
 alias dev='uvicorn src.app.main:app --reload --host 0.0.0.0 --port $SERVER_PORT'
+alias serve='gunicorn src.app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$SERVER_PORT --timeout 600'
 
 
 # Create logs directory if it doesn't exist
@@ -214,7 +215,7 @@ fi
 # Create new screen session and start the server
 log "🖥️  Creating screen session: $SCREEN_NAME"
 UVICORN_CMD="uvicorn src.app.main:app --reload --host 0.0.0.0 --port $SERVER_PORT"
-GUNICORN_CMD="$VENV_NAME/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker src.app.main:app --bind 0.0.0.0:$SERVER_PORT"
+GUNICORN_CMD="gunicorn src.app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$SERVER_PORT --timeout 600"
 
 # Create screen session with the server commandscre
 screen -dmS "$SCREEN_NAME" bash -c "
