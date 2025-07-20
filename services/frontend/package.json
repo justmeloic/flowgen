@@ -1,6 +1,6 @@
 {
   "name": "my-v0-project",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,6 @@
     "build-static": "rm -rf .next out && next build && rm -rf ../agent-orchestration/build/static_frontend && cp -R ./out ../agent-orchestration/build/static_frontend",
     "build": "rm -rf .next out && next build",
     "release": "standard-version"
-
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
