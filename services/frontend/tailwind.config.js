@@ -28,8 +28,9 @@ module.exports = {
           foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "#f1f3f4", // Google Gray
+          DEFAULT: "#f0f4f8", // Light mode sidebar
           foreground: "#3c4043",
+          dark: "#282a2c", // Dark mode sidebar
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -50,6 +51,10 @@ module.exports = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        chatInput: {
+          light: "#ffffff", // Light mode chat input
+          dark: "#1e1f20", // Dark mode chat input
         },
       },
       borderRadius: {

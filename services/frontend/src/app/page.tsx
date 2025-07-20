@@ -239,8 +239,8 @@ export default function ChatPage() {
                       <div
                         className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-3xl text-justify ${
                           message.role === "user"
-                            ? "bg-blue-100 text-gray-800 rounded-tr-none dark:bg-blue-600"
-                            : "bg-white text-gray-800 rounded-tl-none dark:bg-gray-700 dark:text-gray-200"
+                            ? "bg-blue-100 text-gray-800 rounded-tr-none dark:bg-secondary-dark dark:text-gray-200"
+                            : "bg-chatInput-light text-gray-800 rounded-tl-none dark:bg-background dark:text-gray-200"
                         }`}
                       >
                         {message.role === "bot" ? (
@@ -283,12 +283,12 @@ export default function ChatPage() {
 
           {/* Top Gradient Overlay */}
           {(!isFirstPrompt || chatHistory.length > 0) && (
-            <div className="pointer-events-none absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white dark:from-gray-800 to-transparent z-10" />
+            <div className="pointer-events-none absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-chatInput-light to-transparent dark:hidden z-10" />
           )}
 
           {/* Bottom Gradient Overlay */}
           {(!isFirstPrompt || chatHistory.length > 0) && (
-            <div className="pointer-events-none absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-800 to-transparent z-10" />
+            <div className="pointer-events-none absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-chatInput-light to-transparent dark:hidden z-10" />
           )}
 
           {/* Move the ChatInput outside the conditional render and add transition */}
@@ -296,7 +296,7 @@ export default function ChatPage() {
             className={`w-full max-w-[850px] mx-auto sticky transition-all duration-700 ease-in-out ${
               isFirstPrompt && chatHistory.length === 0
                 ? "opacity-0"
-                : "opacity-100 bottom-0 bg-white dark:bg-gray-800 py-2 px-4 dark:border-gray-700"
+                : "opacity-100 bottom-0 bg-chatInput-light dark:bg-background py-2 px-4 dark:border-gray-700"
             }`}
           >
             {!isFirstPrompt && (
@@ -333,7 +333,7 @@ export default function ChatPage() {
             {/* References panel */}
             <div
               data-references-panel
-              className={`fixed right-0 w-[28rem] bg-blue-50 dark:bg-gray-800/80 overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-700 ease-in-out shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] ${
+              className={`fixed right-0 w-[28rem] bg-blue-50 dark:bg-secondary-dark overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-700 ease-in-out shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] ${
                 isReferencesHidden ? "translate-x-[120%]" : "translate-x-0"
               }`}
             >

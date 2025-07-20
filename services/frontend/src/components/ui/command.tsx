@@ -16,13 +16,13 @@
 
 "use client";
 
-import * as React from "react";
 import { type DialogProps } from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
+import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 // Base Command component - MODIFIED: Removed default background
 const Command = React.forwardRef<
@@ -46,22 +46,22 @@ const CommandDialog = ({ children, ...props }: DialogProps) => (
   </Dialog>
 );
 
-// CommandInput - No Changes needed
+// CommandInput - Updated for dark mode support
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div
     className={cn(
-      "flex items-center border-b px-3 rounded-2xl bg-white",
+      "flex items-center border-b px-3 rounded-2xl bg-white dark:bg-secondary-dark dark:border dark:border-gray-600",
       "cmdk-input-wrapper"
     )}
   >
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50 dark:text-gray-400" />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "h-11 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 rounded-full",
+        "h-11 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground dark:text-gray-200 dark:placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 rounded-full",
         className
       )}
       {...props}
@@ -127,7 +127,7 @@ const CommandItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex cursor-default gap-2 select-none items-center rounded-xl px-2 py-1.5 text-sm outline-none",
-      "data-[disabled=true]:pointer-events-none data-[selected='true']:bg-gray-200 data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50",
+      "data-[disabled=true]:pointer-events-none data-[selected='true']:bg-gray-200 dark:data-[selected='true']:bg-gray-700 data-[selected=true]:text-accent-foreground dark:data-[selected=true]:text-gray-200 data-[disabled=true]:opacity-50",
       "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       className
     )}
@@ -153,11 +153,11 @@ CommandShortcut.displayName = "CommandShortcut";
 export {
   Command,
   CommandDialog,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
-  CommandShortcut,
+  CommandList,
   CommandSeparator,
+  CommandShortcut,
 };

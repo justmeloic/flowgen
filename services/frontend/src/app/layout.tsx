@@ -18,6 +18,7 @@
 
 import { Header } from "@/components/header";
 import { ProtectedRoute } from "@/components/protected-route";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/ui/sidebar";
 import { Inter } from "next/font/google";
 import { usePathname } from "next/navigation";
@@ -45,31 +46,38 @@ export default function RootLayout({
         <link rel="icon" href="/CN_Railway_logo.svg" type="image/svg+xml" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        {isLoginPage ? (
-          // Login page without protection
-          children
-        ) : (
-          // Protected pages
-          <ProtectedRoute>
-            <div className="relative flex min-h-screen flex-col">
-              <Header />
-              <div className="flex-1">
-                <div className="border-t">
-                  <div className="bg-background">
-                    <div className="flex">
-                      <Sidebar
-                        isCollapsed={isCollapsed}
-                        onToggle={() => setIsCollapsed(!isCollapsed)}
-                        className="sticky top-0 h-screen"
-                      />
-                      <main className="flex-1 p-8">{children}</main>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {isLoginPage ? (
+            // Login page without protection
+            children
+          ) : (
+            // Protected pages
+            <ProtectedRoute>
+              <div className="relative flex min-h-screen flex-col">
+                <Header />
+                <div className="flex-1">
+                  <div className="border-t">
+                    <div className="bg-background">
+                      <div className="flex">
+                        <Sidebar
+                          isCollapsed={isCollapsed}
+                          onToggle={() => setIsCollapsed(!isCollapsed)}
+                          className="sticky top-0 h-screen"
+                        />
+                        <main className="flex-1 p-8">{children}</main>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </ProtectedRoute>
-        )}
+            </ProtectedRoute>
+          )}
+        </ThemeProvider>
       </body>
     </html>
   );

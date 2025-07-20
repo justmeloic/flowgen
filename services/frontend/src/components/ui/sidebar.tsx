@@ -91,7 +91,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   return (
     <div
       className={cn(
-        "relative flex h-screen flex-col gap-4 px-3 pb-3 pt-16 transition-all duration-300 bg-[#f0f4f8] shadow-[2px_0_10px_0_rgba(0,0,0,0.1)] z-10 rounded-tr-xl rounded-br-xl border-r border-gray-200",
+        "relative flex h-screen flex-col gap-4 px-3 pb-3 pt-16 transition-all duration-300 bg-secondary dark:bg-secondary-dark shadow-[2px_0_10px_0_rgba(0,0,0,0.1)] dark:shadow-none z-10 rounded-tr-xl rounded-br-xl border-r border-gray-200 dark:border-[#2f2f2f]",
         isCollapsed && !isHovered ? "w-[80px]" : "w-[250px]",
         className
       )}
@@ -102,7 +102,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         <Button
           variant="ghost"
           className={cn(
-            "absolute top-4 p-2 hover:bg-white/50",
+            "absolute top-4 p-2 hover:bg-white/50 dark:hover:bg-gray-700/50",
             isCollapsed && !isHovered ? "left-1/2 -translate-x-1/2" : "left-4"
           )}
           onClick={onToggle}
@@ -120,7 +120,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         <div className="mt-16">
           <div
             className={cn(
-              "mb-2 font-semibold text-gray-700 text-sm",
+              "mb-2 font-semibold text-gray-700 dark:text-gray-300 text-sm",
               isCollapsed && !isHovered ? "text-center" : ""
             )}
           >
@@ -131,9 +131,9 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
               <Link
                 href="/doc"
                 className={cn(
-                  "flex items-center text-muted-foreground hover:bg-white/50",
+                  "flex items-center text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-700/50",
                   pathname === "/doc" &&
-                    "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90",
+                    "bg-[#d3e2fd] dark:bg-gray-700 text-primary dark:text-blue-400 hover:bg-[#d3e2fd]/90 dark:hover:bg-gray-600",
                   !isCollapsed || isHovered
                     ? "gap-3 rounded-2xl px-3 py-2"
                     : "justify-center rounded-md p-2"
@@ -150,7 +150,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
             {isCollapsed && (
               <TooltipContent
                 side="right"
-                className="flex items-center gap-4 max-w-xs rounded-2xl bg-[#f0f4f8] px-3 py-1.5 shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)]"
+                className="flex items-center gap-4 max-w-xs rounded-2xl bg-secondary dark:bg-secondary-dark px-3 py-1.5 shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)]"
               >
                 Access detailed project documentation, including code, system
                 architecture, and more.
@@ -162,7 +162,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         {/* **New Title Added Here** */}
         <div
           className={cn(
-            "mb-2 mt-[240px] font-semibold text-gray-700 text-sm",
+            "mb-2 mt-[240px] font-semibold text-gray-700 dark:text-gray-300 text-sm",
             isCollapsed && !isHovered ? "text-center" : ""
           )}
         >
@@ -176,9 +176,9 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
                 key={index}
                 href={link.href}
                 className={cn(
-                  "flex items-center text-muted-foreground hover:bg-white/50",
+                  "flex items-center text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-700/50",
                   pathname === link.href &&
-                    "bg-[#d3e2fd] text-primary hover:bg-[#d3e2fd]/90",
+                    "bg-[#d3e2fd] dark:bg-gray-700 text-primary dark:text-blue-400 hover:bg-[#d3e2fd]/90 dark:hover:bg-gray-600",
                   !isCollapsed || isHovered
                     ? "gap-3 rounded-2xl px-3 py-2"
                     : "justify-center rounded-md p-2"
@@ -199,7 +199,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         <div className="mt-auto mb-24">
           <div
             className={cn(
-              "mb-2 font-semibold text-gray-700 text-sm",
+              "mb-2 font-semibold text-gray-700 dark:text-gray-300 text-sm",
               isCollapsed && !isHovered ? "text-center" : ""
             )}
           >
@@ -213,7 +213,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
                 onClick={handleRestart}
                 disabled={isRestarting}
                 className={cn(
-                  "w-full flex items-center text-muted-foreground hover:text-white hover:bg-red-500/80  hover:border-red-400 rounded-3xl",
+                  "w-full flex items-center text-muted-foreground hover:text-white hover:bg-red-500/80 hover:border-red-400 rounded-3xl dark:bg-secondary-dark dark:border-gray-500 dark:hover:text-white dark:hover:bg-red-500/80 dark:hover:border-red-400",
                   isRestarting && "opacity-50 cursor-not-allowed",
                   !isCollapsed || isHovered
                     ? "gap-2 px-3 py-2"

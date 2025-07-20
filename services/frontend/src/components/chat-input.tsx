@@ -163,9 +163,9 @@ export function ChatInput({
     >
       <div
         className={cn(
-          "relative flex flex-col w-full min-h-28 rounded-3xl border bg-white transition-shadow duration-300 ease-in-out",
+          "relative flex flex-col w-full min-h-28 rounded-3xl border bg-chatInput-light dark:bg-background dark:border-[#3c4043] transition-shadow duration-300 ease-in-out",
           isFocused
-            ? "shadow-[0_1px_6px_1px_rgba(32,33,36,0.12),0_1px_8px_2px_rgba(32,33,36,0.12),0_1px_12px_3px_rgba(32,33,36,0.2)]"
+            ? "shadow-[0_1px_6px_1px_rgba(32,33,36,0.12),0_1px_8px_2px_rgba(32,33,36,0.12),0_1px_12px_3px_rgba(32,33,36,0.2)] dark:shadow-[0_4px_8px_0_rgba(0,0,0,0.4)]"
             : "shadow-none"
         )}
       >
@@ -178,7 +178,7 @@ export function ChatInput({
           onKeyDown={handleKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="min-h-12 w-full rounded-t-3xl bg-transparent px-4 py-3 text-base outline-none placeholder:text-muted-foreground resize-none overflow-hidden"
+          className="min-h-12 w-full rounded-t-3xl bg-transparent px-4 py-3 text-base dark:text-gray-200 outline-none placeholder:text-muted-foreground dark:placeholder:text-gray-500 resize-none overflow-hidden"
           rows={1}
         />
 
@@ -233,10 +233,10 @@ export function ChatInput({
                 type="submit"
                 className={cn(
                   "flex h-7 w-7 items-center justify-center rounded-full transition-colors",
-                  "bg-blue-100 hover:bg-blue-200 focus:bg-blue-200 focus:outline-none"
+                  "bg-blue-100 hover:bg-blue-200 focus:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-600 focus:outline-none"
                 )}
               >
-                <SendHorizontal className="h-4 w-4 text-gray-800" />
+                <SendHorizontal className="h-4 w-4 text-gray-800 dark:text-gray-300" />
                 <span className="sr-only">Send message</span>
               </button>
             ) : null}
