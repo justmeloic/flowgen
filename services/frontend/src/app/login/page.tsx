@@ -72,18 +72,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-4">
-      <Card className="w-full max-w-md bg-[#f0f4f8] shadow-[0_10px_25px_0_rgba(0,0,0,0.2)] rounded-3xl border-none">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-white p-4">
+      <Card className="w-full max-w-md bg-[#f0f4f8] dark:bg-[#f0f4f8] shadow-[0_10px_25px_0_rgba(0,0,0,0.2)] rounded-3xl border-none">
         <CardHeader className="text-center px-6 pt-8 pb-6">
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-white rounded-full shadow-md animate-bounce">
-              <Lock className="h-8 w-8 text-gray-600" />
+            <div className="p-4 bg-white dark:bg-white rounded-full shadow-md animate-bounce">
+              <Lock className="h-8 w-8 text-gray-600 dark:text-gray-600" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
+          <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-900 mb-2">
             CBA Agent Access
           </CardTitle>
-          <CardDescription className="text-gray-600 text-sm">
+          <CardDescription className="text-gray-600 dark:text-gray-600 text-sm">
             Enter your access code to continue
           </CardDescription>
         </CardHeader>
@@ -96,7 +96,7 @@ export default function LoginPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name (optional)"
-                className="w-full h-11 px-6 bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out"
+                className="w-full h-11 px-6 bg-white dark:bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out text-gray-900 dark:text-gray-900 placeholder:text-gray-500 dark:placeholder:text-gray-500"
                 disabled={isLoading}
                 autoComplete="name"
               />
@@ -107,7 +107,7 @@ export default function LoginPage() {
                   value={secret}
                   onChange={(e) => setSecret(e.target.value)}
                   placeholder="Enter your access code"
-                  className="w-full h-11 px-6 pr-12 bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out"
+                  className="w-full h-11 px-6 pr-12 bg-white dark:bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out text-gray-900 dark:text-gray-900 placeholder:text-gray-500 dark:placeholder:text-gray-500"
                   required
                   disabled={isLoading}
                 />
@@ -115,7 +115,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-700 focus:outline-none"
                     disabled={isLoading}
                   >
                     {showPassword ? (
@@ -129,9 +129,12 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <Alert variant="destructive" className="bg-red-50 border-red-200">
+              <Alert
+                variant="destructive"
+                className="bg-red-50 dark:bg-red-50 border-red-200 dark:border-red-200"
+              >
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-red-700">
+                <AlertDescription className="text-red-700 dark:text-red-700">
                   {error}
                 </AlertDescription>
               </Alert>
@@ -140,7 +143,7 @@ export default function LoginPage() {
             <div className="flex justify-center">
               <Button
                 type="submit"
-                className="px-8 h-11  bg-[#d3e2fd] text-gray-800 hover:bg-[#d3e2fd]/90 rounded-full font-medium transition-colors shadow-sm"
+                className="px-8 h-11 bg-[#d3e2fd] dark:bg-[#d3e2fd] text-gray-800 dark:text-gray-800 hover:bg-[#d3e2fd]/90 dark:hover:bg-[#d3e2fd]/90 rounded-full font-medium transition-colors shadow-sm"
                 disabled={isLoading || !secret.trim()}
               >
                 {isLoading ? "Verifying..." : "Access Application"}
@@ -149,10 +152,10 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8 text-center">
-            <p className="text-xs text-gray-500 max-w-xs mx-auto">
+            <p className="text-xs text-gray-500 dark:text-gray-500 max-w-xs mx-auto">
               This is a secure application.
             </p>
-            <p className="text-xs text-gray-500 max-w-xs mx-auto">
+            <p className="text-xs text-gray-500 dark:text-gray-500 max-w-xs mx-auto">
               Please contact Loïc Muhirwa (loicmuhirwa@google.com) if you need
               access.
             </p>
