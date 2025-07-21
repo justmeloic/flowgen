@@ -60,6 +60,8 @@ if ! sudo apt-get update -y >> "$LOG_FILE" 2>&1; then
     log "🔄 Continuing with deployment anyway..."
 fi
 
+# Loic: even if the host server has python3.11 installed, the venv module might not be installed by default
+# This is especially common in Linux distros like Debian-based ones like Ubuntu.
 log "🔧 Installing required packages (unzip, python3.11-venv)..."
 if ! sudo apt-get install -y unzip python3.11-venv >> "$LOG_FILE" 2>&1; then
     log "❌ Error: Failed to install dependencies (unzip, python3.11-venv)."
