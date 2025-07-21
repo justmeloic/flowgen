@@ -224,11 +224,11 @@ screen -dmS "$SCREEN_NAME" bash -c "
     echo '🚀 Starting server in screen session...'
     echo '📍 Working directory: \$(pwd)'
     echo '🐍 Python: \$(which python)'
-    echo '⚡ Command: $UVICORN_CMD'
+    echo '⚡ Command: $GUNICORN_CMD'
     echo '🌐 Server will be available at: http://0.0.0.0:$SERVER_PORT'
     echo '📺 Screen session: $SCREEN_NAME'
     echo ''
-    $UVICORN_CMD
+    $GUNICORN_CMD
     echo '🛑 Server stopped'
     read -p 'Press Enter to exit screen session...'
 "
