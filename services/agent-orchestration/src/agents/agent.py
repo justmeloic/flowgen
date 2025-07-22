@@ -42,6 +42,7 @@ try:
 
     from ..app.core.config import settings
     from .callbacks import (
+        after_model_callback,
         before_model_callback,
         store_tool_result_callback,
     )
@@ -54,6 +55,7 @@ except ImportError:
     # Handle direct script execution (for quick testing)
     # from tools.document_understanding import process_agreements
     from callbacks import (
+        after_model_callback,
         before_model_callback,
         store_tool_result_callback,
     )
@@ -533,7 +535,7 @@ def suggest_closest_matches(role: str, territory: str) -> Dict[str, Optional[str
 
 root_agent = Agent(
     name='root_agent',
-    model=settings.GEMINI_MODEL,
+    model=settings.GEMINI_MODEL_PRO,
     description=(
         'An agent that answers CN employee questions about their '
         'Collective Bargaining Agreements (CBAs). It gathers user '
@@ -545,7 +547,8 @@ root_agent = Agent(
     output_key='last_agent_response',
     tools=[FunctionTool(func=_process_agreements_impl)],
     after_tool_callback=store_tool_result_callback,
-    before_model_callback=before_model_callback,
+    # before_model_callback=before_model_callback,
+    after_model_callback=after_model_callback,
 )
 
 

@@ -159,3 +159,72 @@ def before_model_callback(
         _logger.error('Error in before_model_callback: %s', e)
         _logger.error(traceback.format_exc())
         return None
+
+
+def after_model_callback(
+    callback_context: CallbackContext, llm_response: LlmResponse
+) -> Optional[LlmResponse]:
+    # --- Inspection ---
+    original_llm_text = ''
+    if llm_response.content and llm_response.content.parts:
+        # Assuming simple text response
+        if llm_response.content.parts[0].text:
+            original_llm_text = llm_response.content.parts[0].text
+            print(
+                f"[Callback] Inspected original response text: '{original_llm_text[:100]}...'"
+            )  # Log snippet
+        elif llm_response.content.parts[0].function_call:
+            print(
+                f"[Callback] Inspected response: Contains function call '{llm_response.content.parts[0].function_call.name}'. No text modification."
+            )
+            return None  # Don't modify tool calls in this example
+        else:
+            print('[Callback] Inspected response: No text content found.')
+            return None
+    elif llm_response.error_message:
+        print(
+            f"[Callback] Inspected response: Contains error '{llm_response.error_message}'. No modification."
+        )
+        return None
+    else:
+        print('[Callback] Inspected response: Empty LlmResponse.')
+        return None  # Nothing to modify
+
+    # Check for process agreements tool output
+    process_agreements_tool_raw_output = callback_context.state.get(
+        'process_agreements_tool_raw_output'
+    )
+    if process_agreements_tool_raw_output:
+        # Clear the state to prevent reuse in subsequent turns.
+        callback_context.state['process_agreements_tool_raw_output'] = None
+
+        # Aggregate all responses from the results into a summary
+        results = process_agreements_tool_raw_output.get('results', {})
+        responses = []
+
+        for agreement_type, agreement_data in results.items():
+            if (
+                agreement_data.get('status') == 'success'
+                and 'response' in agreement_data
+            ):
+                responses.append(
+                    f'**{agreement_data["filename"]}:**\n{agreement_data["response"]}'
+                )
+
+        orginal_detailed_summary = '\n\n'.join(responses)
+
+        processed_agreements = process_agreements_tool_raw_output.get(
+            'processed_agreements', []
+        )
+        processed_agreements_text = json.dumps(processed_agreements)
+
+        # Combine original text and processed agreements using a special token for
+        # later parsing.
+        final_text = f'{original_llm_text}<START_OF_REFERENCE_DOCUMENTS>{processed_agreements_text}'
+        content_with_references = Content(parts=[Part(text=final_text)])
+
+        return LlmResponse(
+            content=content_with_references,
+            grounding_metadata=llm_response.grounding_metadata,
+        )
+    return None

@@ -86,6 +86,7 @@ class Settings(BaseSettings):
 
     # Model settings
     GEMINI_MODEL: str = 'gemini-2.5-flash'
+    GEMINI_MODEL_PRO: str = 'gemini-2.5-pro'
 
     # Authentication settings
     AUTH_SECRET: str

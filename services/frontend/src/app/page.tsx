@@ -257,8 +257,16 @@ export default function ChatPage() {
                                   remarkParse,
                                 ]}
                                 skipHtml={false}
+                                components={{
+                                  p: ({ children }) => (
+                                    <p className="mb-4 last:mb-0">{children}</p>
+                                  ),
+                                }}
                               >
-                                {message.content.split("\n\nReferences:")[0]}
+                                {message.content
+                                  .split("\n\nReferences:")[0]
+                                  .replace(/\n\n/g, "\n\n")
+                                  .trim()}
                               </ReactMarkdown>
                             </div>
                           )
