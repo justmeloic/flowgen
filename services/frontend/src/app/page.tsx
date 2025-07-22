@@ -24,23 +24,12 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
 import { sendMessage } from "@/lib/api";
+import { ChatMessage, Reference } from "@/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
-
-interface ChatMessage {
-  role: "user" | "bot";
-  content: string;
-}
-
-interface Reference {
-  id: string;
-  name: string;
-  title: string;
-  link: string;
-}
 
 export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);

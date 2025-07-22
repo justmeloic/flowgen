@@ -111,42 +111,42 @@ export function MessageActions({ message }: MessageActionsProps) {
     <div className="flex items-center gap-2 mt-2">
       <button
         onClick={handleCopy}
-        className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+        className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
       >
-        <Copy className="h-4 w-4 text-gray-600" />
+        <Copy className="h-4 w-4 text-gray-600 dark:text-gray-300" />
       </button>
       {/*<button
         onClick={() => handleFeedback("up")}
-        className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+        className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
       >
          
-        <ThumbsUp className="h-4 w-4 text-gray-600" />
+        <ThumbsUp className="h-4 w-4 text-gray-600 dark:text-gray-300" />
       </button>
       <button
         onClick={() => handleFeedback("down")}
-        className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+        className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
       >
-        <ThumbsDown className="h-4 w-4 text-gray-600" />
+        <ThumbsDown className="h-4 w-4 text-gray-600 dark:text-gray-300" />
       </button> */}
       {isPlaying ? (
         <button
           onClick={handlePause}
-          className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
         >
-          <Pause className="h-4 w-4 text-gray-600" />
+          <Pause className="h-4 w-4 text-gray-600 dark:text-gray-300" />
         </button>
       ) : (
         <button
           onClick={handlePlay}
-          className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
         >
-          <Volume2 className="h-4 w-4 text-gray-600" />
+          <Volume2 className="h-4 w-4 text-gray-600 dark:text-gray-300" />
         </button>
       )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-            <MoreHorizontal className="h-4 w-4 text-gray-600" />
+          <button className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">
+            <MoreHorizontal className="h-4 w-4 text-gray-600 dark:text-gray-300" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>

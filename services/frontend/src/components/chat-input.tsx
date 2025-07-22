@@ -163,7 +163,7 @@ export function ChatInput({
     >
       <div
         className={cn(
-          "relative flex flex-col w-full min-h-28 rounded-3xl border bg-chatInput-light dark:bg-background dark:border-[#3c4043] transition-shadow duration-300 ease-in-out",
+          "relative flex flex-col w-full min-h-28 rounded-3xl border bg-chatInput-light dark:bg-background dark:border-gray-600 transition-shadow duration-300 ease-in-out",
           isFocused
             ? "shadow-[0_1px_6px_1px_rgba(32,33,36,0.12),0_1px_8px_2px_rgba(32,33,36,0.12),0_1px_12px_3px_rgba(32,33,36,0.2)] dark:shadow-[0_4px_8px_0_rgba(0,0,0,0.4)]"
             : "shadow-none"
@@ -198,10 +198,10 @@ export function ChatInput({
               htmlFor="chat-file-upload"
               className={cn(
                 "flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors  ",
-                "hover:bg-gradient-to-r from-blue-500/20 to-pink-500/20 focus:bg-gray-100 focus:outline-none"
+                "hover:bg-gradient-to-r from-blue-500/20 to-pink-500/20 focus:bg-gray-100 dark:focus:bg-gray-700 focus:outline-none"
               )}
             >
-              <Plus className="h-5 w-5 text-gray-600" />
+              <Plus className="h-5 w-5 text-gray-600 dark:text-gray-300" />
               <span className="sr-only">Upload files</span>
             </label>
           </div>
@@ -215,14 +215,14 @@ export function ChatInput({
                 "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
                 isRecording
                   ? "bg-red-500 hover:bg-red-600"
-                  : "text-gray-600 hover:bg-gradient-to-r from-blue-500/20 to-pink-500/20",
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gradient-to-r from-blue-500/20 to-pink-500/20",
                 "focus:outline-none"
               )}
             >
               {isRecording ? (
                 <Square className="h-4 w-4 text-white" />
               ) : (
-                <Mic className="h-5 w-5 text-gray-600" />
+                <Mic className="h-5 w-5 text-gray-600 dark:text-gray-300" />
               )}
               <span className="sr-only">
                 {isRecording ? "Stop recording" : "Start recording"}

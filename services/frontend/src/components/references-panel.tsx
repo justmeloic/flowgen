@@ -20,13 +20,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-interface Reference {
-  id: string;
-  name: string;
-  title: string;
-  link: string;
-}
+import { Reference } from "@/types";
 
 interface ReferencesPanelProps {
   references: { [key: string]: Reference };

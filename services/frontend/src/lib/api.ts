@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
+import { MessageResponse } from "@/types";
+
 // Use environment variable with fallback; 
 // setting the fallback to an empty string will cause the frontend 
 // to use relative paths for API requests.
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || ''; 
-
-interface Reference {
-  id: string;
-  name: string;
-  title: string;
-  link: string;
-}
-
-interface MessageResponse {
-  response: string;
-  references: { [key: string]: Reference };
-}
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 export const sendMessage = async (message: string): Promise<MessageResponse> => {
   try {
