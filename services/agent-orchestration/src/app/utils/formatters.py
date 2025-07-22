@@ -129,7 +129,7 @@ def _parse_processed_agreements(
                     settings.SIGNED_URL_LIFETIME,
                 )
                 url_auth = uri.replace('gs://', 'https://storage.cloud.google.com/')
-                
+
                 link = signed_url or url_auth
             else:  # Local file access
                 relative_path = (

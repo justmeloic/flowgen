@@ -24,10 +24,8 @@ import asyncio
 import csv
 import json
 import logging
-import os
-import pathlib
-import re
 from difflib import SequenceMatcher
+from pathlib import Path
 from typing import Dict, Optional
 
 # Third-party imports
@@ -244,30 +242,27 @@ async def _process_documents_async(
     client = genai.Client()
 
     # Base paths
-    testdata_dir = os.getenv('TESTDATA_DIR', 'testdata')
-    agreements_dir = os.path.join(
-        os.path.dirname(__file__), '..', '..', testdata_dir, 'agreements'
-    )
-    locals_dir = os.path.join(
-        os.path.dirname(__file__), '..', '..', testdata_dir, 'locals'
-    )
+    testdata_dir = settings.TESTDATA_DIR
+    base_dir = Path(__file__).parent.parent.parent
+    agreements_dir = base_dir / testdata_dir / 'agreements'
+    locals_dir = base_dir / testdata_dir / 'locals'
 
     # Define agreement types to process
     agreement_types = [
         {
             'key': 'primary_agreement',
             'base_dir': agreements_dir,
-            'model': os.getenv('GEMINI_MODEL'),
+            'model': settings.GEMINI_MODEL,
         },
         {
             'key': 'subsequent_agreements',
             'base_dir': agreements_dir,
-            'model': os.getenv('GEMINI_MODEL'),
+            'model': settings.GEMINI_MODEL,
         },
         {
             'key': 'local_agreements',
             'base_dir': locals_dir,
-            'model': os.getenv('GEMINI_MODEL'),
+            'model': settings.GEMINI_MODEL,
         },
     ]
 
@@ -279,7 +274,7 @@ async def _process_documents_async(
         if not filename:
             return None
 
-        pdf_path = pathlib.Path(agreement_type['base_dir']) / filename
+        pdf_path = Path(agreement_type['base_dir']) / filename
 
         if not pdf_path.exists():
             return {
@@ -404,13 +399,8 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
         and local agreements filenames. Returns None values if no match is found
         or if the agreement field is empty.
     """
-    csv_path = os.path.join(
-        os.path.dirname(__file__),
-        '..',
-        '..',
-        os.getenv('TESTDATA_DIR', 'testdata'),
-        os.getenv('AGREEMENT_MAPPING_CSV', 'Agreement_Mapping_with_Filenames.csv'),
-    )
+    base_dir = Path(__file__).parent.parent.parent
+    csv_path = base_dir / settings.TESTDATA_DIR / settings.AGREEMENT_MAPPING_CSV
 
     try:
         with open(csv_path, 'r', encoding='utf-8') as csvfile:
@@ -498,13 +488,8 @@ def get_valid_roles_and_territories() -> Dict[str, list]:
     Returns:
         Dictionary with 'roles' and 'territories' keys containing lists of valid values
     """
-    csv_path = os.path.join(
-        os.path.dirname(__file__),
-        '..',
-        '..',
-        os.getenv('TESTDATA_DIR', 'testdata'),
-        os.getenv('AGREEMENT_MAPPING_CSV', 'Agreement_Mapping_with_Filenames.csv'),
-    )
+    base_dir = Path(__file__).parent.parent.parent
+    csv_path = base_dir / settings.TESTDATA_DIR / settings.AGREEMENT_MAPPING_CSV
 
     roles = set()
     territories = set()
