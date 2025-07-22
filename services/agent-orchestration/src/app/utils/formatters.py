@@ -128,7 +128,9 @@ def _parse_processed_agreements(
                     settings.SERVICE_ACCOUNT_EMAIL,
                     settings.SIGNED_URL_LIFETIME,
                 )
-                link = signed_url or uri
+                url_auth = uri.replace('gs://', 'https://storage.cloud.google.com/')
+                
+                link = signed_url or url_auth
             else:  # Local file access
                 relative_path = (
                     f'locals/{filename}'
