@@ -196,7 +196,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
         </nav>
 
         {/* Restart Button at the bottom */}
-        <div className="mt-auto mb-24">
+        <div className="mt-auto mb-32">
           <div
             className={cn(
               "mb-2 font-semibold text-gray-700 dark:text-gray-300 text-sm",

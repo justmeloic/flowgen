@@ -31,6 +31,9 @@ import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 
+// Get version from package.json
+const packageVersion = process.env.npm_package_version || "0.2.0";
+
 export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [references, setReferences] = useState<{ [key: string]: Reference }>(
@@ -343,6 +346,14 @@ export default function ChatPage() {
           </>
         )}
       </div>
+
+      {/* Version display - bottom left corner */}
+      <div className="fixed bottom-4 left-4 z-10">
+        <span className="text-xs text-muted-foreground/60 bg-background/80 dark:bg-background/80 px-1 py-1 rounded-lg font-mono backdrop-blur-sm border border-border/20">
+          v{packageVersion}
+        </span>
+      </div>
+
       <Toaster />
     </div>
   );
