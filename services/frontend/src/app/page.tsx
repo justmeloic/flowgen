@@ -32,7 +32,7 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 
 // Get version from package.json
-const packageVersion = process.env.npm_package_version || "0.2.0";
+const packageVersion = process.env.npm_package_version || "0.3.0";
 
 export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -53,6 +53,145 @@ export default function ChatPage() {
       chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
     }
   }, []);
+
+  // Function to handle citation clicks
+  const handleCitationClick = useCallback(
+    (citationNumber: string) => {
+      const reference = references[citationNumber];
+      if (reference && reference.link) {
+        window.open(reference.link, "_blank");
+      }
+    },
+    [references]
+  );
+
+  // Component to render message content with clickable citations
+  const MessageContent = ({ content }: { content: string }) => {
+    const cleanContent = content
+      .split("\n\nReferences:")[0]
+      .replace(/\n\n/g, "\n\n")
+      .trim();
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      if (containerRef.current) {
+        // Clear any existing citation buttons to prevent duplicates
+        const existingButtons = containerRef.current.querySelectorAll(
+          "button[data-citation]"
+        );
+        existingButtons.forEach((button) => {
+          const parent = button.parentNode;
+          if (parent) {
+            parent.replaceChild(
+              document.createTextNode(
+                `[${button.getAttribute("data-citation")}]`
+              ),
+              button
+            );
+          }
+        });
+
+        // Find all text nodes that contain citations and replace them with buttons
+        const walker = document.createTreeWalker(
+          containerRef.current,
+          NodeFilter.SHOW_TEXT,
+          null
+        );
+
+        const textNodes: Text[] = [];
+        let node;
+        while ((node = walker.nextNode())) {
+          const textContent = node.textContent || "";
+          if (/\[\d+\]/.test(textContent)) {
+            textNodes.push(node as Text);
+          }
+        }
+
+        textNodes.forEach((textNode) => {
+          const parent = textNode.parentNode;
+          if (!parent) return;
+
+          const text = textNode.textContent || "";
+          // Simple regex to match just [number] patterns
+          const simpleCitationRegex = /\[(\d+)\]/g;
+
+          const matches = [...text.matchAll(simpleCitationRegex)];
+
+          if (matches.length > 0) {
+            const fragment = document.createDocumentFragment();
+            let lastIndex = 0;
+
+            matches.forEach((match) => {
+              const citationNumber = match[1];
+              const matchStart = match.index!;
+              const matchEnd = matchStart + match[0].length;
+
+              // Add text before the citation
+              if (matchStart > lastIndex) {
+                const beforeText = text.substring(lastIndex, matchStart);
+                fragment.appendChild(document.createTextNode(beforeText));
+              }
+
+              const reference = references[citationNumber];
+              if (reference) {
+                const button = document.createElement("button");
+                button.textContent = `[${citationNumber}]`;
+                button.setAttribute("data-citation", citationNumber);
+                button.className =
+                  "relative text-blue-600/80 hover:text-blue-800 hover:underline bg-blue-50 hover:bg-blue-100 rounded-full px-1.5 py-1 text-sm font-medium transition-colors duration-200 mx-0.5 dark:text-blue-400/60 dark:hover:text-blue-300 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 group";
+
+                // Create tooltip element
+                const tooltip = document.createElement("div");
+                tooltip.className =
+                  "absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-5 py-5 bg-gray-100 text-gray-800 text-xs rounded-full shadow-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none  dark:bg-secondary-dark dark:text-gray-200 dark:border-gray-600";
+                tooltip.innerHTML = `<div class="font-semibold text-gray-600 dark:text-gray-200">${reference.title}</div>`;
+
+                // Add arrow to tooltip
+                const arrow = document.createElement("div");
+                arrow.className =
+                  "absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-100 dark:border-b-secondary-dark";
+                tooltip.appendChild(arrow);
+
+                button.appendChild(tooltip);
+                button.addEventListener("click", () =>
+                  handleCitationClick(citationNumber)
+                );
+                fragment.appendChild(button);
+              } else {
+                fragment.appendChild(
+                  document.createTextNode(`[${citationNumber}]`)
+                );
+              }
+
+              lastIndex = matchEnd;
+            });
+
+            // Add remaining text after the last citation
+            if (lastIndex < text.length) {
+              const remainingText = text.substring(lastIndex);
+              fragment.appendChild(document.createTextNode(remainingText));
+            }
+
+            parent.replaceChild(fragment, textNode);
+          }
+        });
+      }
+    }, [cleanContent, references, handleCitationClick]);
+
+    return (
+      <div ref={containerRef} className="prose prose-sm max-w-none">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkBreaks, remarkParse]}
+          skipHtml={false}
+          components={{
+            p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+          }}
+        >
+          {cleanContent}
+        </ReactMarkdown>
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (isLoading) {
@@ -241,26 +380,7 @@ export default function ChatPage() {
                           message.role === "bot" ? (
                             <span className="italic">{loadingText}</span>
                           ) : (
-                            <div className="prose prose-sm max-w-none">
-                              <ReactMarkdown
-                                remarkPlugins={[
-                                  remarkGfm,
-                                  remarkBreaks,
-                                  remarkParse,
-                                ]}
-                                skipHtml={false}
-                                components={{
-                                  p: ({ children }) => (
-                                    <p className="mb-4 last:mb-0">{children}</p>
-                                  ),
-                                }}
-                              >
-                                {message.content
-                                  .split("\n\nReferences:")[0]
-                                  .replace(/\n\n/g, "\n\n")
-                                  .trim()}
-                              </ReactMarkdown>
-                            </div>
+                            <MessageContent content={message.content} />
                           )
                         ) : (
                           message.content
