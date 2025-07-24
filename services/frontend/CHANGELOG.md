@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/justmeloic/cn-cba-agent/compare/v0.2.1...v0.3.1) (2025-07-24)
+
+
+### Features
+
+* add version displace and version bump ([5ad5274](https://github.com/justmeloic/cn-cba-agent/commit/5ad527492f79c3273fefddaba73f93f1b0a3ddac))
+* implement interactive citation system with tooltips ([39f2141](https://github.com/justmeloic/cn-cba-agent/commit/39f2141782b67c77ed261d4db653e84b8c51e6c6))
+
+
+### Bug Fixes
+
+* implement conversation memory for role/territory persistence ([ca0fbf8](https://github.com/justmeloic/cn-cba-agent/commit/ca0fbf89f796dd9f665f6dd728837635d884ba8c))
+
 ### [0.2.1](https://github.com/justmeloic/cn-cba-agent/compare/v0.1.1...v0.2.1) (2025-07-23)
 
 
