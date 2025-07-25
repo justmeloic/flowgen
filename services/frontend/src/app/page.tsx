@@ -32,7 +32,7 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 
 // Get version from package.json
-const packageVersion = process.env.npm_package_version || "0.3.0";
+const packageVersion = process.env.npm_package_version || "0.3.2";
 
 export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
