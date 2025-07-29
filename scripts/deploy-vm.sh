@@ -229,7 +229,7 @@ fi
 
 # Create new screen session and start the server
 log "🖥️  Creating screen session: $SCREEN_NAME"
-UVICORN_CMD="uvicorn src.app.main:app --reload --host 0.0.0.0 --port $SERVER_PORT"
+UVICORN_CMD="uvicorn src.app.main:app --host 0.0.0.0 --port $SERVER_PORT"
 GUNICORN_CMD="gunicorn src.app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$SERVER_PORT --timeout 600"
 
 SERVE_CMD=$UVICORN_CMD
