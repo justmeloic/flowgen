@@ -286,6 +286,47 @@ export default function ChatPage() {
     scrollToBottom();
   }, [chatHistory, scrollToBottom]);
 
+  // Listen for new session events from the sidebar
+  useEffect(() => {
+    const handleNewSession = () => {
+      // Add a brief fade effect before resetting
+      if (chatContainerRef.current) {
+        chatContainerRef.current.style.opacity = "0";
+        chatContainerRef.current.style.transform = "translateY(10px)";
+      }
+
+      // Reset all state to initial values after a short delay for smooth transition
+      setTimeout(() => {
+        setChatHistory([]);
+        setReferences({});
+        setIsFirstPrompt(true);
+        setIsLoading(false);
+        setLoadingText("Thinking...");
+        setIsReferencesHidden(false);
+
+        // Scroll to top and restore visibility
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop = 0;
+          chatContainerRef.current.style.opacity = "1";
+          chatContainerRef.current.style.transform = "translateY(0)";
+        }
+
+        toast({
+          title: "New Session Started",
+          description:
+            "Ready to start a fresh conversation. Ask me anything about your CBA!",
+          duration: 3000,
+        });
+      }, 150); // Short delay for smooth transition
+    };
+
+    window.addEventListener("newSessionStarted", handleNewSession);
+
+    return () => {
+      window.removeEventListener("newSessionStarted", handleNewSession);
+    };
+  }, []);
+
   const toggleReferencesVisibility = () => {
     setIsReferencesHidden((prev) => !prev);
   };
@@ -307,7 +348,7 @@ export default function ChatPage() {
         >
           <div
             ref={chatContainerRef}
-            className="flex-1 w-full max-w-[800px] mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide"
+            className="flex-1 w-full max-w-[800px] mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide transition-all duration-700 ease-in-out"
             style={{
               height: "calc(100vh - 10rem)",
               maxHeight: "calc(100vh - 10rem)",
@@ -319,9 +360,9 @@ export default function ChatPage() {
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? (
-              <div className="relative -mt-32">
-                <div className="flex flex-col items-center justify-center h-[500px] space-y-10">
-                  <h1 className="text-center text-4xl md:text-5xl font-bold">
+              <div className="relative -mt-32 animate-in fade-in duration-700 ease-in-out">
+                <div className="flex flex-col items-center justify-center h-[500px] space-y-10 transform transition-all duration-700 ease-in-out">
+                  <h1 className="text-center text-4xl md:text-5xl font-bold animate-in slide-in-from-top-8 duration-1000 ease-out">
                     <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
                       {typeof window !== "undefined" &&
                       sessionStorage.getItem("user_name")
@@ -329,7 +370,7 @@ export default function ChatPage() {
                         : "Hello!"}
                     </span>
                   </h1>
-                  <h3 className="text-center text-sm md:text-sm font-bold w-[450px]">
+                  <h3 className="text-center text-sm md:text-sm font-bold w-[450px] animate-in slide-in-from-top-12 duration-1200 ease-out delay-200">
                     <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
                       I can help you with questions about your Collective
                       Bargaining Agreement (CBA). To find the most accurate
@@ -339,12 +380,12 @@ export default function ChatPage() {
                     </span>
                   </h3>
                 </div>
-                <div className="absolute bottom-8 left-0 right-0 w-full max-w-[850px] mx-auto">
+                <div className="absolute bottom-8 left-0 right-0 w-full max-w-[850px] mx-auto animate-in slide-in-from-bottom-8 duration-1000 ease-out delay-400">
                   <ChatInput onSend={handleSend} isLoading={isLoading} />
                 </div>
               </div>
             ) : (
-              <div className="w-full">
+              <div className="w-full animate-in fade-in duration-500 ease-in-out">
                 {chatHistory.map((message, index) => (
                   <div
                     key={index}

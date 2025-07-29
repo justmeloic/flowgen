@@ -16,7 +16,12 @@
 
 "use client";
 
-import { BookOpen, MessageSquare, RotateCcw } from "lucide-react";
+import {
+  BookOpen,
+  MessageSquare,
+  MessageSquarePlus,
+  RotateCcw,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
@@ -29,6 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { startNewSession } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -40,6 +46,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
+  const [isStartingNew, setIsStartingNew] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleMouseEnter = () => {
@@ -79,6 +86,24 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
     }
   };
 
+  const handleNewSession = () => {
+    setIsStartingNew(true);
+    try {
+      // Clear the session ID to start a new session
+      startNewSession();
+
+      // Dispatch a custom event to notify other components (like the chat page)
+      window.dispatchEvent(new CustomEvent("newSessionStarted"));
+
+      console.log("New session started");
+      // Show success feedback for a moment
+      setTimeout(() => setIsStartingNew(false), 1500);
+    } catch (error) {
+      console.error("Error starting new session:", error);
+      setIsStartingNew(false);
+    }
+  };
+
   const sidebarLinks = [
     {
       title: "CBA",
@@ -115,8 +140,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
 
-        {/* Documentation button at the top */}
-
+        {/* New Session button at the top */}
         <div className="mt-16">
           <div
             className={cn(
@@ -124,36 +148,42 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
               isCollapsed && !isHovered ? "text-center" : ""
             )}
           >
-            Docs
+            Session
           </div>
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <Link
-                href="/doc"
+              <button
+                onClick={handleNewSession}
+                disabled={isStartingNew}
                 className={cn(
-                  "flex items-center text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-700/50",
-                  pathname === "/doc" &&
-                    "bg-[#d3e2fd] dark:bg-gray-700 text-primary dark:text-blue-400 hover:bg-[#d3e2fd]/90 dark:hover:bg-gray-600",
+                  "flex items-center text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-700/50 w-full transition-colors",
+                  isStartingNew && "opacity-50 cursor-not-allowed",
                   !isCollapsed || isHovered
                     ? "gap-3 rounded-2xl px-3 py-2"
                     : "justify-center rounded-md p-2"
                 )}
               >
-                <BookOpen className="h-5 w-5" />
+                <MessageSquarePlus
+                  className={cn("h-6 w-6", isStartingNew && "animate-spin")}
+                />
                 {!isCollapsed || isHovered ? (
-                  "Documentation"
+                  isStartingNew ? (
+                    "Starting..."
+                  ) : (
+                    "New conversation"
+                  )
                 ) : (
-                  <span className="sr-only">Documentation</span>
+                  <span className="sr-only">Start New Session</span>
                 )}
-              </Link>
+              </button>
             </TooltipTrigger>
             {isCollapsed && (
               <TooltipContent
                 side="right"
                 className="flex items-center gap-4 max-w-xs rounded-2xl bg-secondary dark:bg-secondary-dark px-3 py-1.5 shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)]"
               >
-                Access detailed project documentation, including code, system
-                architecture, and more.
+                Start a new session by clearing the current session ID. This
+                will create a new conversation context.
               </TooltipContent>
             )}
           </Tooltip>
@@ -195,16 +225,60 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           })}
         </nav>
 
-        {/* Restart Button at the bottom */}
+        {/* Move docs and dev tools to the bottom */}
         <div className="mt-auto mb-32">
+          {/* Documentation section */}
           <div
             className={cn(
               "mb-2 font-semibold text-gray-700 dark:text-gray-300 text-sm",
               isCollapsed && !isHovered ? "text-center" : ""
             )}
           >
-            Dev Tools
+            Docs
           </div>
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Link
+                href="/doc"
+                className={cn(
+                  "flex items-center text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-700/50 mb-4",
+                  pathname === "/doc" &&
+                    "bg-[#d3e2fd] dark:bg-gray-700 text-primary dark:text-blue-400 hover:bg-[#d3e2fd]/90 dark:hover:bg-gray-600",
+                  !isCollapsed || isHovered
+                    ? "gap-3 rounded-2xl px-3 py-2"
+                    : "justify-center rounded-md p-2"
+                )}
+              >
+                <BookOpen className="h-5 w-5" />
+                {!isCollapsed || isHovered ? (
+                  "Documentation"
+                ) : (
+                  <span className="sr-only">Documentation</span>
+                )}
+              </Link>
+            </TooltipTrigger>
+            {isCollapsed && (
+              <TooltipContent
+                side="right"
+                className="flex items-center gap-4 max-w-xs rounded-2xl bg-secondary dark:bg-secondary-dark px-3 py-1.5 shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)]"
+              >
+                Access detailed project documentation, including code, system
+                architecture, and more.
+              </TooltipContent>
+            )}
+          </Tooltip>
+
+          {/* System section */}
+          <div
+            className={cn(
+              "mb-2 font-semibold text-gray-700 dark:text-gray-300 text-sm",
+              isCollapsed && !isHovered ? "text-center" : ""
+            )}
+          >
+            System
+          </div>
+
+          {/* Server Restart Button */}
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <Button

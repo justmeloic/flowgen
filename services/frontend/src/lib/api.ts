@@ -58,6 +58,12 @@ export const hasExistingSession = (): boolean => {
   return !!localStorage.getItem('chatSessionId');
 };
 
+export const startNewSession = (): void => {
+  // Clear the stored session ID to force creation of a new session
+  localStorage.removeItem('chatSessionId');
+  console.log('Cleared session ID - next request will create a new session');
+};
+
 export const login = async (secret: string, name: string) => {
   const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
     method: 'POST',

@@ -8,7 +8,10 @@
     "lint": "next lint",
     "build-static": "rm -rf .next out && next build && rm -rf ../agent-orchestration/build/static_frontend && cp -R ./out ../agent-orchestration/build/static_frontend",
     "build": "rm -rf .next out && next build",
-    "release": "standard-version"
+    "release": "standard-version",
+    "release:major": "standard-version --release-as major",
+    "release:minor": "standard-version --release-as minor",
+    "release:patch": "standard-version --release-as patch"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
