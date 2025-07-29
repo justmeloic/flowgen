@@ -230,7 +230,9 @@ fi
 # Create new screen session and start the server
 log "🖥️  Creating screen session: $SCREEN_NAME"
 UVICORN_CMD="uvicorn src.app.main:app --reload --host 0.0.0.0 --port $SERVER_PORT"
-GUNICORN_CMD="gunicorn src.app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$SERVER_PORT --timeout 600"
+GUNICORN_CMDD="gunicorn src.app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$SERVER_PORT --timeout 600"
+
+SERVE_CMD=$UVICORN_CMD
 
 # Create screen session with the server commandscre
 screen -dmS "$SCREEN_NAME" bash -c "
@@ -239,11 +241,11 @@ screen -dmS "$SCREEN_NAME" bash -c "
     echo '🚀 Starting server in screen session...'
     echo '📍 Working directory: \$(pwd)'
     echo '🐍 Python: \$(which python)'
-    echo '⚡ Command: $GUNICORN_CMD'
+    echo '⚡ Command: $SERVE_CMD'
     echo '🌐 Server will be available at: http://0.0.0.0:$SERVER_PORT'
     echo '📺 Screen session: $SCREEN_NAME'
     echo ''
-    $GUNICORN_CMD
+    $SERVE_CMD
     echo '🛑 Server stopped'
     read -p 'Press Enter to exit screen session...'
 "
