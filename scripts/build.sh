@@ -59,6 +59,10 @@ if [ -d "$FRONTEND_DIR" ]; then
             log "✅ Frontend dependencies already installed"
         fi
         
+        # Clear Next.js cache to ensure fresh build
+        log "🧹 Clearing Next.js cache..."
+        rm -rf .next >> "$LOG_FILE" 2>&1 || true
+        
         # Run the static build
         log "🏗️  Running npm run build-static..."
         if NEXT_PUBLIC_API_BASE_URL= npm run build-static >> "$LOG_FILE" 2>&1; then

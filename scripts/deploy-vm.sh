@@ -120,6 +120,13 @@ fi
 if [ -d "agent-orchestration" ]; then
     log "📂 Navigating to agent-orchestration directory"
     cd agent-orchestration
+    
+    # Clear Python cache files to ensure fresh deployment
+    log "🧹 Clearing Python cache files..."
+    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+    find . -name "*.pyc" -delete 2>/dev/null || true
+    find . -name "*.pyo" -delete 2>/dev/null || true
+    log "✅ Python cache cleared"
 else
     log "⚠️  Warning: agent-orchestration directory not found, staying in current directory"
 fi
@@ -140,6 +147,12 @@ fi
 
 # Create virtual environment
 log "🔧 Creating virtual environment..."
+# Remove existing virtual environment to ensure fresh setup
+if [ -d "$VENV_NAME" ]; then
+    log "🗑️  Removing existing virtual environment..."
+    rm -rf "$VENV_NAME"
+fi
+
 if $PYTHON_CMD -m venv "$VENV_NAME" 2>>"$LOG_FILE"; then
     log "✅ Virtual environment created successfully"
 else
