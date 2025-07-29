@@ -102,7 +102,7 @@ export default function ChatPage() {
         let node;
         while ((node = walker.nextNode())) {
           const textContent = node.textContent || "";
-          if (/\[\d+\]/.test(textContent)) {
+          if (/\[\d+(?:\s*,\s*\d+)*\]/.test(textContent)) {
             textNodes.push(node as Text);
           }
         }
@@ -112,17 +112,17 @@ export default function ChatPage() {
           if (!parent) return;
 
           const text = textNode.textContent || "";
-          // Simple regex to match just [number] patterns
-          const simpleCitationRegex = /\[(\d+)\]/g;
+          // Enhanced regex to match both [number] and [number, number, ...] patterns
+          const citationRegex = /\[(\d+(?:\s*,\s*\d+)*)\]/g;
 
-          const matches = [...text.matchAll(simpleCitationRegex)];
+          const matches = [...text.matchAll(citationRegex)];
 
           if (matches.length > 0) {
             const fragment = document.createDocumentFragment();
             let lastIndex = 0;
 
             matches.forEach((match) => {
-              const citationNumber = match[1];
+              const citationNumbers = match[1].split(",").map((n) => n.trim());
               const matchStart = match.index!;
               const matchEnd = matchStart + match[0].length;
 
@@ -132,35 +132,86 @@ export default function ChatPage() {
                 fragment.appendChild(document.createTextNode(beforeText));
               }
 
-              const reference = references[citationNumber];
-              if (reference) {
-                const button = document.createElement("button");
-                button.textContent = `[${citationNumber}]`;
-                button.setAttribute("data-citation", citationNumber);
-                button.className =
-                  "relative text-blue-600/80 hover:text-blue-800 hover:underline bg-blue-50 hover:bg-blue-100 rounded-full px-1.5 py-1 text-sm font-medium transition-colors duration-200 mx-0.5 dark:text-blue-400/60 dark:hover:text-blue-300 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 group";
+              // Create a container for multiple citations
+              if (citationNumbers.length === 1) {
+                // Single citation - keep existing behavior
+                const citationNumber = citationNumbers[0];
+                const reference = references[citationNumber];
+                if (reference) {
+                  const button = document.createElement("button");
+                  button.textContent = `[${citationNumber}]`;
+                  button.setAttribute("data-citation", citationNumber);
+                  button.className =
+                    "relative text-blue-600/80 hover:text-blue-800 hover:underline bg-blue-50 hover:bg-blue-100 rounded-full px-1.5 py-1 text-sm font-medium transition-colors duration-200 mx-0.5 dark:text-blue-400/60 dark:hover:text-blue-300 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 group";
 
-                // Create tooltip element
-                const tooltip = document.createElement("div");
-                tooltip.className =
-                  "absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-5 py-5 bg-gray-100 text-gray-800 text-xs rounded-full shadow-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none  dark:bg-secondary-dark dark:text-gray-200 dark:border-gray-600";
-                tooltip.innerHTML = `<div class="font-semibold text-gray-600 dark:text-gray-200">${reference.title}</div>`;
+                  // Create tooltip element
+                  const tooltip = document.createElement("div");
+                  tooltip.className =
+                    "absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-5 py-5 bg-gray-100 text-gray-800 text-xs rounded-full shadow-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none  dark:bg-secondary-dark dark:text-gray-200 dark:border-gray-600";
+                  tooltip.innerHTML = `<div class="font-semibold text-gray-600 dark:text-gray-200">${reference.title}</div>`;
 
-                // Add arrow to tooltip
-                const arrow = document.createElement("div");
-                arrow.className =
-                  "absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-100 dark:border-b-secondary-dark";
-                tooltip.appendChild(arrow);
+                  // Add arrow to tooltip
+                  const arrow = document.createElement("div");
+                  arrow.className =
+                    "absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-100 dark:border-b-secondary-dark";
+                  tooltip.appendChild(arrow);
 
-                button.appendChild(tooltip);
-                button.addEventListener("click", () =>
-                  handleCitationClick(citationNumber)
-                );
-                fragment.appendChild(button);
+                  button.appendChild(tooltip);
+                  button.addEventListener("click", () =>
+                    handleCitationClick(citationNumber)
+                  );
+                  fragment.appendChild(button);
+                } else {
+                  fragment.appendChild(
+                    document.createTextNode(`[${citationNumber}]`)
+                  );
+                }
               } else {
-                fragment.appendChild(
-                  document.createTextNode(`[${citationNumber}]`)
-                );
+                // Multiple citations - create a wrapper with individual buttons
+                const wrapper = document.createElement("span");
+                wrapper.textContent = "[";
+                fragment.appendChild(wrapper);
+
+                citationNumbers.forEach((citationNumber, index) => {
+                  const reference = references[citationNumber];
+                  if (reference) {
+                    const button = document.createElement("button");
+                    button.textContent = citationNumber;
+                    button.setAttribute("data-citation", citationNumber);
+                    button.className =
+                      "relative text-blue-600/80 hover:text-blue-800 hover:underline bg-blue-50 hover:bg-blue-100 rounded-full px-1.5 py-0.5 text-sm font-medium transition-colors duration-200 mx-0.5 dark:text-blue-400/60 dark:hover:text-blue-300 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 group";
+
+                    // Create tooltip element
+                    const tooltip = document.createElement("div");
+                    tooltip.className =
+                      "absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-5 py-5 bg-gray-100 text-gray-800 text-xs rounded-full shadow-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none  dark:bg-secondary-dark dark:text-gray-200 dark:border-gray-600";
+                    tooltip.innerHTML = `<div class="font-semibold text-gray-600 dark:text-gray-200">${reference.title}</div>`;
+
+                    // Add arrow to tooltip
+                    const arrow = document.createElement("div");
+                    arrow.className =
+                      "absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-100 dark:border-b-secondary-dark";
+                    tooltip.appendChild(arrow);
+
+                    button.appendChild(tooltip);
+                    button.addEventListener("click", () =>
+                      handleCitationClick(citationNumber)
+                    );
+                    wrapper.appendChild(button);
+                  } else {
+                    const textNode = document.createTextNode(citationNumber);
+                    wrapper.appendChild(textNode);
+                  }
+
+                  // Add comma separator except for the last item
+                  if (index < citationNumbers.length - 1) {
+                    wrapper.appendChild(document.createTextNode(", "));
+                  }
+                });
+
+                const closingBracket = document.createTextNode("]");
+                wrapper.appendChild(closingBracket);
+                fragment.appendChild(wrapper);
               }
 
               lastIndex = matchEnd;
