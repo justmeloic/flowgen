@@ -53,10 +53,10 @@ export function Header() {
               variant="outline"
               size="sm"
               onClick={logout}
-              className="flex items-center gap-2 px-3 py-2 text-muted-foreground hover:text-white hover:bg-red-500/80 hover:border-red-400 hover:scale-105 rounded-3xl transition-all duration-200 dark:bg-secondary-dark dark:border-gray-500 dark:hover:text-white dark:hover:bg-red-500/80 dark:hover:border-red-400"
+              className="flex items-center gap-0 md:gap-2 px-2 md:px-3 py-2 text-muted-foreground hover:text-white hover:bg-red-500/80 hover:border-red-400 hover:scale-105 rounded-3xl transition-all duration-200 dark:bg-secondary-dark dark:border-gray-500 dark:hover:text-white dark:hover:bg-red-500/80 dark:hover:border-red-400"
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              <span className="hidden md:inline">Logout</span>
             </Button>
           </div>
         )}

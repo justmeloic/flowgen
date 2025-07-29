@@ -396,7 +396,7 @@ export default function ChatPage() {
                     <div className="flex items-start gap-2.5 max-w-[85%] md:max-w-[80%]">
                       {message.role === "bot" && (
                         <Avatar
-                          className={`w-8 h-8 shrink-0 ${
+                          className={`w-6 h-6 shrink-0 ${
                             isLoading && index === chatHistory.length - 1
                               ? "animate-bounce"
                               : ""

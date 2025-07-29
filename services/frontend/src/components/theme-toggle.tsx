@@ -73,7 +73,7 @@ export function ThemeToggle() {
       >
         {isDark ? (
           <svg
-            className="h-5 w-5 text-purple-300"
+            className="h-4 w-4 text-blue-200"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -87,7 +87,7 @@ export function ThemeToggle() {
           </svg>
         ) : (
           <svg
-            className="h-5 w-5 text-blue-700"
+            className="h-4 w-4 text-blue-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
