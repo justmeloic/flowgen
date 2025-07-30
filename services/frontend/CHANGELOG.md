@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://github.com/justmeloic/cn-cba-agent/compare/v0.5.0...v0.5.1) (2025-07-30)
+
+
+### Features
+
+* add CN Railway CBA testdata and reference documents ([ef5a5ca](https://github.com/justmeloic/cn-cba-agent/commit/ef5a5ca61cd2893b1ac4646ebe7f051955513034))
+* add TCRC Traffic Coordinator addenda to all Yard Coordinator entries ([268225b](https://github.com/justmeloic/cn-cba-agent/commit/268225bcdf2fb017559ae7e55830477d5aeec2ed))
+
 ## [0.5.0](https://github.com/justmeloic/cn-cba-agent/compare/v0.4.0...v0.5.0) (2025-07-29)
 
 
