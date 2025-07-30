@@ -30,9 +30,10 @@ import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
+import packageJson from "../../package.json";
 
 // Get version from package.json
-const packageVersion = process.env.npm_package_version || "0.5.0";
+const packageVersion = packageJson.version;
 
 export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
@@ -405,9 +406,6 @@ export default function ChatPage() {
               maxHeight: "calc(100vh - 10rem)",
               scrollbarWidth: "none",
               msOverflowStyle: "none",
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? (
