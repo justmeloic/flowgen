@@ -21,7 +21,7 @@ import { MessageResponse } from "@/types";
 // to use relative paths for API requests.
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-export const sendMessage = async (message: string): Promise<MessageResponse> => {
+export const sendMessage = async (message: string, signal?: AbortSignal): Promise<MessageResponse> => {
   try {
     const storedSessionId = localStorage.getItem('chatSessionId');
     
@@ -32,6 +32,7 @@ export const sendMessage = async (message: string): Promise<MessageResponse> => 
         'X-Session-ID': storedSessionId || '', // Always send the header, even if empty
       },
       body: JSON.stringify({ text: message }),
+      signal, // Add abort signal support
     });
 
     if (!response.ok) {
@@ -41,6 +42,14 @@ export const sendMessage = async (message: string): Promise<MessageResponse> => 
     // Get session ID from response header and store it if present
     const newSessionId = response.headers.get('x-session-id'); // Note: header names are case-insensitive
     if (newSessionId) {
+      // If session ID changed, clear the chat data (indicates new session)
+      if (storedSessionId && storedSessionId !== newSessionId) {
+        localStorage.removeItem('chatHistory');
+        localStorage.removeItem('chatReferences');
+        localStorage.removeItem('isFirstPrompt');
+        console.log('Session ID changed, cleared chat data');
+      }
+      
       localStorage.setItem('chatSessionId', newSessionId);
       console.log('Stored new session ID:', newSessionId); // Debug logging
     } else {
@@ -61,7 +70,11 @@ export const hasExistingSession = (): boolean => {
 export const startNewSession = (): void => {
   // Clear the stored session ID to force creation of a new session
   localStorage.removeItem('chatSessionId');
-  console.log('Cleared session ID - next request will create a new session');
+  // Clear persisted chat data
+  localStorage.removeItem('chatHistory');
+  localStorage.removeItem('chatReferences');
+  localStorage.removeItem('isFirstPrompt');
+  console.log('Cleared session ID and chat data - next request will create a new session');
 };
 
 export const login = async (secret: string, name: string) => {
@@ -101,6 +114,10 @@ export const logout = async () => {
     throw new Error(errorData.detail || 'Logout failed');
   }
 
+  // Clear all session and chat data
   localStorage.removeItem('chatSessionId');
+  localStorage.removeItem('chatHistory');
+  localStorage.removeItem('chatReferences');
+  localStorage.removeItem('isFirstPrompt');
   return response.json();
 };

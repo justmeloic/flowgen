@@ -45,6 +45,103 @@ export default function ChatPage() {
   const [loadingText, setLoadingText] = useState("Thinking...");
   const [isReferencesHidden, setIsReferencesHidden] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Persist and restore chat state
+  useEffect(() => {
+    // Restore chat history and references when component mounts
+    const storedChatHistory = localStorage.getItem("chatHistory");
+    const storedReferences = localStorage.getItem("chatReferences");
+    const storedIsFirstPrompt = localStorage.getItem("isFirstPrompt");
+
+    if (storedChatHistory) {
+      try {
+        const parsedHistory = JSON.parse(storedChatHistory);
+        setChatHistory(parsedHistory);
+
+        // Check if the last message is a hanging "Thinking..." message
+        if (parsedHistory.length > 0) {
+          const lastMessage = parsedHistory[parsedHistory.length - 1];
+          if (
+            lastMessage.role === "bot" &&
+            lastMessage.content === "Thinking..."
+          ) {
+            // Remove the hanging "Thinking..." message
+            const cleanedHistory = parsedHistory.slice(0, -1);
+            setChatHistory(cleanedHistory);
+            localStorage.setItem("chatHistory", JSON.stringify(cleanedHistory));
+          }
+          setIsFirstPrompt(false);
+        }
+      } catch (error) {
+        console.error("Error parsing stored chat history:", error);
+      }
+    }
+
+    if (storedReferences) {
+      try {
+        const parsedReferences = JSON.parse(storedReferences);
+        setReferences(parsedReferences);
+      } catch (error) {
+        console.error("Error parsing stored references:", error);
+      }
+    }
+
+    if (storedIsFirstPrompt !== null) {
+      try {
+        const parsedIsFirstPrompt = JSON.parse(storedIsFirstPrompt);
+        setIsFirstPrompt(parsedIsFirstPrompt);
+      } catch (error) {
+        console.error("Error parsing stored isFirstPrompt:", error);
+      }
+    }
+
+    // Listen for storage events to sync state when localStorage is cleared from another tab/context
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "chatHistory" && !e.newValue) {
+        setChatHistory([]);
+      }
+      if (e.key === "chatReferences" && !e.newValue) {
+        setReferences({});
+      }
+      if (e.key === "isFirstPrompt" && !e.newValue) {
+        setIsFirstPrompt(true);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Cleanup function to abort any ongoing requests when component unmounts
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  // Save chat history to localStorage whenever it changes
+  useEffect(() => {
+    if (chatHistory.length > 0) {
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+    } else {
+      localStorage.removeItem("chatHistory");
+    }
+  }, [chatHistory]);
+
+  // Save references to localStorage whenever they change
+  useEffect(() => {
+    if (Object.keys(references).length > 0) {
+      localStorage.setItem("chatReferences", JSON.stringify(references));
+    } else {
+      localStorage.removeItem("chatReferences");
+    }
+  }, [references]);
+
+  // Save isFirstPrompt to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("isFirstPrompt", JSON.stringify(isFirstPrompt));
+  }, [isFirstPrompt]);
 
   const scrollToBottom = useCallback(() => {
     if (chatContainerRef.current) {
@@ -275,9 +372,23 @@ export default function ChatPage() {
 
   const handleSend = useCallback(
     async (userMessage: string, _botMessage: string) => {
+      // Prevent sending if already loading
+      if (isLoading) {
+        return;
+      }
+
       if (isFirstPrompt) {
         setIsFirstPrompt(false);
       }
+
+      // Cancel any existing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Create new abort controller for this request
+      abortControllerRef.current = new AbortController();
+
       setIsLoading(true);
       setLoadingText("Thinking..."); // Reset to initial state for each new request
       setChatHistory((prev) => [
@@ -288,7 +399,16 @@ export default function ChatPage() {
       setTimeout(scrollToBottom, 0);
 
       try {
-        const response = await sendMessage(userMessage);
+        const response = await sendMessage(
+          userMessage,
+          abortControllerRef.current.signal
+        );
+
+        // Check if request was aborted
+        if (abortControllerRef.current.signal.aborted) {
+          return;
+        }
+
         // Only update references if the new response has references
         if (
           response.references &&
@@ -314,7 +434,15 @@ export default function ChatPage() {
           return newHistory;
         });
         setTimeout(scrollToBottom, 100);
-      } catch (error) {
+      } catch (error: any) {
+        // Don't show error if request was aborted (user navigated away)
+        if (
+          error.name === "AbortError" ||
+          abortControllerRef.current?.signal.aborted
+        ) {
+          return;
+        }
+
         console.error("Error sending message:", error);
         setChatHistory((prev) =>
           prev.slice(0, -1).concat({
@@ -328,10 +456,13 @@ export default function ChatPage() {
           variant: "destructive",
         });
       } finally {
-        setIsLoading(false);
+        // Only update loading state if request wasn't aborted
+        if (!abortControllerRef.current?.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     },
-    [scrollToBottom, isFirstPrompt, loadingText]
+    [scrollToBottom, isFirstPrompt, loadingText, isLoading]
   );
 
   useEffect(() => {
@@ -341,6 +472,11 @@ export default function ChatPage() {
   // Listen for new session events from the sidebar
   useEffect(() => {
     const handleNewSession = () => {
+      // Cancel any ongoing requests
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
       // Add a brief fade effect before resetting
       if (chatContainerRef.current) {
         chatContainerRef.current.style.opacity = "0";
@@ -355,6 +491,11 @@ export default function ChatPage() {
         setIsLoading(false);
         setLoadingText("Thinking...");
         setIsReferencesHidden(false);
+
+        // Clear persisted data from localStorage
+        localStorage.removeItem("chatHistory");
+        localStorage.removeItem("chatReferences");
+        localStorage.removeItem("isFirstPrompt");
 
         // Scroll to top and restore visibility
         if (chatContainerRef.current) {
@@ -509,7 +650,7 @@ export default function ChatPage() {
                 : "opacity-100 bottom-0 bg-chatInput-light dark:bg-background py-2 px-4 dark:border-gray-700"
             }`}
           >
-            {!isFirstPrompt && (
+            {(!isFirstPrompt || chatHistory.length > 0) && (
               <ChatInput onSend={handleSend} isLoading={isLoading} />
             )}
           </div>
