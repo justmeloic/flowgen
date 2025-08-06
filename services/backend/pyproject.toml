@@ -1,5 +1,5 @@
 [project]
-name = "agent-orchestration"
+name = "backend"
 version = "0.3.2"
 description = "Add your description here"
 readme = "README.md"
@@ -19,6 +19,7 @@ dependencies = [
     "ruff>=0.11.11",
     "google-cloud-discoveryengine",
     "gunicorn>=23.0.0",
+    "pip>=25.2",
 ]
 
 [tool.pytest.ini_options]

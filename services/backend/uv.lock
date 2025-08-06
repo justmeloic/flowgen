@@ -2,45 +2,6 @@ version = 1
 requires-python = ">=3.13"
 
 [[package]]
-name = "agent-orchestration"
-version = "0.3.2"
-source = { editable = "." }
-dependencies = [
-    { name = "fastapi" },
-    { name = "google-adk" },
-    { name = "google-cloud-discoveryengine" },
-    { name = "gunicorn" },
-    { name = "httpx" },
-    { name = "loguru" },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-cov" },
-    { name = "python-dotenv" },
-    { name = "ruff" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "fastapi", specifier = ">=0.104.0" },
-    { name = "google-adk", specifier = ">=0.2.0" },
-    { name = "google-cloud-discoveryengine" },
-    { name = "gunicorn", specifier = ">=23.0.0" },
-    { name = "httpx", specifier = ">=0.24.1" },
-    { name = "loguru", specifier = ">=0.7.0" },
-    { name = "pydantic", specifier = ">=2.0.0" },
-    { name = "pydantic-settings", specifier = ">=2.0.0" },
-    { name = "pytest", specifier = ">=7.4.0" },
-    { name = "pytest-asyncio", specifier = ">=0.21.0" },
-    { name = "pytest-cov", specifier = ">=4.1.0" },
-    { name = "python-dotenv", specifier = ">=1.0.0" },
-    { name = "ruff", specifier = ">=0.11.11" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.27.0" },
-]
-
-[[package]]
 name = "annotated-types"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -72,6 +33,47 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a2/9d/b1e08d36899c12c8b894a44a5583ee157789f26fc4b176f8e4b6217b56e1/authlib-1.6.0.tar.gz", hash = "sha256:4367d32031b7af175ad3a323d571dc7257b7099d55978087ceae4a0d88cd3210", size = 158371 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/84/29/587c189bbab1ccc8c86a03a5d0e13873df916380ef1be461ebe6acebf48d/authlib-1.6.0-py2.py3-none-any.whl", hash = "sha256:91685589498f79e8655e8a8947431ad6288831d643f11c55c2143ffcc738048d", size = 239981 },
+]
+
+[[package]]
+name = "backend"
+version = "0.3.2"
+source = { editable = "." }
+dependencies = [
+    { name = "fastapi" },
+    { name = "google-adk" },
+    { name = "google-cloud-discoveryengine" },
+    { name = "gunicorn" },
+    { name = "httpx" },
+    { name = "loguru" },
+    { name = "pip" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "python-dotenv" },
+    { name = "ruff" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.104.0" },
+    { name = "google-adk", specifier = ">=0.2.0" },
+    { name = "google-cloud-discoveryengine" },
+    { name = "gunicorn", specifier = ">=23.0.0" },
+    { name = "httpx", specifier = ">=0.24.1" },
+    { name = "loguru", specifier = ">=0.7.0" },
+    { name = "pip", specifier = ">=25.2" },
+    { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "pydantic-settings", specifier = ">=2.0.0" },
+    { name = "pytest", specifier = ">=7.4.0" },
+    { name = "pytest-asyncio", specifier = ">=0.21.0" },
+    { name = "pytest-cov", specifier = ">=4.1.0" },
+    { name = "python-dotenv", specifier = ">=1.0.0" },
+    { name = "ruff", specifier = ">=0.11.11" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.27.0" },
 ]
 
 [[package]]
@@ -898,6 +900,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a1/d4/1fc4078c65507b51b96ca8f8c3ba19e6a61c8253c72794544580a7b6c24d/packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f", size = 165727 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484", size = 66469 },
+]
+
+[[package]]
+name = "pip"
+version = "25.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz", hash = "sha256:578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2", size = 1840021 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/3f/945ef7ab14dc4f9d7f40288d2df998d1837ee0888ec3659c813487572faa/pip-25.2-py3-none-any.whl", hash = "sha256:6d67a2b4e7f14d8b31b8b52648866fa717f45a1eb70e83002f4331d07e953717", size = 1752557 },
 ]
 
 [[package]]

@@ -1,12 +1,11 @@
 <div align="center">
-  <img src="services/frontend/public/CN_Railway_logo.svg">
-
-  <br>
+  <h1>AgentChat</h1>
+  <p>A Multi-Model AI Agent Chat Interface</p>
 </div>
 
 ---
 
-# Collective Bargaining Agreement & Grievance Agent
+# AgentChat
 
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
@@ -15,7 +14,7 @@
 
 **Author / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
-An agentic question answering system powered by AI for CBA analysis,
+A versatile chat interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools,
 built with Google Cloud Platform services.
 
 ## Services
@@ -23,19 +22,20 @@ built with Google Cloud Platform services.
 Each service has its own README with specific setup instructions. Please refer to:
 
 - [Frontend Setup](services/frontend/README.md)
-- [Agent Orchestration Setup](services/agent-orchestration/README.md)
+- [Agent Orchestration Setup](services/backend/README.md)
 
-### Frontend Client (services/front-end)
+### Frontend Client (services/frontend)
 
-A Next.js web application that provides the user interface for interacting with the CBA analysis system.
+A Next.js web application that provides the user interface for interacting with AI agents across different models and capabilities.
 
-### Agent Orchestration API (services/agent-orchestration)
+### Agent Orchestration API (services/backend)
 
 The backend service that coordinates AI agents for:
 
-- Understanding user queries
-- CBA analysis
-- Response generation
+- Multi-model AI interactions
+- Agent selection and routing
+- Tool integration and execution
+- Response generation and formatting
 
 ## Repository Structure
 
@@ -45,7 +45,7 @@ The backend service that coordinates AI agents for:
 ├── scripts
 │   └── deploy.sh
 └── services
-    ├── agent-orchestration
+    ├── backend
     │   ├── pyproject.toml
     │   ├── src
     │   ├── static_frontend
@@ -66,15 +66,15 @@ The backend service that coordinates AI agents for:
 
 ## Architecture
 
-![Automatic Datastore Refresh Architecture](docs/architecture-diagram.png)
+![AgentChat Architecture](docs/architecture-diagram.png)
 
 ## Component Usage
 
 | Component                   | Type             | Description                                                                                 |
 | --------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
-| Vertext AI Search           | GCP              | Semantic search for RAG                                                                     |
-| GCS Bucket                  | GCP              | Storage for raw CBA files, temporary processing data, and backup storage                    |
-| Cloud Logging               | GCP              | Monitors application performance and tracks data processing operations                      |
+| Vertex AI                   | GCP              | Multi-model AI service for different agent capabilities                                     |
+| GCS Bucket                  | GCP              | Storage for agent configurations, conversation history, and file uploads                    |
+| Cloud Logging               | GCP              | Monitors application performance and tracks agent interactions                              |
 | Cloud Run                   | GCP              | Hosts containerized services for web interfaces and APIs                                    |
 | ADK (Agent Development Kit) | Development Tool | Provides development tools and libraries for building and testing the agentic orchestration |
 
@@ -94,7 +94,7 @@ npm run dev
 ```
 
 ```bash
-cd services/agent-orchestration/src/
+cd services/backend/src/
 uv run app.py
 ```
 
@@ -121,10 +121,10 @@ In this model, the FastAPI backend serves the static assets generated from the N
 
 ```bash
 cd services/frontend/
-npm run build-local # This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend agent-orchestration/build/static_frontend
+npm run build-local # This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend backend/build/static_frontend
 
-cd ../agent-orchestration/src/
-uv run app.py # Services backend with agent-orchestration/build/static_frontend mounted
+cd ../backend/src/
+uv run app.py # Services backend with backend/build/static_frontend mounted
 ```
 
 **Architecture:**
@@ -231,8 +231,8 @@ AUTH_SECRET=your-super-secret-key
 ### Components
 
 - **Login Page**: `services/frontend/src/app/login/page.tsx` - The login form.
-- **Authentication API**: `services/agent-orchestration/src/app/api/v1/auth.py` - The login and logout endpoints.
-- **Session Middleware**: `services/agent-orchestration/src/app/middleware/session_middleware.py` - The middleware that protects routes.
+- **Authentication API**: `services/backend/src/app/api/v1/auth.py` - The login and logout endpoints.
+- **Session Middleware**: `services/backend/src/app/middleware/session_middleware.py` - The middleware that protects routes.
 - **useAuth Hook**: `services/frontend/src/hooks/useAuth.ts` - The frontend logic for handling authentication state.
 - **ProtectedRoute**: `services/frontend/src/components/protected-route.tsx` - The component that wraps protected pages.
 
@@ -273,9 +273,9 @@ source scripts/build.sh
 This script performs the following steps:
 
 1. 🎨 **Frontend Build**: Runs `npm install` (if needed) and `npm run build-static` in the frontend service
-2. 📦 **Archive Creation**: Creates a timestamped zip archive of the agent-orchestration service (including static frontend)
+2. 📦 **Archive Creation**: Creates a timestamped zip archive of the backend service (including static frontend)
 3. 🧹 **GCS Cleanup**: Removes any existing build archives from the GCS bucket
-4. ☁️ **Upload**: Uploads the new build archive to `gs://cn-cba-usecase/`
+4. ☁️ **Upload**: Uploads the new build archive to `gs://agentchat-builds/`
 5. 🗑️ **Local Cleanup**: Removes the local zip file after upload
 
 #### Manual Frontend Build
@@ -291,7 +291,7 @@ npm run build-static          # Build and copy to backend
 The `build-static` script performs:
 
 ```bash
-rm -rf .next out && next build && rm -rf ../agent-orchestration/build/static_frontend && cp -R ./out ../agent-orchestration/build/static_frontend
+rm -rf .next out && next build && rm -rf ../backend/build/static_frontend && cp -R ./out ../backend/build/static_frontend
 ```
 
 ### Deployment Process
@@ -363,7 +363,7 @@ After deployment, use these commands to manage the server:
 
 ```bash
 # Attach to the running server (see logs in real-time)
-screen -r agent-orchestration
+screen -r backend
 
 # Detach from screen session (server keeps running)
 # Press: Ctrl+A, then D
@@ -372,7 +372,7 @@ screen -r agent-orchestration
 screen -list
 
 # Kill the server session
-screen -S agent-orchestration -X quit
+screen -S backend -X quit
 ```
 
 ### Environment Configuration

@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# Deploy agent-orchestration service to VM from Google Cloud Storage
+# Deploy backend service to VM from Google Cloud Storage
 # This script downloads the latest build, sets up environment, and runs the server
 
 # Configuration
-PROJECT_ROOT="/home/txt36456/cn-cba-agent"
-GCS_BUCKET="gs://cn-agent-deployment/"
+PROJECT_ROOT="/home/txt36456/agentchat"
+GCS_BUCKET="gs://agentchat-builds/"
 DEPLOY_DIR="$PROJECT_ROOT/latest-deployment"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 LOG_DIR="$PROJECT_ROOT/logs"
 LOG_FILE="$LOG_DIR/deploy_${TIMESTAMP}.log"
-SCREEN_NAME="agent-orchestration"
+SCREEN_NAME="backend"
 PYTHON_VERSION="3.11"
 VENV_NAME=".venv"
 
@@ -18,13 +18,13 @@ VENV_NAME=".venv"
 SERVER_HOST=0.0.0.0
 SERVER_PORT=8081
 
-# Profile Cnnfigurations
+# Profile Configurations
 export PATH="$PATH:$HOME/.local/bin"
 
 export ACCOUNT=txt36456@cn.ca
 export PROJECT_ID=cnr-agentspace-lab-76cg
 export REGION=us-central1
-export AGENT_STAGING_BUCKET="gs://cn-agent-staging"
+export AGENT_STAGING_BUCKET="gs://agentchat-staging"
 
 # Handy aliases
 alias gs='git status'
@@ -94,9 +94,9 @@ else
         log "📦 Extracting build: $BUILD_FILE"
         
         # Remove existing extraction directory if it exists
-        if [ -d "agent-orchestration" ]; then
-            log "🗑️  Removing existing agent-orchestration directory..."
-            rm -rf agent-orchestration
+        if [ -d "backend" ]; then
+            log "🗑️  Removing existing backend directory..."
+            rm -rf backend
         fi
         
         # Extract with overwrite and verbose logging
@@ -116,10 +116,10 @@ else
     fi
 fi
 
-# Navigate to agent-orchestration directory
-if [ -d "agent-orchestration" ]; then
-    log "📂 Navigating to agent-orchestration directory"
-    cd agent-orchestration
+# Navigate to backend directory
+if [ -d "backend" ]; then
+    log "📂 Navigating to backend directory"
+    cd backend
     
     # Clear Python cache files to ensure fresh deployment
     log "🧹 Clearing Python cache files..."
@@ -128,7 +128,7 @@ if [ -d "agent-orchestration" ]; then
     find . -name "*.pyo" -delete 2>/dev/null || true
     log "✅ Python cache cleared"
 else
-    log "⚠️  Warning: agent-orchestration directory not found, staying in current directory"
+    log "⚠️  Warning: backend directory not found, staying in current directory"
 fi
 
 # Check if Python is available

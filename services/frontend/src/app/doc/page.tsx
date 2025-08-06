@@ -214,7 +214,7 @@ export default function HomePage() {
               <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono">
                 <div>cd services/frontend/</div>
                 <div>npm run dev</div>
-                <div className="mt-2">cd services/agent-orchestration/src/</div>
+                <div className="mt-2">cd services/backend/src/</div>
                 <div>uv run app.py</div>
               </div>
             </div>
@@ -230,7 +230,7 @@ export default function HomePage() {
               <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-sm font-mono">
                 <div>cd services/frontend/</div>
                 <div>npm run build-local</div>
-                <div className="mt-2">cd ../agent-orchestration/src/</div>
+                <div className="mt-2">cd ../backend/src/</div>
                 <div>uv run app.py</div>
               </div>
             </div>
@@ -337,13 +337,13 @@ export default function HomePage() {
         {/* Try the Agent */}
         <div className="text-center">
           <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
-            Try the CBA Agent
+            Try AgentChat
           </h2>
           <Button
             asChild
             className="bg-primary text-white px-8 py-3 rounded-full hover:bg-primary/70 transition-colors text-lg"
           >
-            <Link href="/">Start Chat with CBA Agent</Link>
+            <Link href="/">Start Chat with AgentChat</Link>
           </Button>
         </div>
 
@@ -358,7 +358,7 @@ export default function HomePage() {
             <div>├── scripts</div>
             <div>│ └── deploy.sh</div>
             <div>└── services</div>
-            <div> ├── agent-orchestration</div>
+            <div> ├── backend</div>
             <div> │ ├── pyproject.toml</div>
             <div> │ ├── src</div>
             <div> │ ├── static_frontend</div>
@@ -458,7 +458,7 @@ export default function HomePage() {
               <li>
                 Attach to server:{" "}
                 <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 rounded-2xl">
-                  screen -r agent-orchestration
+                  screen -r backend
                 </code>
               </li>
               <li>
@@ -476,7 +476,7 @@ export default function HomePage() {
               <li>
                 Kill session:{" "}
                 <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 rounded-2xl">
-                  screen -S agent-orchestration -X quit
+                  screen -S backend -X quit
                 </code>
               </li>
             </ul>

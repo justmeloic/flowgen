@@ -20,6 +20,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -27,6 +28,7 @@ import { usePathname } from "next/navigation";
 export function Header() {
   const { isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
+  const { theme } = useTheme();
 
   // Don't show logout button on login page
   const showLogoutButton = isAuthenticated && pathname !== "/login";
@@ -37,8 +39,8 @@ export function Header() {
         <div className="flex items-center gap-2 pl-4 ml-4">
           <Link href="/">
             <Image
-              src="/CN_Railway_logo.svg"
-              alt="CN logo"
+              src={theme === "dark" ? "/logo-dark.png" : "/logo-light.png"}
+              alt="AgentChat logo"
               width={62}
               height={62}
               className="cursor-pointer"

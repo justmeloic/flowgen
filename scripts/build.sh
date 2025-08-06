@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Bundle and upload agent-orchestration service to Google Cloud Storage
-# This script creates a zip archive of the agent-orchestration service,
+# Bundle and upload backend service to Google Cloud Storage
+# This script creates a zip archive of the backend service,
 # uploads it to GCS, and cleans up the local zip file.
 
 # Configuration
-PROJECT_ROOT="/home/txt36456/codebase/cn-cba-agent"
-SERVICE_DIR="$PROJECT_ROOT/services/agent-orchestration"
-GCS_BUCKET="gs://cn-agent-deployment/" 
+PROJECT_ROOT="/home/txt36456/codebase/agentchat"
+SERVICE_DIR="$PROJECT_ROOT/services/backend"
+GCS_BUCKET="gs://agentchat-builds/" 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 ZIP_NAME="build-${TIMESTAMP}.zip"
 ZIP_PATH="$PROJECT_ROOT/$ZIP_NAME"
@@ -84,14 +84,14 @@ log "📦 Creating zip archive: $ZIP_NAME"
 cd "$PROJECT_ROOT/services"
 
 # Use a more effective approach to exclude .venv
-zip -r "$ZIP_PATH" agent-orchestration/ \
-    -x "agent-orchestration/.venv/*" \
-    -x "agent-orchestration/.venv/**" \
+zip -r "$ZIP_PATH" backend/ \
+    -x "backend/.venv/*" \
+    -x "backend/.venv/**" \
     -x "*/.venv/*" \
     -x "*/.venv/**" \
-    -x "agent-orchestration/__pycache__/*" \
-    -x "agent-orchestration/*/__pycache__/*" \
-    -x "agent-orchestration/*/*/__pycache__/*" \
+    -x "backend/__pycache__/*" \
+    -x "backend/*/__pycache__/*" \
+    -x "backend/*/*/__pycache__/*" \
     -x "**/__pycache__/*" >> "$LOG_FILE" 2>&1
 
 # Check if zip was created successfully

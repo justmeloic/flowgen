@@ -42,8 +42,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>CBA Agent</title>
-        <link rel="icon" href="/CN_Railway_logo.svg" type="image/svg+xml" />
+        <title>AgentChat</title>
+        <link rel="icon" href="/logo-light.png" type="image/png" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider

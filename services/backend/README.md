@@ -4,7 +4,7 @@
 ![Google ADK](https://img.shields.io/badge/Google_ADK-0.2.0+-4285F4.svg)
 ![GCP](https://img.shields.io/badge/Google_Cloud-4285F4?logo=google-cloud&logoColor=white)
 
-Backend service that coordinates AI agents for the Tariff Agent system.
+Backend service that coordinates AI agents for the AgentChat system.
 
 ## System Architecture
 
@@ -12,24 +12,29 @@ The following diagram illustrates the high-level architecture of the agent orche
 
 ```mermaid
 graph TD
-    A[User] -- Asks Question --> B(Agent - ADK Application);
-    B -- Uses Tool with Query & Context Filters --> C{VertexAIDatastoreSearchTool};
-    C -- Searches Indexed Documents --> D[(Vertex AI Datastore \n CBA PDFs)];
-    D -- Returns Search Results --> C;
-    C -- Provides Results to Agent --> B;
-    B -- Formulates & Delivers Answer --> A;
+    A[User] -- Sends Message --> B(Agent Orchestrator);
+    B -- Routes to Appropriate Agent --> C{Multi-Model Agents};
+    C -- Agent A: GPT-4 --> D[OpenAI API];
+    C -- Agent B: Claude --> E[Anthropic API];
+    C -- Agent C: Gemini --> F[Vertex AI API];
+    D -- Response --> B;
+    E -- Response --> B;
+    F -- Response --> B;
+    B -- Formatted Response --> A;
 
     style B fill:#f9f,stroke:#333,stroke-width:2px
     style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#lightgrey,stroke:#333,stroke-width:2px
+    style D fill:#lightgreen,stroke:#333,stroke-width:2px
+    style E fill:#lightblue,stroke:#333,stroke-width:2px
+    style F fill:#orange,stroke:#333,stroke-width:2px
 ```
 
 The diagram shows the interaction between different components of the system:
 
-- User Interaction: How CN employees interact with the system
-- Core Agent System: The Supervisor Agent and specialized sub-agents
-- Tools: Various capabilities available to each agent
-- External Data Sources: The different data sources the system can query
+- User Interaction: How users interact with different AI agents
+- Core Agent System: The orchestrator that routes requests to appropriate agents
+- Multi-Model Support: Various AI models and their APIs
+- Tool Integration: Specialized capabilities available to each agent
 
 ## Development Setup
 

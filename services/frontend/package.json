@@ -1,12 +1,12 @@
 {
-  "name": "cn-cba-agent",
+  "name": "agentchat-frontend",
   "version": "0.5.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
-    "build-static": "rm -rf .next out && next build && rm -rf ../agent-orchestration/build/static_frontend && cp -R ./out ../agent-orchestration/build/static_frontend",
+    "build-static": "rm -rf .next out && next build && rm -rf ../backend/build/static_frontend && cp -R ./out ../backend/build/static_frontend",
     "build": "rm -rf .next out && next build",
     "release": "standard-version && mv CHANGELOG.md ../../CHANGELOG.md",
     "release:major": "standard-version --release-as major && mv CHANGELOG.md ../../CHANGELOG.md",
@@ -61,7 +61,7 @@
     "react-hook-form": "^7.54.1",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.7",
-    "react-syntax-highlighter": "^15.6.1",
+    "react-syntax-highlighter": "^5.8.0",
     "recharts": "2.15.0",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",

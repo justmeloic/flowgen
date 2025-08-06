@@ -6,7 +6,7 @@
 # --- Configuration ---
 COPYRIGHT_HOLDER="Google LLC"
 LICENSE_TYPE="apache"
-BACKEND_SRC_DIR="services/agent-orchestration/src"
+BACKEND_SRC_DIR="services/backend/src"
 FRONTEND_SRC_DIR="services/frontend/src"
 
 # --- Logging Configuration ---

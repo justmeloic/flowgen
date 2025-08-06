@@ -4,7 +4,7 @@
 ![React](https://img.shields.io/badge/react-18.0.0+-blue.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0.0+-3178C6.svg)
 
-Web interface for the CBA Agentic system. Built with Next.js for optimal performance and developer experience.
+Web interface for the AgentChat system. Built with Next.js for optimal performance and developer experience.
 
 ## Development Setup
 
@@ -55,10 +55,10 @@ The application will be available at `http://localhost:3000`
 ## Local Static Build for Testing
 
 ```bash
-npm run build-local# This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend agent-orchestration/build/static_frontend
+npm run build-local# This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend backend/build/static_frontend
 
-cd ../agent-orchestration/src/
-uv run app.py # Services backend with agent-orchestration/build/static_frontend mounted
+cd ../backend/src/
+uv run app.py # Services backend with backend/build/static_frontend mounted
 ```
 
 ## Project Structure

@@ -70,8 +70,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = 'development'
 
     # API settings
-    API_TITLE: str = 'CBA Agent API'
-    API_DESCRIPTION: str = 'API for interacting with the CBA information agent'
+    API_TITLE: str = 'AgentChat API'
+    API_DESCRIPTION: str = 'API for interacting with multi-model AI agents'
     API_VERSION: str = '1.0.0'
 
     # Frontend URL for CORS

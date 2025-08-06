@@ -14,9 +14,9 @@
 """Defines the root agent for the application.
 
 This module configures and instantiates the primary agent responsible for
-coordinating responses to user queries about Collective Bargaining Agreements
-(CBAs). It includes callback functions to process data before and after
-interacting with the LLM.
+coordinating responses to user queries through multiple AI models and
+specialized tools. It includes callback functions to process data before
+and after interacting with the LLM.
 """
 
 # Standard library imports
