@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,26 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Utility functions for formatting agent responses."""
 
 from __future__ import annotations
 
-# Standard library imports
 import json
 import logging
 import re
 from typing import Any
 
-# Third-party imports
 from fastapi import Request
 
-# Local application imports
 from src.app.core.config import settings
 from src.app.utils.signed_url import generate_download_signed_url
 
 _logger = logging.getLogger(__name__)
 
-# Constants
 _REFERENCE_TOKEN = '<START_OF_REFERENCE_DOCUMENTS>'
 _CITATION_PATTERN = re.compile(r'(\[[0-9,\s]+\])')
 

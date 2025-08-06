@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Agent service for processing queries via the root agent.
 
 This service orchestrates the interaction with the ADK runner,
@@ -205,5 +206,4 @@ class AgentService:
             )
 
 
-# Create a singleton instance for use across the application
 agent_service = AgentService()

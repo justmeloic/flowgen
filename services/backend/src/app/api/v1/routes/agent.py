@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Root Agent Router Module.
 
 This module handles the routing and execution of the root agent's conversation
@@ -20,17 +21,14 @@ handles agent interactions through FastAPI endpoints.
 
 from __future__ import annotations
 
-# Standard library imports
 from typing import Annotated
 
-# Third-party imports
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
 from google.adk.sessions import Session
 from loguru import logger as _logger
 
-# Application-specific imports
 from src.app.models import AgentConfig
 from src.app.schemas import AgentResponse, Query
 from src.app.services.agent_service import agent_service

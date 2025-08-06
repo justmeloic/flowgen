@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,23 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Dependency injection module for the root agent router."""
 
 from __future__ import annotations
 
-# Standard library imports
 import logging
 import time
 import uuid
 from functools import lru_cache
 from typing import Annotated
 
-# Third-party imports
 from fastapi import Depends, HTTPException, Request, Response
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService, Session
 
-# Application-specific imports
 from src.agents.agent import root_agent
 from src.app.models import AgentConfig
 

@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,10 +26,8 @@ from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-# Create a new router for the frontend
 frontend_router = APIRouter()
 
-# Define the path to the static build directory
 static_files_dir = Path(__file__).parent.parent.parent.parent / 'build/static_frontend'
 
 

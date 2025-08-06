@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from __future__ import annotations
 
-# Standard library imports
 import csv
 import json
 import logging
@@ -23,14 +21,12 @@ import os
 import pathlib
 from typing import Dict, Optional
 
-# Third-party imports
 from google import genai
 from google.adk.tools import FunctionTool
 from google.genai import types
 from google.genai.types import Content, FunctionDeclaration, Part, Schema, Type
 from loguru import logger as _logger
 
-# Application-specific imports
 from src.app.core.config import settings
 
 
@@ -292,7 +288,6 @@ def _get_agreement_filenames(role: str, territory: str) -> Dict[str, Optional[st
         }
 
 
-# This tells the ADK exactly what the tool looks like, bypassing automatic parsing.
 process_agreements_declaration = FunctionDeclaration(
     name='process_agreements',
     description=(

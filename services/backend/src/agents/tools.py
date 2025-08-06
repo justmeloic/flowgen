@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,33 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Defines tools for the agent, including CBA datastore search.
 
 This module provides the core tool for searching Collective Bargaining
 Agreements (CBAs) using Google Cloud's Vertex AI Search. It also includes
 a callback function to handle the results of tool calls.
 """
-# NOTE: Intentionally not using "from __future__ import annotations" here
-# as a test for ADK's introspection capabilities.
 
-# Standard library imports
 import json
 import logging
 import os
 import traceback
 from typing import Any, Dict, Optional
 
-# Third-party imports
 from google.adk.tools import FunctionTool
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.cloud import discoveryengine_v1beta as discoveryengine
 from loguru import logger as _logger
 
-# Local imports
 from .tools import _process_agreements_with_gemini
 
-# Create the FunctionTool for process_agreements_with_gemini
 _process_agreements_with_gemini.__name__ = 'process_agreements_with_gemini'
 process_agreements_with_gemini = FunctionTool(func=_process_agreements_with_gemini)
 

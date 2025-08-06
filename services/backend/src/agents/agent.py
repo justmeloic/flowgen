@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Defines the root agent for the application.
 
 This module configures and instantiates the primary agent responsible for
@@ -19,7 +20,6 @@ specialized tools. It includes callback functions to process data before
 and after interacting with the LLM.
 """
 
-# Standard library imports
 import asyncio
 import csv
 import json
@@ -28,7 +28,6 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Dict, Optional
 
-# Third-party imports
 from dotenv import load_dotenv
 from google import genai
 from google.adk.agents import Agent
@@ -36,7 +35,6 @@ from google.adk.tools import FunctionTool
 from google.genai import types
 from loguru import logger as _logger
 
-# Application-specific imports
 try:
     # from .tools.document_understanding import process_agreements
 
@@ -68,7 +66,6 @@ except ImportError:
     from src.app.core.config import settings
 
 
-# Load environment variables
 load_dotenv()
 
 
@@ -154,7 +151,6 @@ def _find_best_match(
     return best_match
 
 
-# ======================= START:WORKAROUND FOR FUNCTION CALLING =======================
 """
 NOTE[Loïc]:
 
@@ -530,7 +526,6 @@ def suggest_closest_matches(role: str, territory: str) -> Dict[str, Optional[str
     return {'role': suggested_role, 'territory': suggested_territory}
 
 
-# ======================== END:WORKAROUND FOR FUNCTION CALLING ========================
 
 
 root_agent = Agent(

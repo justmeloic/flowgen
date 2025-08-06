@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Defines the specialized search agent for CBA document retrieval.
 
 This agent is responsible for taking search queries, interacting with the
@@ -20,14 +21,12 @@ supervisor agent.
 
 from __future__ import annotations
 
-# Standard library imports
 import json
 import logging
 import os
 import traceback
 from typing import Any, Optional
 
-# Third-party imports
 from google.adk.agents import Agent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.models import LlmRequest, LlmResponse
@@ -38,8 +37,6 @@ from src.agents.sub_agents.search_agent.prompts import (
     return_search_agent_instructions,
 )
 
-# Application-specific imports
-# Note: This agent reuses the tools and callbacks defined at the higher agents level.
 from src.agents.tools import search_cba_datastore, store_tool_result_callback
 
 

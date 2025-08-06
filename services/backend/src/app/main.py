@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,16 +101,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Set up middleware
 app.add_middleware(CORSMiddleware, **settings.cors.model_dump())
 app.add_middleware(SessionMiddleware)
 
-# Include the API router
 main_router = APIRouter()
 main_router.include_router(main_v1_router)
 
 app.include_router(main_router)
 
 
-# Register frontend routes
 register_frontend_routes(app)

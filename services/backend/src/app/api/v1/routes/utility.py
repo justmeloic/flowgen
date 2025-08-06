@@ -1,4 +1,4 @@
-# Copyright 2025 Google LLC
+# Copyright 2025 Loïc Muhirwa
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,7 +48,6 @@ async def restart_server():
         )
 
 
-# Status endpoint for API v1
 @router.get('/status', tags=['Server Info'])
 async def api_status() -> dict[str, str]:
     """Provides API information and health status."""
@@ -61,7 +60,6 @@ async def api_status() -> dict[str, str]:
     }
 
 
-# Health check endpoint - must be before catch-all route
 @router.get('/health')
 async def health_check():
     """
