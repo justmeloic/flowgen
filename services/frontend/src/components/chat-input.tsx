@@ -172,13 +172,13 @@ export function ChatInput({
         {/* Top section with textarea input */}
         <textarea
           ref={textareaRef}
-          placeholder="Ask Gemini"
+          placeholder="Ask anything"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="min-h-12 w-full rounded-t-3xl bg-transparent px-4 py-3 text-base dark:text-gray-200 outline-none placeholder:text-muted-foreground dark:placeholder:text-gray-500 resize-none overflow-hidden"
+          className="min-h-12 w-full rounded-t-3xl bg-transparent px-4 py-3 text-sm dark:text-gray-200 outline-none placeholder:text-muted-foreground dark:placeholder:text-gray-500 resize-none overflow-hidden"
           rows={1}
         />
 

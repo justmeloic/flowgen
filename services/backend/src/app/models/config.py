@@ -46,7 +46,7 @@ class AgentConfig(BaseModel):
 
         json_schema_extra = {
             'example': {
-                'app_name': 'cba_agent',
+                'app_name': 'root_agent',
                 'user_id': 'user123',
                 'max_tokens': 2048,
                 'temperature': 0.1,

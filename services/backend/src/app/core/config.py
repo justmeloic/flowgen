@@ -98,7 +98,7 @@ class Settings(BaseSettings):
         'gemini-2.5-flash': {
             'name': 'gemini-2.5-flash',
             'display_name': 'Gemini 2.5 Flash',
-            'description': 'Latest fast model with improved capabilities',
+            'description': "Google's latest fast model with improved capabilities",
             'max_tokens': 4096,
             'supports_tools': True,
             'default_temperature': 0.1,
@@ -106,7 +106,7 @@ class Settings(BaseSettings):
         'gemini-2.5-pro': {
             'name': 'gemini-2.5-pro',
             'display_name': 'Gemini 2.5 Pro',
-            'description': 'Latest high-quality model for complex reasoning',
+            'description': "Google's latest high-quality model for complex reasoning",
             'max_tokens': 8192,
             'supports_tools': True,
             'default_temperature': 0.1,

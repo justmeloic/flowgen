@@ -372,12 +372,14 @@ export default function ChatPage() {
     }, [cleanContent, references, handleCitationClick]);
 
     return (
-      <div ref={containerRef} className="prose prose-sm max-w-none">
+      <div ref={containerRef} className="prose prose-xs max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkBreaks, remarkParse]}
           skipHtml={false}
           components={{
-            p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+            p: ({ children }) => (
+              <p className="mb-3 last:mb-0 text-sm">{children}</p>
+            ),
           }}
         >
           {cleanContent}
@@ -666,9 +668,9 @@ export default function ChatPage() {
                         </Avatar>
                       )}
                       <div
-                        className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-3xl text-justify ${
+                        className={`prose prose-xs max-w-none inline-block p-3 px-4 rounded-3xl text-justify ${
                           message.role === "user"
-                            ? "bg-background text-foreground rounded-tr-none border border-border/20 dark:bg-background dark:text-foreground dark:border-border/30"
+                            ? "bg-background text-foreground rounded-tr-none border border-border/20 dark:bg-gray-800 dark:text-foreground dark:border-border/30"
                             : "bg-chatInput-light text-gray-800 rounded-tl-none dark:bg-background dark:text-gray-200"
                         }`}
                         style={
@@ -686,12 +688,14 @@ export default function ChatPage() {
                           isLoading &&
                           index === chatHistory.length - 1 &&
                           message.role === "bot" ? (
-                            <span className="italic">{loadingText}</span>
+                            <span className="italic text-sm">
+                              {loadingText}
+                            </span>
                           ) : (
                             <MessageContent content={message.content} />
                           )
                         ) : (
-                          message.content
+                          <span className="text-sm">{message.content}</span>
                         )}
                       </div>
                     </div>
@@ -773,13 +777,6 @@ export default function ChatPage() {
             </div>
           </>
         )}
-      </div>
-
-      {/* Version display - bottom left corner */}
-      <div className="fixed bottom-4 left-4 z-10">
-        <span className="text-xs text-muted-foreground/60 bg-background/80 dark:bg-background/80 px-1 py-1 rounded-lg font-mono backdrop-blur-sm border border-border/20">
-          v{packageVersion}
-        </span>
       </div>
 
       <Toaster />

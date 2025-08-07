@@ -15,7 +15,7 @@
  */
 
 /**
- * Authentication configuration for the CBA Assistant
+ * Authentication configuration for AgentChat
  * 
  * This configuration uses environment variables for security.
  * Make sure to set AUTH_SECRET in your .env files.
@@ -27,9 +27,9 @@ export const AUTH_CONFIG = {
   
   // Local storage keys
   STORAGE_KEYS: {
-    AUTHENTICATED: "cba_authenticated",
-    TIMESTAMP: "cba_auth_timestamp",
-    REDIRECT: "cba_redirect_after_login",
+    AUTHENTICATED: "agentchat_authenticated",
+    TIMESTAMP: "agentchat_auth_timestamp",
+    REDIRECT: "agentchat_redirect_after_login",
   },
 } as const;
 

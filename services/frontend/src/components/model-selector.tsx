@@ -117,15 +117,12 @@ export function ModelSelector({
     return (
       <Button
         variant="ghost"
-        className="w-48 h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark border-none shadow-none opacity-50"
+        className="w-auto h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark border-none shadow-none opacity-50 px-4"
         disabled
       >
         <div className="flex flex-col items-start truncate">
-          <span className="text-sm font-medium dark:text-gray-200">
-            Loading...
-          </span>
           <span className="text-xs text-muted-foreground dark:text-gray-400">
-            Models
+            Loading...
           </span>
         </div>
       </Button>
@@ -139,20 +136,17 @@ export function ModelSelector({
           variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-48 h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark hover:bg-gray-200 dark:hover:bg-[#2d2e2f] border-none shadow-none focus:ring-0 focus:outline-none"
+          className="w-auto h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark hover:bg-gray-200 dark:hover:bg-[#2d2e2f] border-none shadow-none focus:ring-0 focus:outline-none px-4"
         >
-          <div className="flex flex-col items-start truncate min-w-0">
-            <span className="text-sm font-medium dark:text-gray-200 truncate">
+          <div className="flex flex-col items-start min-w-0">
+            <span className="text-xs text-muted-foreground dark:text-gray-400 whitespace-nowrap">
               {currentModel?.label || "Select Model"}
-            </span>
-            <span className="text-xs text-muted-foreground dark:text-gray-400 truncate">
-              {currentModel?.description || "Choose a model"}
             </span>
           </div>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 rounded-2xl p-1 bg-accent dark:bg-[#2d2e2f] dark:border-[#404142] shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] dark:shadow-[0_4px_8px_0_rgba(0,0,0,0.4)]">
+      <PopoverContent className="w-80 rounded-2xl p-1 bg-accent dark:bg-[#2d2e2f] dark:border-[#404142] shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] dark:shadow-[0_4px_8px_0_rgba(0,0,0,0.4)]">
         <Command className="dark:bg-[#2d2e2f] rounded-xl">
           <CommandInput placeholder="Search models..." />
           <CommandList className="dark:bg-[#2d2e2f]">
@@ -168,7 +162,7 @@ export function ModelSelector({
                     onModelChange(currentValue);
                     setOpen(false);
                   }}
-                  className="dark:text-gray-200 dark:hover:bg-[#3c4043] rounded-lg"
+                  className="dark:text-gray-200 dark:hover:bg-[#3c4043] rounded-2xl"
                 >
                   <Check
                     className={cn(
@@ -178,11 +172,11 @@ export function ModelSelector({
                         : "opacity-0"
                     )}
                   />
-                  <div className="flex flex-col items-start min-w-0">
-                    <span className="dark:text-gray-200 font-medium text-sm truncate">
+                  <div className="flex flex-col items-start w-full">
+                    <span className="dark:text-gray-200 font-medium text-sm">
                       {model.label}
                     </span>
-                    <span className="text-xs text-muted-foreground dark:text-gray-400 truncate">
+                    <span className="text-xs text-muted-foreground dark:text-gray-400 leading-relaxed">
                       {model.description}
                     </span>
                   </div>

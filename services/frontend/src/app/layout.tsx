@@ -47,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>AgentChat</title>
+        <title>Agent Interface</title>
         <link rel="icon" href="/logo-dark.png" type="image/png" />
       </head>
       <body
@@ -68,15 +68,20 @@ export default function RootLayout({
               <div className="relative flex min-h-screen flex-col">
                 <Header />
                 <div className="flex-1">
-                  <div className="border-t">
+                  <div className="">
                     <div className="bg-background">
                       <div className="flex">
                         <Sidebar
                           isCollapsed={isCollapsed}
                           onToggle={() => setIsCollapsed(!isCollapsed)}
-                          className="sticky top-0 h-screen"
                         />
-                        <main className="flex-1 p-8">{children}</main>
+                        <main
+                          className={`flex-1 p-8 transition-all duration-700 ease-out ${
+                            isCollapsed ? "ml-20" : "ml-0"
+                          }`}
+                        >
+                          {children}
+                        </main>
                       </div>
                     </div>
                   </div>
