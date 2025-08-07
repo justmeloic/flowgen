@@ -1,37 +1,23 @@
 #!/bin/bash
 
-# Deploy backend service to VM from Google Cloud Storage
-# This script downloads the latest build, sets up environment, and runs the server
+# Deploy backend service on Raspberry Pi
+# This script sets up the environment and runs the server using Gunicorn
 
 # Configuration
-PROJECT_ROOT="/home/txt36456/agentchat"
-GCS_BUCKET="gs://agentchat-builds/"
-DEPLOY_DIR="$PROJECT_ROOT/latest-deployment"
+# Get the project root directory (parent of the scripts directory)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+BACKEND_DIR="$PROJECT_ROOT/services/backend"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 LOG_DIR="$PROJECT_ROOT/logs"
 LOG_FILE="$LOG_DIR/deploy_${TIMESTAMP}.log"
 SCREEN_NAME="backend"
-PYTHON_VERSION="3.11"
+NGROK_SCREEN="agent-interface-ngrok"
 VENV_NAME=".venv"
 
 # Server Configuration
 SERVER_HOST=0.0.0.0
 SERVER_PORT=8081
-
-# Profile Configurations
-export PATH="$PATH:$HOME/.local/bin"
-
-export ACCOUNT=txt36456@cn.ca
-export PROJECT_ID=cnr-agentspace-lab-76cg
-export REGION=us-central1
-export AGENT_STAGING_BUCKET="gs://agentchat-staging"
-
-# Handy aliases
-alias gs='git status'
-alias auth='gcloud auth login --update-adc'
-alias dev='uvicorn src.app.main:app --reload --host 0.0.0.0 --port $SERVER_PORT'
-alias serve='gunicorn src.app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$SERVER_PORT --timeout 600'
-
 
 # Create logs directory if it doesn't exist
 mkdir -p "$LOG_DIR"
@@ -41,95 +27,39 @@ log() {
     echo "$1" | tee -a "$LOG_FILE"
 }
 
-log "🚀 Starting VM deployment process at $(date)..."
+log "🚀 Starting deployment process at $(date)..."
 
-gcloud auth login --update-adc
-
-# Check gcloud authentication
-log "🔐 Checking gcloud authentication..."
-if ! gcloud auth list --filter="status:ACTIVE" --format="value(account)" | grep -q .; then
-    log "❌ Error: No active gcloud authentication found. Please run 'gcloud auth login' first."
-    log "🔄 Continuing with deployment anyway..."
-fi
-log "✅ Gcloud authentication check passed"
-
-# Install necessary packages (standard GCP VMs don't have come with unzip, python3.11-venv pre-installed)
-log "🔧 Updating package list..."
-if ! sudo apt-get update -y >> "$LOG_FILE" 2>&1; then
-    log "❌ Error: Failed to update package list."
-    log "🔄 Continuing with deployment anyway..."
-fi
-
-# Loic: even if the host server has python3.11 installed, the venv module might not be installed by default
-# This is especially common in Linux distros like Debian-based ones like Ubuntu.
-log "🔧 Installing required packages (unzip, python3.11-venv)..."
-if ! sudo apt-get install -y unzip python3.11-venv >> "$LOG_FILE" 2>&1; then
-    log "❌ Error: Failed to install dependencies (unzip, python3.11-venv)."
-    log "🔄 Continuing with deployment anyway..."
-fi
-log "✅ System dependencies checked/installed."
-
-# Create deployment directory
-log "📁 Creating deployment directory: $DEPLOY_DIR"
-mkdir -p "$DEPLOY_DIR"
-cd "$DEPLOY_DIR"
-
-# Find the latest build in GCS bucket
-log "🔍 Finding latest build in GCS bucket..."
-LATEST_BUILD=$(gcloud storage ls "$GCS_BUCKET" | grep "build-" | sort -r | head -1 2>>"$LOG_FILE")
-
-if [ -z "$LATEST_BUILD" ]; then
-    log "❌ Error: No builds found in bucket $GCS_BUCKET"
-    log "🔄 Continuing with deployment anyway..."
-else
-    log "📦 Latest build found: $LATEST_BUILD"
-    
-    # Download the latest build
-    log "⬇️  Downloading build from GCS..."
-    if gcloud storage cp "$LATEST_BUILD" . 2>>"$LOG_FILE"; then
-        log "✅ Build downloaded successfully"
-        
-        # Extract the zip file
-        BUILD_FILE=$(basename "$LATEST_BUILD")
-        log "📦 Extracting build: $BUILD_FILE"
-        
-        # Remove existing extraction directory if it exists
-        if [ -d "backend" ]; then
-            log "🗑️  Removing existing backend directory..."
-            rm -rf backend
-        fi
-        
-        # Extract with overwrite and verbose logging
-        if unzip -o "$BUILD_FILE" -d . >> "$LOG_FILE" 2>&1; then
-            log "✅ Build extracted successfully"
-            rm "$BUILD_FILE"
-            log "🗑️  Cleaned up zip file"
-        else
-            log "❌ Error: Failed to extract build (timeout or extraction error)"
-            log "🔄 Continuing with deployment anyway..."
-            # Clean up the zip file even if extraction failed
-            #rm -f "$BUILD_FILE" 2>/dev/null || true
-        fi
+# Check if ngrok is available (optional)
+NGROK_AVAILABLE=false
+if command -v ngrok &> /dev/null; then
+    # Check if authtoken is configured (either via config file or environment)
+    if [ -n "$NGROK_AUTH_TOKEN" ] || [ -f ~/.config/ngrok/ngrok.yml ]; then
+        NGROK_AVAILABLE=true
+        log "✅ Ngrok found and configured - will create public tunnel"
     else
-        log "❌ Error: Failed to download build from GCS"
-        log "🔄 Continuing with deployment anyway..."
+        log "⚠️  Ngrok found but not configured - skipping public tunnel"
+        log "💡 Set NGROK_AUTH_TOKEN environment variable or run: ngrok config add-authtoken YOUR_TOKEN"
     fi
+else
+    log "⚠️  Ngrok not found - skipping public tunnel"
+fi
+
+# Check if backend directory exists
+if [ ! -d "$BACKEND_DIR" ]; then
+    log "❌ Error: Backend directory not found at $BACKEND_DIR"
+    exit 1
 fi
 
 # Navigate to backend directory
-if [ -d "backend" ]; then
-    log "📂 Navigating to backend directory"
-    cd backend
-    
-    # Clear Python cache files to ensure fresh deployment
-    log "🧹 Clearing Python cache files..."
-    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-    find . -name "*.pyc" -delete 2>/dev/null || true
-    find . -name "*.pyo" -delete 2>/dev/null || true
-    log "✅ Python cache cleared"
-else
-    log "⚠️  Warning: backend directory not found, staying in current directory"
-fi
+log "📂 Navigating to backend directory"
+cd "$BACKEND_DIR"
+
+# Clear Python cache files to ensure fresh deployment
+log "🧹 Clearing Python cache files..."
+find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+find . -name "*.pyc" -delete 2>/dev/null || true
+find . -name "*.pyo" -delete 2>/dev/null || true
+log "✅ Python cache cleared"
 
 # Check if Python is available
 log "🐍 Checking Python installation..."
@@ -171,10 +101,10 @@ if [ -f "$VENV_NAME/bin/activate" ]; then
     pip install --upgrade pip >> "$LOG_FILE" 2>&1
     
     # Install dependencies from requirements files
-    if [ -f "vm-requirements.txt" ]; then
-        log "📋 Installing from vm-requirements.txt..."
-        pip install -r vm-requirements.txt >> "$LOG_FILE" 2>&1
-        log "✅ Dependencies installed from vm-requirements.txt"
+    if [ -f "requirements-raspberry-pi.txt" ]; then
+        log "📋 Installing from requirements-raspberry-pi.txt..."
+        pip install -r requirements-raspberry-pi.txt >> "$LOG_FILE" 2>&1
+        log "✅ Dependencies installed from requirements-raspberry-pi.txt"
     elif [ -f "requirements.txt" ]; then
         log "📋 Installing from requirements.txt..."
         pip install -r requirements.txt >> "$LOG_FILE" 2>&1
@@ -197,10 +127,16 @@ else
 fi
 
 # Kill existing screen session if it exists
-log "🔍 Checking for existing screen session..."
+log "🔍 Checking for existing screen sessions..."
 if screen -list | grep -q "$SCREEN_NAME"; then
-    log "🛑 Killing existing screen session: $SCREEN_NAME"
+    log "🛑 Killing existing backend screen session: $SCREEN_NAME"
     screen -S "$SCREEN_NAME" -X quit 2>>"$LOG_FILE" || true
+    sleep 2
+fi
+
+if screen -list | grep -q "$NGROK_SCREEN"; then
+    log "🛑 Killing existing ngrok screen session: $NGROK_SCREEN"
+    screen -S "$NGROK_SCREEN" -X quit 2>>"$LOG_FILE" || true
     sleep 2
 fi
 
@@ -229,23 +165,20 @@ fi
 
 # Create new screen session and start the server
 log "🖥️  Creating screen session: $SCREEN_NAME"
-UVICORN_CMD="uvicorn src.app.main:app --host 0.0.0.0 --port $SERVER_PORT"
-GUNICORN_CMD="gunicorn src.app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$SERVER_PORT --timeout 600"
+UVICORN_CMD="uvicorn src.app.main:app --host $SERVER_HOST --port $SERVER_PORT"
 
-SERVE_CMD=$UVICORN_CMD
-
-# Create screen session with the server commandscre
+# Create screen session with the server command
 screen -dmS "$SCREEN_NAME" bash -c "
     cd '$PWD'
     source '$VENV_NAME/bin/activate' 2>/dev/null || true
     echo '🚀 Starting server in screen session...'
     echo '📍 Working directory: \$(pwd)'
     echo '🐍 Python: \$(which python)'
-    echo '⚡ Command: $SERVE_CMD'
-    echo '🌐 Server will be available at: http://0.0.0.0:$SERVER_PORT'
+    echo '⚡ Command: $UVICORN_CMD'
+    echo '🌐 Server will be available at: http://$SERVER_HOST:$SERVER_PORT'
     echo '📺 Screen session: $SCREEN_NAME'
     echo ''
-    $SERVE_CMD
+    $UVICORN_CMD
     echo '🛑 Server stopped'
     read -p 'Press Enter to exit screen session...'
 "
@@ -256,9 +189,39 @@ sleep 3
 # Check if screen session is running
 if screen -list | grep -q "$SCREEN_NAME"; then
     log "✅ Screen session '$SCREEN_NAME' created and running"
-    log "🌐 Server should be starting at http://0.0.0.0:$SERVER_PORT"
+    log "🌐 Server should be starting at http://$SERVER_HOST:$SERVER_PORT"
 else
     log "❌ Error: Failed to create screen session"
+fi
+
+# Start Ngrok Service (expose to internet) - only if available and configured
+if [ "$NGROK_AVAILABLE" = true ]; then
+    log "🌐 Starting ngrok tunnel..."
+    screen -dmS "$NGROK_SCREEN" bash -c "
+        # Use environment variable if available, otherwise rely on config file
+        if [ -n '$NGROK_AUTH_TOKEN' ]; then
+            export NGROK_AUTHTOKEN='$NGROK_AUTH_TOKEN'
+        fi
+        echo '🚀 Starting Ngrok tunnel for agent-interface...'
+        echo '🌍 Exposing http://localhost:$SERVER_PORT to the internet'
+        echo '📱 This will make your agent interface accessible from anywhere'
+        echo ''
+        ngrok http $SERVER_PORT
+    "
+    log "✅ Ngrok tunnel started in screen session: $NGROK_SCREEN"
+    
+    # Wait for ngrok to start
+    sleep 2
+    
+    # Check if ngrok session is running
+    if screen -list | grep -q "$NGROK_SCREEN"; then
+        log "✅ Ngrok tunnel running successfully"
+        log "🌍 Public URL available in ngrok session (screen -r $NGROK_SCREEN)"
+    else
+        log "❌ Ngrok tunnel failed to start (check authtoken)"
+    fi
+else
+    log "⚠️  Skipping ngrok tunnel (not available or not configured)"
 fi
 
 # Back to root
@@ -266,19 +229,35 @@ cd "$PROJECT_ROOT"
 
 # Display deployment summary
 log "📊 Deployment Summary:"
-log "   📁 Deploy directory: $DEPLOY_DIR"
+log "   📁 Backend directory: $BACKEND_DIR"
 log "   🐍 Python command: $PYTHON_CMD"
-log "   🔧 Virtual environment: $PWD/$VENV_NAME"
+log "   🔧 Virtual environment: $BACKEND_DIR/$VENV_NAME"
 log "   📺 Screen session: $SCREEN_NAME"
-log "   🌐 Server URL: http://0.0.0.0:$SERVER_PORT"
+log "   🌐 Server URL: http://$SERVER_HOST:$SERVER_PORT"
+if [ "$NGROK_AVAILABLE" = true ]; then
+    log "   🌍 Ngrok session: $NGROK_SCREEN"
+fi
 log "   📋 Log file: $LOG_FILE"
 
-log "🎉 VM deployment process completed at $(date)!"
+log "🎉 Deployment process completed at $(date)!"
 log ""
-log "� Screen Session Commands:"
-log "   📌 Attach to session:     screen -r $SCREEN_NAME"
+log "🌐 Access URLs:"
+log "   Local:    http://localhost:$SERVER_PORT"
+log "   Network:  http://$SERVER_HOST:$SERVER_PORT"
+if [ "$NGROK_AVAILABLE" = true ]; then
+    log "   Public:   Check ngrok session for public URL"
+fi
+log ""
+log "📺 Screen Session Commands:"
+log "   📌 Attach to backend:     screen -r $SCREEN_NAME"
+if [ "$NGROK_AVAILABLE" = true ]; then
+    log "   📌 Attach to ngrok:       screen -r $NGROK_SCREEN"
+fi
 log "   📌 List all sessions:     screen -list"
-log "   📌 Kill session:          screen -S $SCREEN_NAME -X quit"
+log "   📌 Kill backend:          screen -S $SCREEN_NAME -X quit"
+if [ "$NGROK_AVAILABLE" = true ]; then
+    log "   📌 Kill ngrok:            screen -S $NGROK_SCREEN -X quit"
+fi
 log ""
 log "🖥️  Commands while inside screen session:"
 log "   � Detach from screen:    Ctrl+A, then D"

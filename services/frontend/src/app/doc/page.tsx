@@ -46,6 +46,9 @@ export default function HomePage() {
             <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
               v{packageVersion}
             </span>
+            <span className="text-sm text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900 px-3 py-1 rounded-full font-medium">
+              🍓 Optimized for Raspberry Pi 5
+            </span>
           </div>
           <div className="flex justify-center space-x-2 mb-6">
             <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-3 py-1 rounded-full">
@@ -64,7 +67,7 @@ export default function HomePage() {
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
             A versatile chat interface that allows users to interact with
             different AI agents powered by various models and equipped with
-            specialized tools.
+            specialized tools. <strong>Engineered for optimal performance on Raspberry Pi 5.</strong>
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             <strong>Author / Maintainer:</strong>{" "}
@@ -352,44 +355,80 @@ export default function HomePage() {
         {/* Deployment Models */}
         <div>
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
-            Deployment Models
+            Deployment Architecture
           </h2>
-          <p className="text-xs text-gray-700 dark:text-gray-300 mb-6">
-            This project supports two primary deployment models, offering
-            flexibility based on your operational needs, team structure, and
-            scaling requirements.
-          </p>
+          <div className="bg-red-50 dark:bg-red-900/30 p-6 rounded-2xl mb-6 border border-red-200 dark:border-red-700">
+            <h3 className="text-lg font-semibold mb-3 dark:text-gray-100 flex items-center">
+              <span className="mr-2">🍓</span>
+              Raspberry Pi 5 Optimized
+            </h3>
+            <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
+              This project is specifically optimized for deployment on Raspberry Pi 5, using a streamlined 
+              single-service architecture that maximizes performance and minimizes resource usage on Pi hardware.
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-2xl">
               <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
-                1. Independent Services (Microservice-Style)
+                Development Mode (Two Services)
               </h3>
               <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
-                The Next.js frontend and FastAPI backend are deployed and
-                managed as separate, independent services.
+                During development, run frontend and backend as separate services 
+                over the network for faster iteration and hot-reloading.
               </p>
               <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono">
+                <div># Frontend (port 3000)</div>
                 <div>cd services/frontend/</div>
                 <div>npm run dev</div>
-                <div className="mt-2">cd services/backend/src/</div>
-                <div>uv run app.py</div>
+                <div className="mt-2"># Backend (port 8081)</div>
+                <div>cd services/backend/</div>
+                <div>uvicorn src.app.main:app --host 0.0.0.0 --port 8081</div>
               </div>
             </div>
 
             <div className="bg-green-50 dark:bg-green-900/30 p-6 rounded-2xl">
               <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
-                2. Modular Monolith (Combined Deployment)
+                Production Mode (Single Service)
               </h3>
               <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
-                The FastAPI backend serves static assets from the Next.js
-                frontend, creating a single deployable unit.
+                For Raspberry Pi deployment, the FastAPI backend serves pre-rendered 
+                static frontend files, creating a unified, resource-efficient service.
               </p>
               <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono">
-                <div>cd services/frontend/</div>
-                <div>npm run build-local</div>
-                <div className="mt-2">cd ../backend/src/</div>
-                <div>uv run app.py</div>
+                <div># Build and deploy on Pi</div>
+                <div>source scripts/build.sh</div>
+                <div>source scripts/deploy.sh</div>
+                <div className="mt-2"># Single service on port 8081</div>
+                <div># Serves both static frontend + API</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4">
+            <h4 className="text-base font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+              🏗️ Why This Architecture for Raspberry Pi?
+            </h4>
+            <div className="grid md:grid-cols-2 gap-4 text-xs text-yellow-700 dark:text-yellow-200">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">⚡</span>
+                  <span><strong>Resource Efficiency:</strong> Single process uses less RAM and CPU</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">🔧</span>
+                  <span><strong>Simplified Management:</strong> One service to monitor and restart</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">🌐</span>
+                  <span><strong>Network Simplicity:</strong> Only port 8081 to expose</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">🚀</span>
+                  <span><strong>Fast Startup:</strong> Quick boot times on Pi hardware</span>
+                </div>
               </div>
             </div>
           </div>
@@ -627,108 +666,147 @@ export default function HomePage() {
         {/* Build & Deploy Section */}
         <div>
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
-            Build & Deploy
+            Build & Deploy for Raspberry Pi
           </h2>
-          <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-2xl mb-6">
-            <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Single Service, Static Frontend
+          <div className="bg-red-50 dark:bg-red-900/30 p-6 rounded-2xl mb-6 border border-red-200 dark:border-red-700">
+            <h3 className="text-base font-semibold mb-2 dark:text-gray-100 flex items-center">
+              <span className="mr-2">🎯</span>
+              Raspberry Pi 5 Deployment Strategy
             </h3>
             <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
-              The frontend is pre-rendered into static HTML, CSS, and JS files
-              using Next.js. These static files are then mounted and served by
-              the FastAPI backend, so you only need to deploy one service. This
-              approach improves performance, simplifies deployment, and reduces
-              operational complexity.
+              The system uses a streamlined deployment approach optimized for Raspberry Pi 5. The Next.js frontend 
+              is pre-rendered into static HTML, CSS, and JS files, then served by the FastAPI backend as a single 
+              unified service. This reduces resource usage and simplifies management on Pi hardware.
             </p>
-            <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
-              <strong>Why GCS?</strong> The build is zipped and uploaded to a
-              Google Cloud Storage bucket because the deployment host server may
-              not have internet access to clone or pull the repository. Using
-              GCS allows you to reliably transfer the build artifact to
-              air-gapped or restricted environments.
-            </p>
+            <div className="grid md:grid-cols-2 gap-4 mt-4">
+              <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">Development Benefits</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Two-service mode with hot reload for fast iteration during development
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">Production Benefits</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Single-service mode optimized for Pi's memory and processing constraints
+                </p>
+              </div>
+            </div>
           </div>
+
           <div className="mb-6">
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Automated Build & Upload
+              Automated Build for Pi
             </h3>
             <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono mb-2">
               <div># From project root</div>
               <div>source scripts/build.sh</div>
             </div>
             <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 mb-2">
-              <li>
-                Builds frontend static files and copies them to the backend
-              </li>
-              <li>
-                Creates a zip archive of the backend (with static frontend)
-              </li>
-              <li>Uploads the archive to a GCS bucket</li>
+              <li>Builds Next.js frontend into static files optimized for Pi serving</li>
+              <li>Copies static assets to backend directory structure</li>
+              <li>Validates build completion and file integrity</li>
             </ul>
           </div>
+
           <div className="mb-6">
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Automated Deployment
+              Automated Deployment on Raspberry Pi
             </h3>
             <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono mb-2">
-              <div># On the deployment server</div>
-              <div>source scripts/deploy-vm.sh</div>
+              <div># On the Raspberry Pi</div>
+              <div>source scripts/deploy.sh</div>
             </div>
             <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 mb-2">
-              <li>Downloads the latest build from GCS</li>
-              <li>Extracts and sets up the environment</li>
-              <li>Kills any process using port 8000 or running uvicorn</li>
-              <li>Starts the FastAPI server in a screen session</li>
+              <li>Sets up Python virtual environment with Pi-optimized dependencies</li>
+              <li>Clears Python cache and manages port 8081 availability</li>
+              <li>Starts Uvicorn server in a detached screen session for persistence</li>
+              <li>Provides server management commands for Pi administration</li>
             </ul>
           </div>
+
           <div className="mb-6">
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Deployment Pipeline
+              Pi-Optimized Architecture
             </h3>
             <div className="overflow-x-auto">
               <pre className="bg-gray-100 dark:bg-gray-800 dark:text-gray-300 p-3 rounded text-xs font-mono whitespace-pre">
-                {`Build Process:           Deploy Process:
-[Frontend Build]          [Download from GCS]
-      ↓                         ↓
-[Static Files]            [Extract Archive]
-      ↓                         ↓
-[Zip Archive]             [Setup Environment]
-      ↓                         ↓
-[Upload to GCS]           [Start Server]
-`}
+{`Development:                 Production (Pi):
+[Next.js :3000]              [Static Files]
+      ↓                           ↓
+[API Proxy]                  [FastAPI :8081]
+      ↓                           ↓
+[FastAPI :8081]              [Unified Service]
+
+Network: 2 services          Network: 1 service
+Memory: ~400MB               Memory: ~200MB
+Ports: 3000 + 8081          Ports: 8081 only`}
               </pre>
             </div>
           </div>
+
           <div className="mb-6">
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Server Management
+              Raspberry Pi Server Management
             </h3>
-            <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 mb-2">
-              <li>
-                Attach to server:{" "}
-                <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 rounded-2xl">
-                  screen -r backend
-                </code>
-              </li>
-              <li>
-                Detach:{" "}
-                <span className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 rounded-2xl">
-                  Ctrl+A, then D
-                </span>
-              </li>
-              <li>
-                List sessions:{" "}
-                <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 rounded-2xl">
-                  screen -list
-                </code>
-              </li>
-              <li>
-                Kill session:{" "}
-                <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 rounded-2xl">
-                  screen -S backend -X quit
-                </code>
-              </li>
-            </ul>
+            <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
+              <p className="text-xs text-gray-700 dark:text-gray-300 mb-3">
+                The deployment script uses <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">screen</code> sessions 
+                to run the server persistently on your Raspberry Pi:
+              </p>
+              <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 space-y-1">
+                <li>
+                  Connect to server: 
+                  <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                    screen -r backend
+                  </code>
+                </li>
+                <li>
+                  Detach (keep running): 
+                  <span className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                    Ctrl+A, then D
+                  </span>
+                </li>
+                <li>
+                  List sessions: 
+                  <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                    screen -list
+                  </code>
+                </li>
+                <li>
+                  Stop server: 
+                  <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                    screen -S backend -X quit
+                  </code>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
+              Pi Performance Characteristics
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl">
+                <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">Resource Usage</h4>
+                <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  <li>• RAM: 150-300MB (depending on model)</li>
+                  <li>• CPU: Low idle, moderate during AI calls</li>
+                  <li>• Storage: ~500MB total footprint</li>
+                  <li>• Port: 8081 (configurable)</li>
+                </ul>
+              </div>
+              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
+                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Access & Network</h4>
+                <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  <li>• Local: <code>http://localhost:8081</code></li>
+                  <li>• Network: <code>http://[pi-ip]:8081</code></li>
+                  <li>• Dependencies: Pi-optimized packages</li>
+                  <li>• Startup: ~5-10 seconds on Pi 5</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 

@@ -10,10 +10,11 @@
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://opensource.org/licenses/Apache-2.0)
+![Raspberry Pi](https://img.shields.io/badge/Optimized%20for-Raspberry%20Pi%205-red.svg)
 
 **Owner / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
-An interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools.
+An interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools. **Optimized for deployment on Raspberry Pi 5** with a streamlined single-service architecture.
 
 ## Services
 
@@ -68,67 +69,65 @@ The backend service that coordinates AI agents for:
 
 ## Deployment Models
 
-This project is structured to support two primary deployment models, offering flexibility based on your operational needs, team structure, and scaling requirements. The choice of model can impact local development, testing, and production rollout.
+This project is **optimized for Raspberry Pi 5 deployment** and supports flexible development and deployment patterns:
 
-### 1. Independent Services (Microservice-Style)
+### Development Mode (Two Services)
 
-In this model, the Next.JS frontend and the FastAPI backend are deployed and managed as separate, independent services.
+During development, you can run the frontend and backend as separate services over the network for faster iteration and hot-reloading:
 
-### _Dev_
-
+**Frontend Development Server:**
 ```bash
 cd services/frontend/
-npm run dev
+npm run dev  # Runs on http://localhost:3000
 ```
 
+**Backend API Server:**
 ```bash
-cd services/backend/src/
-uv run app.py
+cd services/backend/
+uvicorn src.app.main:app --host 0.0.0.0 --port 8081  # Runs on http://localhost:8081
 ```
 
-**Architecture:**
+The frontend development server will proxy API calls to the backend service, allowing you to develop with full hot-reload capabilities.
+
+### Production Deployment (Single Service)
+
+For production deployment, especially on Raspberry Pi 5, the system uses a **unified deployment model** where:
+
+1. **Static Build**: The Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
+2. **Single Service**: The FastAPI backend serves both API endpoints and the static frontend files
+3. **Simplified Deployment**: Only one service to deploy, manage, and monitor
+
+**Production Build & Deploy:**
+```bash
+# Build static frontend and deploy on Raspberry Pi
+source scripts/build.sh   # Builds static frontend
+source scripts/deploy.sh  # Deploys unified service
+```
+
+### Why This Architecture?
+
+**For Raspberry Pi 5 Optimization:**
+- **Resource Efficiency**: Single service reduces memory and CPU overhead
+- **Simplified Networking**: No need to manage cross-service communication
+- **Easier Monitoring**: One process to monitor instead of two
+- **Port Management**: Only one port to expose and manage
+
+**Development vs Production:**
+- **Development**: Two services for faster iteration and debugging
+- **Production**: Single service for optimal performance and simplicity
+
+**Architecture Comparison:**
 
 ```mermaid
 graph TD
-  subgraph Frontend Service
-    A1[Next.js App] --> A2[npm run dev]
+  subgraph "Development (Two Services)"
+    A1[Next.js Dev Server :3000] --> A2[API Proxy]
+    A2 --> A3[FastAPI Backend :8081]
   end
 
-  subgraph Backend Service
-    B1[FastAPI App] --> B2[uv run app.py]
-  end
-
-  A1 <-->|"API Calls"| B1
-```
-
-### 2. Modular Monolith (Combined Deployment)
-
-In this model, the FastAPI backend serves the static assets generated from the Next.JS frontend, creating a single deployable unit. This is the model facilitated by the npm run build script in the frontend service, which prepares assets for the backend.
-
-### _Dev_
-
-```bash
-cd services/frontend/
-npm run build-local # This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend backend/build/static_frontend
-
-cd ../backend/src/
-uv run app.py # Services backend with backend/build/static_frontend mounted
-```
-
-**Architecture:**
-
-```mermaid
-graph TD
-  subgraph Build Process
-    C1[Next.js App] --> C2[npm run build]
-    C2 --> C3[Static Assets: HTML/CSS/JS]
-    C3 --> C4[Copy to Backend static_frontend/]
-  end
-
-  subgraph Unified Service
-    D1[FastAPI App] --> D2[Serves Static Frontend]
-    D1 --> D3[API Endpoints]
-    C4 --> D2
+  subgraph "Production (Single Service)"
+    B1[FastAPI Backend :8081] --> B2[Static Frontend Files]
+    B1 --> B3[API Endpoints]
   end
 ```
 
@@ -237,38 +236,35 @@ This is a simple authentication system suitable for a proof-of-concept. For prod
 
 ## Building and Deploying
 
-This project uses a streamlined deployment model where the frontend is pre-rendered into static files and served by the FastAPI backend as a single deployable unit. The build is packaged and transferred via Google Cloud Storage for deployment on air-gapped environments.
+This project uses a **streamlined deployment model optimized for Raspberry Pi 5**, where the frontend is pre-rendered into static files and served by the FastAPI backend as a single deployable unit.
 
-### Deployment Strategy Overview
+### Deployment Strategy
 
-The deployment process follows these key principles:
+The deployment process is designed specifically for Raspberry Pi environments:
 
-1. **Static Frontend Build**: The Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
-2. **Single Service Deployment**: The FastAPI backend serves both API endpoints and static frontend files
-3. **Air-Gapped Deployment**: Build artifacts are transferred via GCS bucket since deployment servers may not have internet access to clone repositories
+1. **Static Frontend Build**: Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
+2. **Single Service Deployment**: FastAPI backend serves both API endpoints and static frontend files
+3. **Local Deployment**: Optimized for local Raspberry Pi hosting without external dependencies
 
 ### Build Process
 
-#### Automated Build & Upload
+#### Automated Build
 
-Use the automated build script to build the frontend and upload to GCS:
+Use the build script to prepare the frontend for deployment:
 
 ```bash
 # From project root
 source scripts/build.sh
 ```
 
-This script performs the following steps:
-
-1. 🎨 **Frontend Build**: Runs `npm install` (if needed) and `npm run build-static` in the frontend service
-2. 📦 **Archive Creation**: Creates a timestamped zip archive of the backend service (including static frontend)
-3. 🧹 **GCS Cleanup**: Removes any existing build archives from the GCS bucket
-4. ☁️ **Upload**: Uploads the new build archive to `gs://agentchat-builds/`
-5. 🗑️ **Local Cleanup**: Removes the local zip file after upload
+This script:
+1. 🎨 **Frontend Build**: Installs dependencies and runs `npm run build-static` 
+2. � **Static Copy**: Copies static files to `services/backend/build/static_frontend/`
+3. ✅ **Validation**: Ensures build completed successfully
 
 #### Manual Frontend Build
 
-If you need to build just the frontend manually:
+Build the frontend manually if needed:
 
 ```bash
 cd services/frontend
@@ -276,78 +272,59 @@ npm install                    # Install dependencies if needed
 npm run build-static          # Build and copy to backend
 ```
 
-The `build-static` script performs:
-
-```bash
-rm -rf .next out && next build && rm -rf ../backend/build/static_frontend && cp -R ./out ../backend/build/static_frontend
-```
-
 ### Deployment Process
 
-#### Automated Deployment
+#### Automated Deployment on Raspberry Pi
 
-Deploy the latest build from GCS to your server:
+Deploy the application on your Raspberry Pi:
 
 ```bash
-# From project root (on target server)
-source scripts/deploy-vm.sh
+# From project root (on Raspberry Pi)
+source scripts/deploy.sh
 ```
 
-This script performs the following steps:
+This script:
+1. � **Environment Setup**: Creates Python virtual environment and installs dependencies from `requirements-raspberry-pi.txt`
+2. 🧹 **Cleanup**: Clears Python cache and kills existing server processes
+3. 🛑 **Port Management**: Ensures port 8081 is available for the server
+4. 📺 **Server Start**: Starts Uvicorn server in a detached screen session
+5. 📊 **Summary**: Provides deployment summary and management commands
 
-1. 📁 **Setup**: Creates deployment directory at `$PROJECT_ROOT/test_serving`
-2. 🔍 **Discovery**: Finds the latest build archive in the GCS bucket
-3. ⬇️ **Download**: Downloads and extracts the build archive
-4. 🐍 **Environment**: Sets up Python virtual environment and installs dependencies
-5. 🛑 **Cleanup**: Kills any existing processes using port 8000 or running uvicorn
-6. 📺 **Server**: Starts the FastAPI server in a detached screen session
-7. 📊 **Summary**: Provides deployment summary and screen session commands
-
-#### Deployment Architecture
+#### Deployment Architecture for Raspberry Pi
 
 ```mermaid
 graph LR
-    A[Developer Machine] -->|build.sh| B[GCS Bucket]
-    B -->|deploy-vm.sh| C[Target Server]
+    A[Development Machine] -->|build.sh| B[Static Files]
+    B -->|Copy to Pi| C[Raspberry Pi 5]
 
     subgraph "Build Process"
         A1[Frontend Build] --> A2[Static Files]
-        A2 --> A3[Zip Archive]
-        A3 --> A4[Upload to GCS]
+        A2 --> A3[Copy to Backend]
     end
 
-    subgraph "Deploy Process"
-        C1[Download from GCS] --> C2[Extract Archive]
-        C2 --> C3[Setup Environment]
-        C3 --> C4[Start Server]
+    subgraph "Deploy Process (Pi)"
+        C1[Setup Environment] --> C2[Install Dependencies]
+        C2 --> C3[Start Uvicorn Server]
+        C3 --> C4[Serve Static + API]
     end
 ```
 
-#### Why This Approach?
+#### Why This Approach for Raspberry Pi?
 
-**Single Service Deployment**:
-
-- Simplifies deployment by having one FastAPI service that handles both API and frontend
-- Reduces operational complexity compared to managing separate frontend/backend services
-- Better performance due to reduced network hops
-
-**GCS-Based Transfer**:
-
-- Target deployment servers often lack internet access for security reasons
-- GCS provides reliable, versioned artifact storage
-- Enables deployment to air-gapped environments
-- Supports rollback by keeping previous build archives
+**Single Service Benefits**:
+- **Resource Efficiency**: Minimal memory and CPU usage on Pi hardware
+- **Simplified Management**: One process to monitor and manage
+- **Network Simplicity**: Only one port (8081) to expose
+- **Fast Startup**: Quick boot times suitable for Pi environments
 
 **Static Frontend Benefits**:
+- **Performance**: Pre-rendered content loads faster on Pi hardware
+- **Lower Resource Usage**: No Node.js runtime required on Pi
+- **Reliability**: Fewer moving parts reduce potential failure points
 
-- Faster page loads with pre-rendered content
-- Better SEO with server-side rendering at build time
-- Reduced server load as static files are served directly
-- Simplified deployment with no Node.js runtime required on the server
+### Server Management on Raspberry Pi
 
-### Server Management
-
-After deployment, use these commands to manage the server:
+After deployment, manage the server using screen:
 
 ```bash
 # Attach to the running server (see logs in real-time)
@@ -359,25 +336,26 @@ screen -r backend
 # List all screen sessions
 screen -list
 
-# Kill the server session
+# Stop the server
 screen -S backend -X quit
 ```
 
 ### Environment Configuration
 
-The deployment uses these key directories:
+The deployment uses Raspberry Pi optimized settings:
 
-- **Deploy Directory**: `$PROJECT_ROOT/test_serving` - Where builds are extracted and run
-- **Log Directory**: `$PROJECT_ROOT/logs` - Build and deployment logs
-- **Static Frontend**: `build/static_frontend/` - Pre-rendered frontend files served by FastAPI
+- **Server Host**: `0.0.0.0` (accessible from network)
+- **Server Port**: `8081` (avoids conflicts with common services)
+- **Dependencies**: `requirements-raspberry-pi.txt` (Pi-optimized packages)
+- **Python Environment**: Virtual environment in `services/backend/.venv`
+- **Static Files**: Served from `services/backend/build/static_frontend/`
 
-### Build Artifacts
+### Raspberry Pi Performance Notes
 
-- **Build Archive**: `build-YYYYMMDD_HHMMSS.zip` in GCS bucket
-- **Log Files**: `build_YYYYMMDD_HHMMSS.log` and `deploy_YYYYMMDD_HHMMSS.log`
-- **Server URL**: `http://0.0.0.0:8000` (accessible on deployment server)
-
-The build output will be in the `out/` directory and needs to be copied to the backend's static folder for deployment.
+- **Memory Usage**: Typically uses 150-300MB RAM (depending on model usage)
+- **CPU Usage**: Low CPU usage during idle, moderate during AI processing
+- **Storage**: Requires ~500MB for application and dependencies
+- **Network**: Accessible via Pi's IP address on port 8081
 
 ## License
 

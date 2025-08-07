@@ -1,16 +1,14 @@
 #!/bin/bash
 
-# Bundle and upload backend service to Google Cloud Storage
-# This script creates a zip archive of the backend service,
-# uploads it to GCS, and cleans up the local zip file.
+# Build script for agent-interface
+# This script builds the frontend static files and prepares the project for deployment.
 
 # Configuration
-PROJECT_ROOT="/home/txt36456/codebase/agentchat"
+# Get the project root directory (parent of the scripts directory)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 SERVICE_DIR="$PROJECT_ROOT/services/backend"
-GCS_BUCKET="gs://agentchat-builds/" 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-ZIP_NAME="build-${TIMESTAMP}.zip"
-ZIP_PATH="$PROJECT_ROOT/$ZIP_NAME"
 LOG_DIR="$PROJECT_ROOT/logs"
 LOG_FILE="$LOG_DIR/build_${TIMESTAMP}.log"
 
@@ -22,15 +20,7 @@ log() {
     echo "$1" | tee -a "$LOG_FILE"
 }
 
-log "🚀 Starting build and upload process at $(date)..."
-
-# Check gcloud authentication
-log "🔐 Checking gcloud authentication..."
-if ! gcloud auth list --filter="status:ACTIVE" --format="value(account)" | grep -q .; then
-    log "❌ Error: No active gcloud authentication found. Please run 'gcloud auth login' first."
-    exit 1
-fi
-log "✅ Gcloud authentication check passed"
+log "🚀 Starting build process at $(date)..."
 
 # Check if the service directory exists
 if [ ! -d "$SERVICE_DIR" ]; then
@@ -53,7 +43,7 @@ if [ -d "$FRONTEND_DIR" ]; then
                 log "✅ Frontend dependencies installed successfully"
             else
                 log "❌ Error: Failed to install frontend dependencies"
-                log "🔄 Continuing with build process anyway..."
+                exit 1
             fi
         else
             log "✅ Frontend dependencies already installed"
@@ -69,71 +59,19 @@ if [ -d "$FRONTEND_DIR" ]; then
             log "✅ Frontend static build completed successfully"
         else
             log "❌ Error: Failed to build frontend static files"
-            log "🔄 Continuing with build process anyway..."
+            exit 1
         fi
     else
-        log "⚠️  Warning: No package.json found in frontend directory"
+        log "❌ Error: No package.json found in frontend directory"
+        exit 1
     fi
 else
-    log "⚠️  Warning: Frontend directory not found at $FRONTEND_DIR"
-    log "🔄 Continuing with build process anyway..."
-fi
-
-# Create zip archive
-log "📦 Creating zip archive: $ZIP_NAME"
-cd "$PROJECT_ROOT/services"
-
-# Use a more effective approach to exclude .venv
-zip -r "$ZIP_PATH" backend/ \
-    -x "backend/.venv/*" \
-    -x "backend/.venv/**" \
-    -x "*/.venv/*" \
-    -x "*/.venv/**" \
-    -x "backend/__pycache__/*" \
-    -x "backend/*/__pycache__/*" \
-    -x "backend/*/*/__pycache__/*" \
-    -x "**/__pycache__/*" >> "$LOG_FILE" 2>&1
-
-# Check if zip was created successfully
-if [ ! -f "$ZIP_PATH" ]; then
-    log "❌ Error: Failed to create zip archive"
+    log "❌ Error: Frontend directory not found at $FRONTEND_DIR"
     exit 1
-fi
-
-log "✅ Zip archive created successfully: $ZIP_PATH"
-log "📏 Archive size: $(du -h "$ZIP_PATH" | cut -f1)"
-
-# Clean up existing zip files in the bucket
-log "🧹 Cleaning up existing zip files in bucket..."
-if gcloud storage ls "$GCS_BUCKET*.zip" 2>>"$LOG_FILE" | grep -q ".zip"; then
-    log "🗑️  Found existing zip files, deleting them..."
-    gcloud storage rm "$GCS_BUCKET*.zip" 2>>"$LOG_FILE" || log "⚠️  No zip files to delete or deletion failed"
-else
-    log "✨ No existing zip files found in bucket"
-fi
-
-# Upload to Google Cloud Storage
-log "☁️  Uploading to Google Cloud Storage: $GCS_BUCKET"
-if gcloud storage cp "$ZIP_PATH" "$GCS_BUCKET" 2>>"$LOG_FILE"; then
-    log "🎉 Upload successful!"
-else
-    log "❌ Error: Failed to upload to Google Cloud Storage"
-    log "🔄 Continuing with cleanup despite upload failure..."
-fi
-
-# Clean up local zip file
-log "🧹 Cleaning up local zip file..."
-rm "$ZIP_PATH"
-
-if [ ! -f "$ZIP_PATH" ]; then
-    log "✅ Local zip file deleted successfully"
-else
-    log "⚠️  Warning: Failed to delete local zip file"
 fi
 
 # Back to root
 cd "$PROJECT_ROOT"
 
-log "🎉 Bundle and upload process completed successfully at $(date)!"
-log "📤 Archive uploaded to: ${GCS_BUCKET}${ZIP_NAME}"
+log "🎉 Build process completed successfully at $(date)!"
 log "📋 Process log saved to: $LOG_FILE"
