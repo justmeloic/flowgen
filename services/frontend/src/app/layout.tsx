@@ -18,8 +18,8 @@
 
 import { Header } from "@/components/header";
 import { ProtectedRoute } from "@/components/protected-route";
+import { Sidebar } from "@/components/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Sidebar } from "@/components/ui/sidebar";
 import { Inter } from "next/font/google";
 import { usePathname } from "next/navigation";
 import type React from "react";
