@@ -1,21 +1,19 @@
 <div align="center">
-  <h1>AgentChat</h1>
+  <img src="services/frontend/public/logo-banner.png">
   <p>A Multi-Model AI Agent Chat Interface</p>
+
+  <br>
 </div>
 
 ---
 
-# AgentChat
-
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
-![GCP](https://img.shields.io/badge/Google_Cloud-4285F4?logo=google-cloud&logoColor=white)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Author / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
+**Owner / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
-A versatile chat interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools,
-built with Google Cloud Platform services.
+A versatile chat interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools.
 
 ## Services
 
