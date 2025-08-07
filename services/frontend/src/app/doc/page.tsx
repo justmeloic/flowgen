@@ -46,9 +46,6 @@ export default function HomePage() {
             <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
               v{packageVersion}
             </span>
-            <span className="text-sm text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900 px-3 py-1 rounded-full font-medium">
-              🍓 Optimized for Raspberry Pi 5
-            </span>
           </div>
           <div className="flex justify-center space-x-2 mb-6">
             <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-3 py-1 rounded-full">
@@ -67,7 +64,7 @@ export default function HomePage() {
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
             A versatile chat interface that allows users to interact with
             different AI agents powered by various models and equipped with
-            specialized tools. <strong>Engineered for optimal performance on Raspberry Pi 5.</strong>
+            specialized tools. Optimized for Raspberry Pi 5 🍓.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             <strong>Author / Maintainer:</strong>{" "}

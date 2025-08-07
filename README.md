@@ -100,8 +100,7 @@ For production deployment, especially on Raspberry Pi 5, the system uses a **uni
 **Production Build & Deploy:**
 ```bash
 # Build static frontend and deploy on Raspberry Pi
-source scripts/build.sh   # Builds static frontend
-source scripts/deploy.sh  # Deploys unified service
+make all
 ```
 
 ### Why This Architecture?
