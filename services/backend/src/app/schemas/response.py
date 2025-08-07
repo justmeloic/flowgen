@@ -41,6 +41,7 @@ class AgentResponse(BaseModel):
         default_factory=dict, description='References and sources used by the agent'
     )
     session_id: Optional[str] = Field(None, description='Session identifier')
+    model: Optional[str] = Field(None, description='Model used for this response')
     confidence: Optional[float] = Field(
         None, ge=0.0, le=1.0, description='Confidence score of the response'
     )
@@ -51,13 +52,14 @@ class AgentResponse(BaseModel):
         json_schema_extra = {
             'example': {
                 'response': (
-                    'According to your CBA, overtime is paid at 1.5x the regular rate '
-                    'for hours worked over 8 in a day or 40 in a week.'
+                    'According to the latest research, AI development is advancing '
+                    'rapidly in areas like multimodal understanding and reasoning.'
                 ),
                 'references': {
-                    'section_12_3': 'CBA Section 12.3 - Overtime Compensation'
+                    'arxiv_paper': 'Recent Advances in Large Language Models'
                 },
                 'session_id': 'abc123-def456-ghi789',
+                'model': 'gemini-2.5-pro',
                 'confidence': 0.95,
             }
         }

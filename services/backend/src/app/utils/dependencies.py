@@ -26,7 +26,8 @@ from fastapi import Depends, HTTPException, Request, Response
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService, Session
 
-from src.agents.agent import root_agent
+from src.agents.agent_factory import agent_factory
+from src.app.core.config import settings
 from src.app.models import AgentConfig
 
 _logger = logging.getLogger(__name__)
@@ -55,6 +56,32 @@ def get_session_service(request: Request) -> InMemorySessionService:
         An instance of InMemorySessionService.
     """
     return request.app.state.session_service
+
+
+async def get_session_model(
+    request: Request,
+) -> str:
+    """Determine which model to use for this request.
+
+    Priority order:
+    1. Model specified in request body (parsed separately)
+    2. Session default model
+    3. System default model
+
+    Args:
+        request: The FastAPI request object
+
+    Returns:
+        The model name to use for this request
+    """
+    # We'll get the model from the request state, set by the endpoint
+    model_name = getattr(request.state, 'selected_model', None)
+
+    if not model_name or model_name not in settings.AVAILABLE_MODELS:
+        model_name = settings.DEFAULT_MODEL
+
+    _logger.info(f'Selected model: {model_name}')
+    return model_name
 
 
 async def get_or_create_session(
@@ -100,6 +127,8 @@ async def get_or_create_session(
             'user_id': config.user_id,
             'created_at': time.time(),
             'query_count': 0,
+            'default_model': settings.DEFAULT_MODEL,
+            'last_used_model': None,
         }
         session = await session_service.create_session(
             app_name=config.app_name,
@@ -119,34 +148,46 @@ async def get_or_create_session(
 def get_runner(
     request: Request,
     config: Annotated[AgentConfig, Depends(get_agent_config)],
+    model_name: Annotated[str, Depends(get_session_model)],
 ) -> Runner:
-    """Gets or creates the singleton agent Runner instance.
+    """Gets or creates a model-specific Runner instance.
 
     Args:
         request: The incoming FastAPI request object.
         config: The agent configuration.
+        model_name: The model to use for this runner.
 
     Raises:
         HTTPException: If the runner fails to initialize.
 
     Returns:
-        The singleton Runner instance.
+        A model-specific Runner instance.
     """
-    if not hasattr(request.app.state, 'runner'):
+    # Create unique runner for each model
+    runner_key = f'runner_{model_name.replace("-", "_").replace(".", "_")}'
+
+    if not hasattr(request.app.state, runner_key):
         try:
-            request.app.state.runner = Runner(
-                agent=root_agent,
+            # Get the model-specific agent from the factory
+            agent = agent_factory.get_agent(model_name)
+
+            # Create runner with the model-specific agent
+            runner = Runner(
+                agent=agent,
                 app_name=config.app_name,
                 session_service=request.app.state.session_service,
             )
-            _logger.info('Created new Runner instance')
+            setattr(request.app.state, runner_key, runner)
+            _logger.info(f'Created new Runner for model: {model_name}')
         except Exception as e:
-            _logger.error('Failed to create runner: %s', e)
+            _logger.error(f'Failed to create runner for model {model_name}: %s', e)
             raise HTTPException(
                 status_code=500,
                 detail={
-                    'message': 'Failed to initialize agent runner',
+                    'message': (
+                        f'Failed to initialize agent runner for model {model_name}'
+                    ),
                     'error': str(e),
                 },
             )
-    return request.app.state.runner
+    return getattr(request.app.state, runner_key)

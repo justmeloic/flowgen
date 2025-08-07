@@ -23,12 +23,11 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import StreamingResponse
-from google.adk.runners import Runner
-from google.adk.sessions import Session
 from loguru import logger as _logger
 
+from src.agents.agent_factory import agent_factory
 from src.app.models import AgentConfig
 from src.app.schemas import AgentResponse, Query
 from src.app.services.agent_service import agent_service
@@ -36,39 +35,62 @@ from src.app.utils.dependencies import (
     get_agent_config,
     get_or_create_session,
     get_runner,
+    get_session_model,
 )
 from src.app.utils.sse import sse_manager
 
 router = APIRouter()
 
 
+@router.get('/models')
+async def get_available_models():
+    """Get list of available models.
+
+    Returns:
+        Dictionary of available models with their configurations.
+    """
+    return {
+        'models': agent_factory.get_available_models(),
+        'default_model': agent_factory.get_default_model(),
+    }
+
+
 @router.post('/', response_model=AgentResponse)
 async def agent_endpoint(
     request: Request,
+    response: Response,
     query: Query,
     config: Annotated[AgentConfig, Depends(get_agent_config)],
-    session: Annotated[Session, Depends(get_or_create_session)],
-    runner: Annotated[Runner, Depends(get_runner)],
 ) -> AgentResponse:
-    """Processes a user query via the root agent.
+    """Processes a user query via the appropriate agent model.
 
     Args:
         request: The incoming FastAPI request object.
-        query: The validated request body containing the user's query text.
+        response: The outgoing FastAPI response object.
+        query: The validated request body containing the user's query text
+            and optional model.
         config: The agent configuration, injected as a dependency.
-        session: The user's session, created or retrieved as a dependency.
-        runner: The ADK runner instance, injected as a dependency.
 
     Returns:
         An AgentResponse object containing the agent's response and metadata.
     """
-    _logger.info('Received query for root_agent: %s...', query.text[:50])
+    # Set the selected model in request state for dependencies to use
+    request.state.selected_model = query.model
+
+    # Get dependencies with model-specific configurations
+    session = await get_or_create_session(request, response, config)
+    model_name = await get_session_model(request)
+    runner = get_runner(request, config, model_name)
+
+    _logger.info('Received query for model %s: %s...', model_name, query.text[:50])
+
     return await agent_service.process_query(
         request=request,
         query=query,
         config=config,
         session=session,
         runner=runner,
+        model_name=model_name,
     )
 
 

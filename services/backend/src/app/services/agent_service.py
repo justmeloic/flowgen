@@ -32,7 +32,7 @@ from google.adk.sessions import InMemorySessionService, Session
 from google.genai import types as genai_types
 from loguru import logger as _logger
 
-from src.agents.agent import root_agent
+from src.agents.agent_factory import agent_factory
 from src.app.models import AgentConfig
 from src.app.schemas import AgentResponse, Query
 from src.app.utils.formatters import format_text_response
@@ -47,7 +47,11 @@ class AgentService:
         self._logger = _logger
 
     async def _create_and_log_user_event(
-        self, session_service: InMemorySessionService, session: Session, query_text: str
+        self,
+        session_service: InMemorySessionService,
+        session: Session,
+        query_text: str,
+        model_name: str,
     ) -> genai_types.Content:
         """Creates the user event, appends it to the session, and returns the content.
 
@@ -55,6 +59,7 @@ class AgentService:
             session_service: The session service instance.
             session: The user session.
             query_text: The user's query text.
+            model_name: The model being used for this query.
 
         Returns:
             The user content for the agent.
@@ -62,8 +67,12 @@ class AgentService:
         user_content = genai_types.Content(
             role='user', parts=[genai_types.Part(text=query_text)]
         )
+
+        # Get agent name from the factory
+        agent = agent_factory.get_agent(model_name)
+
         user_event = Event(
-            author=root_agent.name,
+            author=agent.name,
             content=user_content,
             timestamp=time.time(),
             actions=EventActions(
@@ -71,6 +80,7 @@ class AgentService:
                     'last_query': query_text,
                     'last_query_ts': time.time(),
                     'query_count': session.state.get('query_count', 0) + 1,
+                    'model_name': model_name,
                 }
             ),
             invocation_id=str(uuid.uuid4()),
@@ -86,6 +96,7 @@ class AgentService:
         session: Session,
         config: AgentConfig,
         user_content: genai_types.Content,
+        model_name: str,
     ) -> Tuple[str, Dict]:
         """Runs the agent and processes the resulting event stream.
 
@@ -96,6 +107,7 @@ class AgentService:
             session: The user session.
             config: The agent configuration.
             user_content: The user content for the agent.
+            model_name: The model being used for this query.
 
         Returns:
             A tuple of (final_response_text, references_json).
@@ -132,9 +144,14 @@ class AgentService:
                 state_changes = {
                     'last_response': final_response_text,
                     'last_interaction_ts': time.time(),
+                    'model_name': model_name,
                 }
+
+                # Get agent name from the factory
+                agent = agent_factory.get_agent(model_name)
+
                 state_update_event = Event(
-                    author=root_agent.name,
+                    author=agent.name,
                     actions=EventActions(state_delta=state_changes),
                     timestamp=time.time(),
                     invocation_id=str(uuid.uuid4()),
@@ -150,6 +167,7 @@ class AgentService:
         config: AgentConfig,
         session: Session,
         runner: Runner,
+        model_name: str,
     ) -> AgentResponse:
         """Handles the full lifecycle of an interaction with the agent.
 
@@ -159,6 +177,7 @@ class AgentService:
             config: The agent configuration.
             session: The active user session.
             runner: The ADK runner instance.
+            model_name: The model being used for this query.
 
         Raises:
             HTTPException: If an unexpected error occurs during processing.
@@ -177,11 +196,17 @@ class AgentService:
             )
 
             user_content = await self._create_and_log_user_event(
-                session_service, session, query.text
+                session_service, session, query.text, model_name
             )
 
             final_response_text, references_json = await self._process_agent_events(
-                request, session_service, runner, session, config, user_content
+                request,
+                session_service,
+                runner,
+                session,
+                config,
+                user_content,
+                model_name,
             )
 
             self._logger.info(
@@ -194,6 +219,7 @@ class AgentService:
                 response=final_response_text,
                 references=references_json,
                 session_id=session_id,
+                model=model_name,
             )
 
         except Exception as e:

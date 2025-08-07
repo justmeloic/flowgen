@@ -87,10 +87,31 @@ class Settings(BaseSettings):
     # Model settings
     GEMINI_MODEL: str = 'gemini-2.5-flash'
     GEMINI_MODEL_PRO: str = 'gemini-2.5-pro'
+    DEFAULT_MODEL: str = 'gemini-2.5-flash'
 
     # Authentication settings
     AUTH_SECRET: str
     SESSION_TIMEOUT_HOURS: int = 24
+
+    # Model configuration
+    AVAILABLE_MODELS: dict = {
+        'gemini-2.5-flash': {
+            'name': 'gemini-2.5-flash',
+            'display_name': 'Gemini 2.5 Flash',
+            'description': 'Latest fast model with improved capabilities',
+            'max_tokens': 4096,
+            'supports_tools': True,
+            'default_temperature': 0.1,
+        },
+        'gemini-2.5-pro': {
+            'name': 'gemini-2.5-pro',
+            'display_name': 'Gemini 2.5 Pro',
+            'description': 'Latest high-quality model for complex reasoning',
+            'max_tokens': 8192,
+            'supports_tools': True,
+            'default_temperature': 0.1,
+        },
+    }
 
     # Data configuration
     FILE_ACCESS_METHOD: str = 'GCS'
