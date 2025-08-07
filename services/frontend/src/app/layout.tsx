@@ -20,13 +20,18 @@ import { Header } from "@/components/header";
 import { ProtectedRoute } from "@/components/protected-route";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Inter } from "next/font/google";
+import { Dancing_Script, Inter } from "next/font/google";
 import { usePathname } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import "../styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const dancingScript = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-cursive",
+  weight: ["400", "500", "600", "700"],
+});
 
 export default function RootLayout({
   children,
@@ -45,7 +50,9 @@ export default function RootLayout({
         <title>AgentChat</title>
         <link rel="icon" href="/logo-dark.png" type="image/png" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body
+        className={`${inter.variable} ${dancingScript.variable} font-sans antialiased`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

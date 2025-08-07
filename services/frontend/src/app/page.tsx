@@ -32,6 +32,34 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import packageJson from "../../package.json";
 
+// Typewriter hook
+const useTypewriter = (text: string, speed: number = 100) => {
+  const [displayText, setDisplayText] = useState("");
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    if (text.length === 0) return;
+
+    setDisplayText("");
+    setIsComplete(false);
+    let index = 0;
+
+    const timer = setInterval(() => {
+      if (index < text.length) {
+        setDisplayText(text.slice(0, index + 1));
+        index++;
+      } else {
+        setIsComplete(true);
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return { displayText, isComplete };
+};
+
 // Get version from package.json
 const packageVersion = packageJson.version;
 
@@ -48,6 +76,20 @@ export default function ChatPage() {
     useState<string>("gemini-2.5-flash");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Typewriter animation for greeting
+  const greetingText =
+    typeof window !== "undefined" && sessionStorage.getItem("user_name")
+      ? `Hello ${sessionStorage.getItem("user_name")}!`
+      : "Hello!";
+
+  const subtitleText =
+    "Your Multi-Model AI Agent Interface. Interact with specialized AI agents powered by various models and equipped with advanced tools. Ask me anything and I'll help you get the answers you need!";
+
+  const { displayText: displayGreeting, isComplete: greetingComplete } =
+    useTypewriter(greetingText, 80);
+  const { displayText: displaySubtitle, isComplete: subtitleComplete } =
+    useTypewriter(greetingComplete ? subtitleText : "", 30);
 
   // Persist and restore chat state
   useEffect(() => {
@@ -349,12 +391,12 @@ export default function ChatPage() {
       const intervalId = setInterval(() => {
         setLoadingText((prevText) => {
           if (
-            prevText === "Please wait while I look for your document..." ||
-            prevText === "Analyzing your CBA to find the answer..."
+            prevText === "Please wait while I search for information..." ||
+            prevText === "Analyzing your request to find the best answer..."
           ) {
-            return prevText === "Please wait while I look for your document..."
-              ? "Analyzing your CBA to find the answer..."
-              : "Please wait while I look for your document...";
+            return prevText === "Please wait while I search for information..."
+              ? "Analyzing your request to find the best answer..."
+              : "Please wait while I search for information...";
           }
           return "Thinking...";
         });
@@ -362,7 +404,7 @@ export default function ChatPage() {
 
       // Show longer messages after 5 seconds (this is when the Agent is executing a tool)
       const timeoutId = setTimeout(() => {
-        setLoadingText("Please wait while I look for your document...");
+        setLoadingText("Please wait while I search for information...");
       }, 5000);
 
       return () => {
@@ -508,8 +550,7 @@ export default function ChatPage() {
 
         toast({
           title: "New Session Started",
-          description:
-            "Ready to start a fresh conversation. Ask me anything about your CBA!",
+          description: "Ready to start a fresh conversation. Ask me anything!",
           duration: 3000,
         });
       }, 150); // Short delay for smooth transition
@@ -557,27 +598,42 @@ export default function ChatPage() {
             {isFirstPrompt && chatHistory.length === 0 ? (
               <div className="relative -mt-32 animate-in fade-in duration-700 ease-in-out">
                 <div className="flex flex-col items-center justify-center h-[500px] space-y-10 transform transition-all duration-700 ease-in-out">
-                  <h1 className="text-center text-4xl md:text-5xl font-bold animate-in slide-in-from-top-8 duration-1000 ease-out">
-                    <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                      {typeof window !== "undefined" &&
-                      sessionStorage.getItem("user_name")
-                        ? `Hello ${sessionStorage.getItem("user_name")}!`
-                        : "Hello!"}
+                  <h1 className="text-center text-4xl md:text-5xl font-bold">
+                    <span
+                      className="bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent font-cursive dark:from-gray-300 dark:to-gray-100"
+                      style={{
+                        fontWeight: 500,
+                        letterSpacing: "0.02em",
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {displayGreeting}
+                      <span className="animate-pulse">|</span>
                     </span>
                   </h1>
-                  <h3 className="text-center text-sm md:text-sm font-bold w-[450px] animate-in slide-in-from-top-12 duration-1200 ease-out delay-200">
-                    <span className="bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                      I can help you with questions about your Collective
-                      Bargaining Agreement (CBA). To find the most accurate
-                      information, could you please tell me your role
-                      (Conductor, Engineer, or Yard Coordinator) and your work
-                      territory/location?
-                    </span>
-                  </h3>
+                  {greetingComplete && (
+                    <h3 className="text-center text-base md:text-lg w-[500px] transition-opacity duration-500 ease-in-out">
+                      <span
+                        className="bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent font-cursive dark:from-gray-400 dark:to-gray-200"
+                        style={{
+                          fontWeight: 400,
+                          letterSpacing: "0.01em",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {displaySubtitle}
+                        {!subtitleComplete && (
+                          <span className="animate-pulse">|</span>
+                        )}
+                      </span>
+                    </h3>
+                  )}
                 </div>
-                <div className="absolute bottom-8 left-0 right-0 w-full max-w-[850px] mx-auto animate-in slide-in-from-bottom-8 duration-1000 ease-out delay-400">
-                  <ChatInput onSend={handleSend} isLoading={isLoading} />
-                </div>
+                {subtitleComplete && (
+                  <div className="absolute bottom-8 left-0 right-0 w-full max-w-[850px] mx-auto animate-in slide-in-from-bottom-8 duration-1000 ease-out delay-400">
+                    <ChatInput onSend={handleSend} isLoading={isLoading} />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="w-full animate-in fade-in duration-500 ease-in-out">
