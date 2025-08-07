@@ -27,7 +27,7 @@ export default function HomePage() {
       <div className="space-y-8 max-w-4xl mx-auto">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4 dark:text-gray-100" id="top">
-            Collective Bargaining Agreement & Grievance Agent
+            AgentChat - Multi-Model AI Agent Chat Interface
           </h1>
           <div className="flex justify-center space-x-2 mb-6">
             <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm px-3 py-1 rounded-full">
@@ -35,6 +35,9 @@ export default function HomePage() {
             </span>
             <span className="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm px-3 py-1 rounded-full">
               Next.js 14.0.0+
+            </span>
+            <span className="inline-block bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm px-3 py-1 rounded-full">
+              Google ADK 0.2.0+
             </span>
             <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm px-3 py-1 rounded-full">
               Google Cloud
@@ -44,8 +47,8 @@ export default function HomePage() {
             </span>
           </div>
           <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
-            An agentic question answering system powered by AI for CBA analysis,
-            built with Google Cloud Platform services.
+            A versatile chat interface that allows users to interact with different AI agents powered by various models
+            and equipped with specialized tools, built with Google Cloud Platform services.
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             <strong>Author / Maintainer:</strong> Loïc Muhirwa
@@ -55,16 +58,86 @@ export default function HomePage() {
         {/* Architecture Diagram */}
         <div className="text-center">
           <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
-            Architecture
+            System Architecture
           </h2>
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-6">
             <Image
               src="/architecture-diagram.png"
-              alt="Architecture Diagram"
+              alt="AgentChat Architecture"
               width={1000}
               height={600}
               className="rounded-2xl shadow-lg dark:shadow-gray-800"
             />
+          </div>
+        </div>
+
+        {/* Multi-Model Conversation Continuity */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
+            Multi-Model Conversation Continuity
+          </h2>
+          <p className="text-gray-700 dark:text-gray-300 mb-6">
+            One of the most sophisticated features of this system is <strong>seamless model switching mid-conversation</strong>. 
+            Users can switch between different AI models (e.g., Gemini 2.5 Flash ↔ Gemini 2.5 Pro) while maintaining 
+            complete conversation history and context.
+          </p>
+          
+          <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-2xl mb-6">
+            <h3 className="text-xl font-semibold mb-3 dark:text-gray-100">
+              How It Works
+            </h3>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Our architecture leverages Google ADK's session management to provide true conversation continuity across different models:
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">🏭 Agent Factory Pattern</h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Creates and caches model-specific agents with LRU caching for optimal performance.
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                <h4 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">🏃‍♂️ Runner Management</h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Model-specific runners that share the same session service for memory continuity.
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                <h4 className="font-semibold text-purple-600 dark:text-purple-400 mb-2">🧠 Shared Session Service</h4>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Single session ID across all models with automatic history loading.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-secondary-dark p-6 rounded-2xl">
+            <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
+              Key Benefits
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">✅</span>
+                  <span className="dark:text-gray-300"><strong>True Conversation Continuity:</strong> Switch models without losing context</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">✅</span>
+                  <span className="dark:text-gray-300"><strong>Performance Optimization:</strong> Cached runners and agents for fast switching</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">✅</span>
+                  <span className="dark:text-gray-300"><strong>Model-Specific Capabilities:</strong> Each model maintains its unique characteristics</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-500">✅</span>
+                  <span className="dark:text-gray-300"><strong>Unified Memory:</strong> Shared session service ensures consistent experience</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -73,36 +146,76 @@ export default function HomePage() {
           <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
             Services
           </h2>
+          <p className="text-gray-700 dark:text-gray-300 mb-6">
+            AgentChat is built with a modular architecture consisting of two main services that can be deployed 
+            independently or as a unified application.
+          </p>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 dark:bg-secondary-dark p-6 rounded-2xl">
-              <h3 className="text-xl font-semibold mb-3 dark:text-gray-100">
+            <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-2xl border border-green-200 dark:border-green-700">
+              <h3 className="text-xl font-semibold mb-3 dark:text-gray-100 flex items-center">
+                <span className="mr-2">🎨</span>
                 Frontend Client
               </h3>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                A Next.js web application that provides the user interface for
-                interacting with the CBA analysis system.
+                A Next.js web application that provides the user interface for interacting with AI agents 
+                across different models and capabilities.
               </p>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>• Modern React-based interface</li>
-                <li>• Responsive design</li>
-                <li>• Real-time chat interface</li>
-                <li>• Session management</li>
-              </ul>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Modern React-based interface with TypeScript</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Responsive design with dark/light mode</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Real-time chat interface with model selector</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Session management and conversation history</span>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-lg">
+                <code className="text-sm text-gray-700 dark:text-gray-300">
+                  Tech Stack: Next.js 14+, React 18+, TypeScript, Tailwind CSS
+                </code>
+              </div>
             </div>
-            <div className="bg-gray-50 dark:bg-secondary-dark p-6 rounded-2xl">
-              <h3 className="text-xl font-semibold mb-3 dark:text-gray-100">
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-6 rounded-2xl border border-purple-200 dark:border-purple-700">
+              <h3 className="text-xl font-semibold mb-3 dark:text-gray-100 flex items-center">
+                <span className="mr-2">🤖</span>
                 Agent Orchestration API
               </h3>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                The backend service that coordinates AI agents for CBA analysis
-                and response generation.
+                The backend service that coordinates AI agents using Google ADK for sophisticated 
+                multi-model conversations and tool integration.
               </p>
-              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li>• Understanding user queries</li>
-                <li>• CBA analysis</li>
-                <li>• Response generation</li>
-                <li>• Agent coordination</li>
-              </ul>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Multi-model AI interactions (Gemini 2.5 Flash/Pro)</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Agent selection and intelligent routing</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Tool integration and execution (Google Search)</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  <span className="dark:text-gray-300">Response generation and formatting</span>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-lg">
+                <code className="text-sm text-gray-700 dark:text-gray-300">
+                  Tech Stack: FastAPI, Python 3.13+, Google ADK, Vertex AI
+                </code>
+              </div>
             </div>
           </div>
         </div>
@@ -110,7 +223,7 @@ export default function HomePage() {
         {/* Component Usage */}
         <div>
           <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
-            Component Usage
+            Technology Stack & Components
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
@@ -130,13 +243,24 @@ export default function HomePage() {
               <tbody>
                 <tr>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Vertex AI Search
+                    Vertex AI
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
                     GCP
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Semantic search for RAG
+                    Multi-model AI service powering Gemini 2.5 Flash and Pro agents
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Google ADK
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Development Tool
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Agent Development Kit providing session management and conversation continuity
                   </td>
                 </tr>
                 <tr>
@@ -147,8 +271,7 @@ export default function HomePage() {
                     GCP
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Storage for raw CBA files, temporary processing data, and
-                    backup storage
+                    Storage for build artifacts, deployment packages, and backup storage
                   </td>
                 </tr>
                 <tr>
@@ -159,8 +282,7 @@ export default function HomePage() {
                     GCP
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Monitors application performance and tracks data processing
-                    operations
+                    Monitors application performance and tracks agent interactions
                   </td>
                 </tr>
                 <tr>
@@ -176,14 +298,24 @@ export default function HomePage() {
                 </tr>
                 <tr>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    ADK (Agent Development Kit)
+                    FastAPI
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Development Tool
+                    Backend Framework
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Provides development tools and libraries for building and
-                    testing the agentic orchestration
+                    High-performance async API framework with automatic OpenAPI documentation
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Next.js
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Frontend Framework
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    React framework with SSR/SSG capabilities for optimal performance
                   </td>
                 </tr>
               </tbody>
@@ -306,31 +438,83 @@ export default function HomePage() {
         {/* Session Management */}
         <div>
           <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
-            Session Management
+            Session Management & Memory Architecture
           </h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            The system uses session IDs to maintain conversation continuity and
-            context preservation across multiple interactions.
+          <p className="text-gray-700 dark:text-gray-300 mb-6">
+            The system uses sophisticated session management to maintain conversation continuity and 
+            context preservation across multiple interactions and model switches.
           </p>
 
-          <div className="bg-gray-50 dark:bg-secondary-dark p-4 rounded-2xl">
-            <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
-              Session Flow
-            </h3>
-            <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2">
-              <li>
-                <strong>Initial Request:</strong> Backend generates new UUID and
-                creates session, returns session ID in X-Session-ID header
-              </li>
-              <li>
-                <strong>Subsequent Requests:</strong> Frontend includes
-                X-Session-ID header, backend validates and uses existing session
-              </li>
-              <li>
-                <strong>Session State:</strong> Backend maintains session state
-                using ADK's InMemorySessionService
-              </li>
-            </ul>
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-2xl border border-blue-200 dark:border-blue-700">
+              <h3 className="text-lg font-semibold mb-3 dark:text-gray-100 flex items-center">
+                <span className="mr-2">🔄</span>
+                Session Flow
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start space-x-2">
+                  <span className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">1</span>
+                  <div>
+                    <strong className="text-blue-700 dark:text-blue-300">Initial Request:</strong>
+                    <p className="text-gray-600 dark:text-gray-400">Backend generates new UUID, creates session, returns session ID in X-Session-ID header</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <span className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">2</span>
+                  <div>
+                    <strong className="text-blue-700 dark:text-blue-300">Subsequent Requests:</strong>
+                    <p className="text-gray-600 dark:text-gray-400">Frontend includes X-Session-ID header, backend validates and uses existing session</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <span className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-0.5">3</span>
+                  <div>
+                    <strong className="text-blue-700 dark:text-blue-300">Session State:</strong>
+                    <p className="text-gray-600 dark:text-gray-400">Backend maintains session state using ADK's InMemorySessionService</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-6 rounded-2xl border border-purple-200 dark:border-purple-700">
+              <h3 className="text-lg font-semibold mb-3 dark:text-gray-100 flex items-center">
+                <span className="mr-2">🧠</span>
+                Memory Continuity
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                  <strong className="text-purple-700 dark:text-purple-300">Same Session Service:</strong>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">All runners share the same InMemorySessionService instance</p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                  <strong className="text-purple-700 dark:text-purple-300">Automatic Context Loading:</strong>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">ADK automatically provides full conversation history to new models</p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
+                  <strong className="text-purple-700 dark:text-purple-300">Cross-Model Memory:</strong>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">Switching models preserves complete conversation context</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4">
+            <div className="flex items-start">
+              <div className="ml-3">
+                <h4 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                  🔬 Advanced Engineering Pattern
+                </h4>
+                <p className="text-sm text-yellow-700 dark:text-yellow-200 mb-2">
+                  The session architecture enables a sophisticated pattern where each AI model gets its own isolated runner, 
+                  but they all share the same conversation memory through the ADK session service. This means when you switch 
+                  from Gemini 2.5 Flash to Gemini 2.5 Pro mid-conversation, the Pro model automatically receives the complete 
+                  conversation history and remembers everything from the Flash model's interactions.
+                </p>
+                <code className="text-xs bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                  session_service=request.app.state.session_service  # 🔑 THE MAGIC
+                </code>
+              </div>
+            </div>
           </div>
         </div>
 
