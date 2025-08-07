@@ -69,7 +69,8 @@ export function ModelSelector({
           "gemini-2.5-flash": {
             name: "gemini-2.5-flash",
             display_name: "Gemini 2.5 Flash",
-            description: "Latest fast model with improved capabilities",
+            description:
+              "Google's latest fast model with improved capabilities",
             max_tokens: 4096,
             supports_tools: true,
             default_temperature: 0.1,
@@ -77,7 +78,8 @@ export function ModelSelector({
           "gemini-2.5-pro": {
             name: "gemini-2.5-pro",
             display_name: "Gemini 2.5 Pro",
-            description: "Latest high-quality model for complex reasoning",
+            description:
+              "Google's latest and smartest model for complex reasoning",
             max_tokens: 8192,
             supports_tools: true,
             default_temperature: 0.1,
@@ -115,11 +117,11 @@ export function ModelSelector({
     return (
       <Button
         variant="ghost"
-        className="w-x-auto h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark border-none shadow-none opacity-50"
+        className="w-48 h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark border-none shadow-none opacity-50"
         disabled
       >
         <div className="flex flex-col items-start truncate">
-          <span className="text-base font-medium dark:text-gray-200">
+          <span className="text-sm font-medium dark:text-gray-200">
             Loading...
           </span>
           <span className="text-xs text-muted-foreground dark:text-gray-400">
@@ -137,20 +139,20 @@ export function ModelSelector({
           variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-x-auto h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark hover:bg-gray-200 dark:hover:bg-[#2d2e2f] border-none shadow-none focus:ring-0 focus:outline-none"
+          className="w-48 h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark hover:bg-gray-200 dark:hover:bg-[#2d2e2f] border-none shadow-none focus:ring-0 focus:outline-none"
         >
-          <div className="flex flex-col items-start truncate">
-            <span className="text-base font-medium dark:text-gray-200">
+          <div className="flex flex-col items-start truncate min-w-0">
+            <span className="text-sm font-medium dark:text-gray-200 truncate">
               {currentModel?.label || "Select Model"}
             </span>
-            <span className="text-xs text-muted-foreground dark:text-gray-400">
+            <span className="text-xs text-muted-foreground dark:text-gray-400 truncate">
               {currentModel?.description || "Choose a model"}
             </span>
           </div>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[270px] rounded-2xl p-1 bg-accent dark:bg-[#2d2e2f] dark:border-[#404142] shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] dark:shadow-[0_4px_8px_0_rgba(0,0,0,0.4)]">
+      <PopoverContent className="w-64 rounded-2xl p-1 bg-accent dark:bg-[#2d2e2f] dark:border-[#404142] shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] dark:shadow-[0_4px_8px_0_rgba(0,0,0,0.4)]">
         <Command className="dark:bg-[#2d2e2f] rounded-xl">
           <CommandInput placeholder="Search models..." />
           <CommandList className="dark:bg-[#2d2e2f]">
@@ -176,11 +178,11 @@ export function ModelSelector({
                         : "opacity-0"
                     )}
                   />
-                  <div className="flex flex-col items-start">
-                    <span className="dark:text-gray-200 font-medium">
+                  <div className="flex flex-col items-start min-w-0">
+                    <span className="dark:text-gray-200 font-medium text-sm truncate">
                       {model.label}
                     </span>
-                    <span className="text-xs text-muted-foreground dark:text-gray-400">
+                    <span className="text-xs text-muted-foreground dark:text-gray-400 truncate">
                       {model.description}
                     </span>
                   </div>

@@ -654,17 +654,33 @@ export default function ChatPage() {
                           }`}
                         >
                           <AvatarImage
-                            src="/gemini-logo-new.png"
+                            src="/logo-light.png"
                             alt="Bot Avatar"
+                            className="dark:hidden"
+                          />
+                          <AvatarImage
+                            src="/logo-dark.png"
+                            alt="Bot Avatar"
+                            className="hidden dark:block"
                           />
                         </Avatar>
                       )}
                       <div
                         className={`prose prose-sm max-w-none inline-block p-3 px-4 rounded-3xl text-justify ${
                           message.role === "user"
-                            ? "bg-blue-100 text-gray-800 rounded-tr-none dark:bg-secondary-dark dark:text-gray-200"
+                            ? "bg-background text-foreground rounded-tr-none border border-border/20 dark:bg-background dark:text-foreground dark:border-border/30"
                             : "bg-chatInput-light text-gray-800 rounded-tl-none dark:bg-background dark:text-gray-200"
                         }`}
+                        style={
+                          message.role === "user"
+                            ? {
+                                boxShadow:
+                                  "0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.08)",
+                                filter:
+                                  "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))",
+                              }
+                            : {}
+                        }
                       >
                         {message.role === "bot" ? (
                           isLoading &&
