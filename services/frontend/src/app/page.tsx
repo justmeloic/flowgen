@@ -44,6 +44,8 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Thinking...");
   const [isReferencesHidden, setIsReferencesHidden] = useState(false);
+  const [selectedModel, setSelectedModel] =
+    useState<string>("gemini-2.5-flash");
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -399,10 +401,10 @@ export default function ChatPage() {
       setTimeout(scrollToBottom, 0);
 
       try {
-        const response = await sendMessage(
-          userMessage,
-          abortControllerRef.current.signal
-        );
+        const response = await sendMessage(userMessage, {
+          signal: abortControllerRef.current.signal,
+          model: selectedModel,
+        });
 
         // Check if request was aborted
         if (abortControllerRef.current.signal.aborted) {
@@ -462,7 +464,7 @@ export default function ChatPage() {
         }
       }
     },
-    [scrollToBottom, isFirstPrompt, loadingText, isLoading]
+    [scrollToBottom, isFirstPrompt, loadingText, isLoading, selectedModel]
   );
 
   useEffect(() => {
@@ -527,7 +529,10 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col flex-1 h-full">
       <div className="flex items-center justify-between">
-        <ModelSelector />
+        <ModelSelector
+          selectedModel={selectedModel}
+          onModelChange={setSelectedModel}
+        />
         <div className="w-[110px]" />
       </div>
 

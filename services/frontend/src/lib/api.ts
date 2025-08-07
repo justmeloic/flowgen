@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-import { MessageResponse } from "@/types";
+import { MessageResponse, Model } from "@/types";
 
 // Use environment variable with fallback; 
 // setting the fallback to an empty string will cause the frontend 
 // to use relative paths for API requests.
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-export const sendMessage = async (message: string, signal?: AbortSignal): Promise<MessageResponse> => {
+export interface SendMessageOptions {
+  model?: string;
+  signal?: AbortSignal;
+}
+
+export const sendMessage = async (
+  message: string, 
+  options?: SendMessageOptions
+): Promise<MessageResponse> => {
   try {
     const storedSessionId = localStorage.getItem('chatSessionId');
+    
+    const requestBody: { text: string; model?: string } = { text: message };
+    if (options?.model) {
+      requestBody.model = options.model;
+    }
     
     const response = await fetch(`${BASE_URL}/api/v1/root_agent/`, {
       method: 'POST',
@@ -31,8 +44,8 @@ export const sendMessage = async (message: string, signal?: AbortSignal): Promis
         'Content-Type': 'application/json',
         'X-Session-ID': storedSessionId || '', // Always send the header, even if empty
       },
-      body: JSON.stringify({ text: message }),
-      signal, // Add abort signal support
+      body: JSON.stringify(requestBody),
+      signal: options?.signal, // Add abort signal support
     });
 
     if (!response.ok) {
@@ -59,6 +72,26 @@ export const sendMessage = async (message: string, signal?: AbortSignal): Promis
     return await response.json();
   } catch (error) {
     console.error('Failed to send message:', error);
+    throw error;
+  }
+};
+
+export const getAvailableModels = async (): Promise<{ models: Record<string, Model>; default_model: string }> => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/root_agent/models`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch available models:', error);
     throw error;
   }
 };

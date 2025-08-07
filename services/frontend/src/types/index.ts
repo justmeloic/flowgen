@@ -17,6 +17,7 @@
 export interface ChatMessage {
   role: "user" | "bot";
   content: string;
+  model?: string; // Track which model generated this message
 }
 
 export interface Reference {
@@ -29,4 +30,16 @@ export interface Reference {
 export interface MessageResponse {
   response: string;
   references: { [key: string]: Reference };
+  session_id?: string;
+  model?: string; // Include model information
+  confidence?: number;
+}
+
+export interface Model {
+  name: string;
+  display_name: string;
+  description: string;
+  max_tokens: number;
+  supports_tools: boolean;
+  default_temperature: number;
 }

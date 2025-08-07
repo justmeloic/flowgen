@@ -30,21 +30,105 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { getAvailableModels } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { Model } from "@/types";
 import { Check, ChevronDown } from "lucide-react";
 import * as React from "react";
 
-const models = [
-  {
-    value: "gemini-2.5-flash",
-    label: "Gemini",
-    description: "2.5 Flash",
-  },
-];
+interface ModelSelectorProps {
+  selectedModel: string;
+  onModelChange: (model: string) => void;
+}
 
-export function ModelSelector() {
+export function ModelSelector({
+  selectedModel,
+  onModelChange,
+}: ModelSelectorProps) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("gemini-2.5-flash");
+  const [models, setModels] = React.useState<Record<string, Model>>({});
+  const [defaultModel, setDefaultModel] = React.useState<string>("");
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const { models: availableModels, default_model } =
+          await getAvailableModels();
+        setModels(availableModels);
+        setDefaultModel(default_model);
+
+        // If no model is selected, use the default
+        if (!selectedModel && default_model) {
+          onModelChange(default_model);
+        }
+      } catch (error) {
+        console.error("Failed to fetch models:", error);
+        // Fallback to hardcoded models if API fails
+        const fallbackModels = {
+          "gemini-2.5-flash": {
+            name: "gemini-2.5-flash",
+            display_name: "Gemini 2.5 Flash",
+            description: "Latest fast model with improved capabilities",
+            max_tokens: 4096,
+            supports_tools: true,
+            default_temperature: 0.1,
+          },
+          "gemini-2.5-pro": {
+            name: "gemini-2.5-pro",
+            display_name: "Gemini 2.5 Pro",
+            description: "Latest high-quality model for complex reasoning",
+            max_tokens: 8192,
+            supports_tools: true,
+            default_temperature: 0.1,
+          },
+        };
+        setModels(fallbackModels);
+        setDefaultModel("gemini-2.5-flash");
+        if (!selectedModel) {
+          onModelChange("gemini-2.5-flash");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, [selectedModel, onModelChange]);
+
+  const modelArray = React.useMemo(
+    () =>
+      Object.values(models).map((model) => ({
+        value: model.name,
+        label: model.display_name,
+        description: model.description,
+      })),
+    [models]
+  );
+
+  const currentModel = React.useMemo(
+    () => modelArray.find((model) => model.value === selectedModel),
+    [modelArray, selectedModel]
+  );
+
+  if (loading) {
+    return (
+      <Button
+        variant="ghost"
+        className="w-x-auto h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark border-none shadow-none opacity-50"
+        disabled
+      >
+        <div className="flex flex-col items-start truncate">
+          <span className="text-base font-medium dark:text-gray-200">
+            Loading...
+          </span>
+          <span className="text-xs text-muted-foreground dark:text-gray-400">
+            Models
+          </span>
+        </div>
+      </Button>
+    );
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -57,10 +141,10 @@ export function ModelSelector() {
         >
           <div className="flex flex-col items-start truncate">
             <span className="text-base font-medium dark:text-gray-200">
-              {models.find((model) => model.value === value)?.label}
+              {currentModel?.label || "Select Model"}
             </span>
             <span className="text-xs text-muted-foreground dark:text-gray-400">
-              {models.find((model) => model.value === value)?.description}
+              {currentModel?.description || "Choose a model"}
             </span>
           </div>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -74,12 +158,12 @@ export function ModelSelector() {
               No model found.
             </CommandEmpty>
             <CommandGroup className="dark:bg-[#2d2e2f]">
-              {models.map((model) => (
+              {modelArray.map((model) => (
                 <CommandItem
                   key={model.value}
                   value={model.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue);
+                    onModelChange(currentValue);
                     setOpen(false);
                   }}
                   className="dark:text-gray-200 dark:hover:bg-[#3c4043] rounded-lg"
@@ -87,7 +171,9 @@ export function ModelSelector() {
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4 dark:text-gray-300",
-                      value === model.value ? "opacity-100" : "opacity-0"
+                      selectedModel === model.value
+                        ? "opacity-100"
+                        : "opacity-0"
                     )}
                   />
                   <div className="flex flex-col items-start">
