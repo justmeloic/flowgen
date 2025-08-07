@@ -40,7 +40,7 @@ export default function HomePage() {
       <div className="space-y-8 max-w-4xl mx-auto">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-4 dark:text-gray-100" id="top">
-            AgentChat
+            Agent Interface
           </h1>
           <div className="flex justify-center items-center space-x-4 mb-6">
             <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">

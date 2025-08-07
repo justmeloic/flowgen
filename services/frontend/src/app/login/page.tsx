@@ -81,7 +81,7 @@ export default function LoginPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-900 mb-2">
-            AgentChat Access
+            Agent Interface Access
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-600 text-sm">
             Enter your access code to continue

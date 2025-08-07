@@ -66,16 +66,6 @@ The backend service that coordinates AI agents for:
 
 ![AgentChat Architecture](docs/architecture-diagram.png)
 
-## Component Usage
-
-| Component                   | Type             | Description                                                                                 |
-| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
-| Vertex AI                   | GCP              | Multi-model AI service for different agent capabilities                                     |
-| GCS Bucket                  | GCP              | Storage for agent configurations, conversation history, and file uploads                    |
-| Cloud Logging               | GCP              | Monitors application performance and tracks agent interactions                              |
-| Cloud Run                   | GCP              | Hosts containerized services for web interfaces and APIs                                    |
-| ADK (Agent Development Kit) | Development Tool | Provides development tools and libraries for building and testing the agentic orchestration |
-
 ## Deployment Models
 
 This project is structured to support two primary deployment models, offering flexibility based on your operational needs, team structure, and scaling requirements. The choice of model can impact local development, testing, and production rollout.
