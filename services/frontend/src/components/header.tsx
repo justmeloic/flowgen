@@ -16,7 +16,6 @@
 
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut } from "lucide-react";
@@ -50,7 +49,6 @@ export function Header() {
 
         {showLogoutButton && (
           <div className="pr-4 mr-4 flex items-center gap-4">
-            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"

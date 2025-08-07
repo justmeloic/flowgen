@@ -43,7 +43,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <title>AgentChat</title>
-        <link rel="icon" href="/logo-light.png" type="image/png" />
+        <link rel="icon" href="/logo-dark.png" type="image/png" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider

@@ -16,11 +16,19 @@
 
 "use client";
 
-import { BookOpen, MessageSquare, RefreshCw } from "lucide-react";
+import {
+  BookOpen,
+  MessageSquare,
+  Moon,
+  RefreshCw,
+  Settings,
+  Sun,
+} from "lucide-react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,7 +49,15 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const [isStartingNew, setIsStartingNew] = useState(false);
+  const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { theme, setTheme } = useTheme();
+
+  // Avoid hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleMouseEnter = () => {
     hoverTimeoutRef.current = setTimeout(() => {
@@ -210,6 +226,73 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
             )}
           </Tooltip>
         </nav>
+
+        {/* Settings section */}
+        <div className="mt-auto mb-32">
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setIsSettingsExpanded(!isSettingsExpanded)}
+                className={cn(
+                  "flex items-center text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-700/50 w-full transition-colors",
+                  !isCollapsed || isHovered
+                    ? "gap-3 rounded-2xl px-3 py-2"
+                    : "justify-center rounded-md p-2"
+                )}
+              >
+                <Settings className="h-5 w-5" />
+                {!isCollapsed || isHovered ? (
+                  "Settings"
+                ) : (
+                  <span className="sr-only">Settings</span>
+                )}
+              </button>
+            </TooltipTrigger>
+            {isCollapsed && (
+              <TooltipContent
+                side="right"
+                className="flex items-center gap-4 max-w-xs rounded-2xl bg-secondary dark:bg-secondary-dark px-3 py-1.5 shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)]"
+              >
+                Access application settings and preferences.
+              </TooltipContent>
+            )}
+          </Tooltip>
+
+          {/* Theme selector - only show when settings expanded and sidebar not collapsed */}
+          {isSettingsExpanded && (!isCollapsed || isHovered) && mounted && (
+            <div className="mt-2 p-2 bg-white/30 dark:bg-gray-800/30 rounded-xl">
+              <div className="text-xs font-medium text-muted-foreground mb-2 px-2">
+                Theme
+              </div>
+              <div className="grid gap-1">
+                <button
+                  onClick={() => setTheme("light")}
+                  className={cn(
+                    "flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg transition-colors",
+                    theme === "light"
+                      ? "bg-[#d3e2fd] dark:bg-gray-700 text-primary dark:text-blue-400"
+                      : "hover:bg-white/50 dark:hover:bg-gray-700/50 text-muted-foreground"
+                  )}
+                >
+                  <Sun className="h-4 w-4" />
+                  Light
+                </button>
+                <button
+                  onClick={() => setTheme("dark")}
+                  className={cn(
+                    "flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg transition-colors",
+                    theme === "dark"
+                      ? "bg-[#d3e2fd] dark:bg-gray-700 text-primary dark:text-blue-400"
+                      : "hover:bg-white/50 dark:hover:bg-gray-700/50 text-muted-foreground"
+                  )}
+                >
+                  <Moon className="h-4 w-4" />
+                  Dark
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </TooltipProvider>
     </div>
   );

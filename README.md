@@ -1,6 +1,6 @@
 <div align="center">
   <img src="services/frontend/public/logo-banner.png">
-  <p>A Multi-Model AI Agent Chat Interface</p>
+  <p>A Multi-Model AI Agent Interface</p>
 
   <br>
 </div>
@@ -13,7 +13,7 @@
 
 **Owner / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
-A versatile chat interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools.
+An interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools.
 
 ## Services
 
