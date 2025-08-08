@@ -6,6 +6,12 @@
 
 Web interface for the AgentChat system. Built with Next.js for optimal performance and developer experience.
 
+## Interface
+
+![Interface Greeting](../../docs/interface.gif)
+
+![Query Interface](../../docs/query-interface.gif)
+
 ## Development Setup
 
 ### Prerequisites

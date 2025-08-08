@@ -5,6 +5,8 @@
   <br>
 </div>
 
+![Interface Greeting](docs/interface.gif)
+
 ---
 
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
@@ -76,12 +78,14 @@ This project is **optimized for Raspberry Pi 5 deployment** and supports flexibl
 During development, you can run the frontend and backend as separate services over the network for faster iteration and hot-reloading:
 
 **Frontend Development Server:**
+
 ```bash
 cd services/frontend/
 npm run dev  # Runs on http://localhost:3000
 ```
 
 **Backend API Server:**
+
 ```bash
 cd services/backend/
 uvicorn src.app.main:app --host 0.0.0.0 --port 8081  # Runs on http://localhost:8081
@@ -98,6 +102,7 @@ For production deployment, especially on Raspberry Pi 5, the system uses a **uni
 3. **Simplified Deployment**: Only one service to deploy, manage, and monitor
 
 **Production Build & Deploy:**
+
 ```bash
 # Build static frontend and deploy on Raspberry Pi
 make all
@@ -106,12 +111,14 @@ make all
 ### Why This Architecture?
 
 **For Raspberry Pi 5 Optimization:**
+
 - **Resource Efficiency**: Single service reduces memory and CPU overhead
 - **Simplified Networking**: No need to manage cross-service communication
 - **Easier Monitoring**: One process to monitor instead of two
 - **Port Management**: Only one port to expose and manage
 
 **Development vs Production:**
+
 - **Development**: Two services for faster iteration and debugging
 - **Production**: Single service for optimal performance and simplicity
 
@@ -257,7 +264,8 @@ source scripts/build.sh
 ```
 
 This script:
-1. 🎨 **Frontend Build**: Installs dependencies and runs `npm run build-static` 
+
+1. 🎨 **Frontend Build**: Installs dependencies and runs `npm run build-static`
 2. � **Static Copy**: Copies static files to `services/backend/build/static_frontend/`
 3. ✅ **Validation**: Ensures build completed successfully
 
@@ -283,6 +291,7 @@ source scripts/deploy.sh
 ```
 
 This script:
+
 1. � **Environment Setup**: Creates Python virtual environment and installs dependencies from `requirements-raspberry-pi.txt`
 2. 🧹 **Cleanup**: Clears Python cache and kills existing server processes
 3. 🛑 **Port Management**: Ensures port 8081 is available for the server
@@ -311,12 +320,14 @@ graph LR
 #### Why This Approach for Raspberry Pi?
 
 **Single Service Benefits**:
+
 - **Resource Efficiency**: Minimal memory and CPU usage on Pi hardware
 - **Simplified Management**: One process to monitor and manage
 - **Network Simplicity**: Only one port (8081) to expose
 - **Fast Startup**: Quick boot times suitable for Pi environments
 
 **Static Frontend Benefits**:
+
 - **Performance**: Pre-rendered content loads faster on Pi hardware
 - **Lower Resource Usage**: No Node.js runtime required on Pi
 - **Reliability**: Fewer moving parts reduce potential failure points
