@@ -8,9 +8,13 @@ Web interface for the AgentChat system. Built with Next.js for optimal performan
 
 ## Interface
 
-![Interface Greeting](../../docs/interface.gif)
+<div align="center">
+  <img src="../../docs/interface.gif" alt="Interface Greeting" style="border-radius: 10px; max-width: 100%;">
+</div>
 
-![Query Interface](../../docs/query-interface.gif)
+<div align="center">
+  <img src="../../docs/query-interface.gif" alt="Query Interface" style="border-radius: 10px; max-width: 100%;">
+</div>
 
 ## Development Setup
 

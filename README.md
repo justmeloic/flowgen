@@ -3,11 +3,8 @@
   <p>A Multi-Model AI Agent Interface</p>
 
   <br>
-</div>
 
-![Interface Greeting](docs/interface.gif)
-
----
+  <img src="docs/interface.gif" alt="Interface Greeting" style="border-radius: 10px; max-width: 100%;">
 
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
@@ -16,6 +13,7 @@
 
 **Owner / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
+</div>
 An interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools. **Optimized for deployment on Raspberry Pi 5** with a streamlined single-service architecture.
 
 ## Services
