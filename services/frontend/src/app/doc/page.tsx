@@ -82,7 +82,7 @@ export default function HomePage() {
         {/* Architecture Diagram */}
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
-            System Architecture
+            High-level Architecture
           </h2>
           <div className="flex justify-center mb-6">
             <Image
@@ -360,8 +360,9 @@ export default function HomePage() {
               Raspberry Pi 5 Optimized
             </h3>
             <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
-              This project is specifically optimized for deployment on Raspberry Pi 5, using a streamlined 
-              single-service architecture that maximizes performance and minimizes resource usage on Pi hardware.
+              This project is specifically optimized for deployment on Raspberry
+              Pi 5, using a streamlined single-service architecture that
+              maximizes performance and minimizes resource usage on Pi hardware.
             </p>
           </div>
 
@@ -371,8 +372,9 @@ export default function HomePage() {
                 Development Mode (Two Services)
               </h3>
               <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
-                During development, run frontend and backend as separate services 
-                over the network for faster iteration and hot-reloading.
+                During development, run frontend and backend as separate
+                services over the network for faster iteration and
+                hot-reloading.
               </p>
               <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono">
                 <div># Frontend (port 3000)</div>
@@ -389,8 +391,9 @@ export default function HomePage() {
                 Production Mode (Single Service)
               </h3>
               <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
-                For Raspberry Pi deployment, the FastAPI backend serves pre-rendered 
-                static frontend files, creating a unified, resource-efficient service.
+                For Raspberry Pi deployment, the FastAPI backend serves
+                pre-rendered static frontend files, creating a unified,
+                resource-efficient service.
               </p>
               <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono">
                 <div># Build and deploy on Pi</div>
@@ -410,21 +413,33 @@ export default function HomePage() {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">⚡</span>
-                  <span><strong>Resource Efficiency:</strong> Single process uses less RAM and CPU</span>
+                  <span>
+                    <strong>Resource Efficiency:</strong> Single process uses
+                    less RAM and CPU
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">🔧</span>
-                  <span><strong>Simplified Management:</strong> One service to monitor and restart</span>
+                  <span>
+                    <strong>Simplified Management:</strong> One service to
+                    monitor and restart
+                  </span>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">🌐</span>
-                  <span><strong>Network Simplicity:</strong> Only port 8081 to expose</span>
+                  <span>
+                    <strong>Network Simplicity:</strong> Only port 8081 to
+                    expose
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">🚀</span>
-                  <span><strong>Fast Startup:</strong> Quick boot times on Pi hardware</span>
+                  <span>
+                    <strong>Fast Startup:</strong> Quick boot times on Pi
+                    hardware
+                  </span>
                 </div>
               </div>
             </div>
@@ -671,21 +686,29 @@ export default function HomePage() {
               Raspberry Pi 5 Deployment Strategy
             </h3>
             <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
-              The system uses a streamlined deployment approach optimized for Raspberry Pi 5. The Next.js frontend 
-              is pre-rendered into static HTML, CSS, and JS files, then served by the FastAPI backend as a single 
-              unified service. This reduces resource usage and simplifies management on Pi hardware.
+              The system uses a streamlined deployment approach optimized for
+              Raspberry Pi 5. The Next.js frontend is pre-rendered into static
+              HTML, CSS, and JS files, then served by the FastAPI backend as a
+              single unified service. This reduces resource usage and simplifies
+              management on Pi hardware.
             </p>
             <div className="grid md:grid-cols-2 gap-4 mt-4">
               <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
-                <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">Development Benefits</h4>
+                <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">
+                  Development Benefits
+                </h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Two-service mode with hot reload for fast iteration during development
+                  Two-service mode with hot reload for fast iteration during
+                  development
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
-                <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">Production Benefits</h4>
+                <h4 className="font-semibold text-red-600 dark:text-red-400 mb-2">
+                  Production Benefits
+                </h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Single-service mode optimized for Pi's memory and processing constraints
+                  Single-service mode optimized for Pi's memory and processing
+                  constraints
                 </p>
               </div>
             </div>
@@ -700,7 +723,10 @@ export default function HomePage() {
               <div>source scripts/build.sh</div>
             </div>
             <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 mb-2">
-              <li>Builds Next.js frontend into static files optimized for Pi serving</li>
+              <li>
+                Builds Next.js frontend into static files optimized for Pi
+                serving
+              </li>
               <li>Copies static assets to backend directory structure</li>
               <li>Validates build completion and file integrity</li>
             </ul>
@@ -715,9 +741,15 @@ export default function HomePage() {
               <div>source scripts/deploy.sh</div>
             </div>
             <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 mb-2">
-              <li>Sets up Python virtual environment with Pi-optimized dependencies</li>
+              <li>
+                Sets up Python virtual environment with Pi-optimized
+                dependencies
+              </li>
               <li>Clears Python cache and manages port 8081 availability</li>
-              <li>Starts Uvicorn server in a detached screen session for persistence</li>
+              <li>
+                Starts Uvicorn server in a detached screen session for
+                persistence
+              </li>
               <li>Provides server management commands for Pi administration</li>
             </ul>
           </div>
@@ -728,7 +760,7 @@ export default function HomePage() {
             </h3>
             <div className="overflow-x-auto">
               <pre className="bg-gray-100 dark:bg-gray-800 dark:text-gray-300 p-3 rounded text-xs font-mono whitespace-pre">
-{`Development:                 Production (Pi):
+                {`Development:                 Production (Pi):
 [Next.js :3000]              [Static Files]
       ↓                           ↓
 [API Proxy]                  [FastAPI :8081]
@@ -748,30 +780,33 @@ Ports: 3000 + 8081          Ports: 8081 only`}
             </h3>
             <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
               <p className="text-xs text-gray-700 dark:text-gray-300 mb-3">
-                The deployment script uses <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">screen</code> sessions 
-                to run the server persistently on your Raspberry Pi:
+                The deployment script uses{" "}
+                <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">
+                  screen
+                </code>{" "}
+                sessions to run the server persistently on your Raspberry Pi:
               </p>
               <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 space-y-1">
                 <li>
-                  Connect to server: 
+                  Connect to server:
                   <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
                     screen -r backend
                   </code>
                 </li>
                 <li>
-                  Detach (keep running): 
+                  Detach (keep running):
                   <span className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
                     Ctrl+A, then D
                   </span>
                 </li>
                 <li>
-                  List sessions: 
+                  List sessions:
                   <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
                     screen -list
                   </code>
                 </li>
                 <li>
-                  Stop server: 
+                  Stop server:
                   <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
                     screen -S backend -X quit
                   </code>
@@ -786,7 +821,9 @@ Ports: 3000 + 8081          Ports: 8081 only`}
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl">
-                <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">Resource Usage</h4>
+                <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">
+                  Resource Usage
+                </h4>
                 <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                   <li>• RAM: 150-300MB (depending on model)</li>
                   <li>• CPU: Low idle, moderate during AI calls</li>
@@ -795,10 +832,16 @@ Ports: 3000 + 8081          Ports: 8081 only`}
                 </ul>
               </div>
               <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
-                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Access & Network</h4>
+                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                  Access & Network
+                </h4>
                 <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                  <li>• Local: <code>http://localhost:8081</code></li>
-                  <li>• Network: <code>http://[pi-ip]:8081</code></li>
+                  <li>
+                    • Local: <code>http://localhost:8081</code>
+                  </li>
+                  <li>
+                    • Network: <code>http://[pi-ip]:8081</code>
+                  </li>
                   <li>• Dependencies: Pi-optimized packages</li>
                   <li>• Startup: ~5-10 seconds on Pi 5</li>
                 </ul>
