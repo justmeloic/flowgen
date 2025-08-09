@@ -48,23 +48,23 @@ export default function HomePage() {
             </span>
           </div>
           <div className="flex justify-center space-x-2 mb-6">
-            <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-3 py-1 rounded-full">
+            <span className="inline-block bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 text-blue-700 dark:text-blue-300 text-xs px-3 py-1 rounded-full border border-blue-200 dark:border-blue-700">
               Python 3.13+
             </span>
-            <span className="inline-block bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-3 py-1 rounded-full">
+            <span className="inline-block bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/40 text-emerald-700 dark:text-emerald-300 text-xs px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-700">
               Next.js 14.0.0+
             </span>
-            <span className="inline-block bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-3 py-1 rounded-full">
+            <span className="inline-block bg-gradient-to-r from-violet-50 to-violet-100 dark:from-violet-900/40 dark:to-violet-800/40 text-violet-700 dark:text-violet-300 text-xs px-3 py-1 rounded-full border border-violet-200 dark:border-violet-700">
               Google ADK 0.2.0+
             </span>
-            <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-3 py-1 rounded-full">
+            <span className="inline-block bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/40 dark:to-indigo-800/40 text-indigo-700 dark:text-indigo-300 text-xs px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-700">
               FastAPI
             </span>
           </div>
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-            A versatile chat interface that allows users to interact with
-            different AI agents powered by various models and equipped with
-            specialized tools. Optimized for Raspberry Pi 5 🍓.
+            An interface that allows users to interact with different AI agents
+            powered by various models and equipped with specialized tools.
+            Optimized for Raspberry Pi 5 🍓.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             <strong>Author / Maintainer:</strong>{" "}
@@ -87,7 +87,7 @@ export default function HomePage() {
           <div className="flex justify-center mb-6">
             <Image
               src="/architecture-diagram.png"
-              alt="AgentChat Architecture"
+              alt="Agent Architecture"
               width={1000}
               height={600}
               className="rounded-2xl shadow-lg dark:shadow-gray-800"
@@ -108,39 +108,39 @@ export default function HomePage() {
             context.
           </p>
 
-          <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-2xl mb-6">
-            <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
+          <div className="bg-gradient-to-br from-blue-50/50 via-indigo-50/30 to-purple-50/50 dark:from-slate-800/50 dark:via-slate-800/30 dark:to-slate-700/50 p-6 rounded-2xl mb-6 border border-blue-100 dark:border-slate-600 backdrop-blur-sm">
+            <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100">
               How It Works
             </h3>
-            <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
               Our architecture leverages Google ADK's session management to
               provide true conversation continuity across different models:
             </p>
 
             <div className="grid md:grid-cols-3 gap-4 text-xs">
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
-                <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">
+              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
+                <h4 className="font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
                   🏭 Agent Factory Pattern
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-slate-600 dark:text-slate-300">
                   Creates and caches model-specific agents with LRU caching for
                   optimal performance.
                 </p>
               </div>
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm">
                 <h4 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">
                   🏃‍♂️ Runner Management
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-slate-600 dark:text-slate-300">
                   Model-specific runners that share the same session service for
                   memory continuity.
                 </p>
               </div>
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
-                <h4 className="font-semibold text-purple-600 dark:text-purple-400 mb-2">
+              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-violet-100 dark:border-violet-900/50 shadow-sm">
+                <h4 className="font-semibold text-violet-600 dark:text-violet-400 mb-2">
                   🧠 Shared Session Service
                 </h4>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-slate-600 dark:text-slate-300">
                   Single session ID across all models with automatic history
                   loading.
                 </p>
@@ -148,22 +148,22 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 dark:bg-secondary-dark p-6 rounded-2xl">
-            <h3 className="text-base font-semibold mb-3 dark:text-gray-100">
+          <div className="bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 dark:from-slate-800 dark:via-slate-800 dark:to-slate-700 p-6 rounded-2xl border border-slate-200 dark:border-slate-600">
+            <h3 className="text-base font-semibold mb-3 text-slate-800 dark:text-slate-100">
               Key Benefits
             </h3>
             <div className="grid md:grid-cols-2 gap-4 text-xs">
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">✅</span>
-                  <span className="dark:text-gray-300">
+                  <span className="text-emerald-500">✅</span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     <strong>True Conversation Continuity:</strong> Switch models
                     without losing context
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">✅</span>
-                  <span className="dark:text-gray-300">
+                  <span className="text-emerald-500">✅</span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     <strong>Performance Optimization:</strong> Cached runners
                     and agents for fast switching
                   </span>
@@ -171,15 +171,15 @@ export default function HomePage() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">✅</span>
-                  <span className="dark:text-gray-300">
+                  <span className="text-emerald-500">✅</span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     <strong>Model-Specific Capabilities:</strong> Each model
                     maintains its unique characteristics
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">✅</span>
-                  <span className="dark:text-gray-300">
+                  <span className="text-emerald-500">✅</span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     <strong>Unified Memory:</strong> Shared session service
                     ensures consistent experience
                   </span>
@@ -195,91 +195,91 @@ export default function HomePage() {
             Services
           </h2>
           <p className="text-xs text-gray-700 dark:text-gray-300 mb-6">
-            AgentChat is built with a modular architecture consisting of two
-            main services that can be deployed independently or as a unified
+            Agent Interface is built with a modular architecture consisting of
+            two main services that can be deployed independently or as a unified
             application.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-2xl border border-green-200 dark:border-green-700">
-              <h3 className="text-lg font-semibold mb-3 dark:text-gray-100 flex items-center">
+            <div className="bg-gradient-to-br from-emerald-50/70 via-teal-50/50 to-cyan-50/70 dark:from-emerald-900/20 dark:via-teal-900/15 dark:to-cyan-900/20 p-6 rounded-2xl border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
                 <span className="mr-2">🎨</span>
                 Frontend Client
               </h3>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                 A Next.js web application that provides the user interface for
                 interacting with AI agents across different models and
                 capabilities.
               </p>
               <div className="space-y-2 text-xs">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Modern React-based interface with TypeScript
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Responsive design with dark/light mode
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Real-time chat interface with model selector
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Session management and conversation history
                   </span>
                 </div>
               </div>
-              <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-lg">
-                <code className="text-xs text-gray-700 dark:text-gray-300">
+              <div className="mt-4 p-3 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-emerald-100 dark:border-emerald-900/30">
+                <code className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
                   Tech Stack: Next.js 14+
                 </code>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-6 rounded-2xl border border-purple-200 dark:border-purple-700">
-              <h3 className="text-lg font-semibold mb-3 dark:text-gray-100 flex items-center">
+            <div className="bg-gradient-to-br from-violet-50/70 via-purple-50/50 to-fuchsia-50/70 dark:from-violet-900/20 dark:via-purple-900/15 dark:to-fuchsia-900/20 p-6 rounded-2xl border border-violet-200/50 dark:border-violet-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
                 <span className="mr-2">🤖</span>
                 Agent Orchestration API
               </h3>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                 The backend service that coordinates AI agents using Google ADK
                 for sophisticated multi-model conversations and tool
                 integration.
               </p>
               <div className="space-y-2 text-xs">
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Multi-model AI interactions (Gemini 2.5 Flash/Pro)
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Agent selection and intelligent routing
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Tool integration and execution (Google Search)
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  <span className="dark:text-gray-300">
+                  <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
                     Response generation and formatting
                   </span>
                 </div>
               </div>
-              <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-lg">
-                <code className="text-xs text-gray-700 dark:text-gray-300">
+              <div className="mt-4 p-3 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-violet-100 dark:border-violet-900/30">
+                <code className="text-xs text-violet-700 dark:text-violet-300 font-medium">
                   Tech Stack: FastAPI, Google ADK
                 </code>
               </div>
@@ -354,12 +354,12 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
             Deployment Architecture
           </h2>
-          <div className="bg-red-50 dark:bg-red-900/30 p-6 rounded-2xl mb-6 border border-red-200 dark:border-red-700">
-            <h3 className="text-lg font-semibold mb-3 dark:text-gray-100 flex items-center">
+          <div className="bg-gradient-to-br from-rose-50/60 via-red-50/40 to-orange-50/60 dark:from-rose-900/25 dark:via-red-900/20 dark:to-orange-900/25 p-6 rounded-2xl mb-6 border border-rose-200/50 dark:border-rose-700/50 shadow-sm backdrop-blur-sm">
+            <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
               <span className="mr-2">🍓</span>
               Raspberry Pi 5 Optimized
             </h3>
-            <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
               This project is specifically optimized for deployment on Raspberry
               Pi 5, using a streamlined single-service architecture that
               maximizes performance and minimizes resource usage on Pi hardware.
@@ -367,16 +367,16 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-2xl">
-              <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
+            <div className="bg-gradient-to-br from-blue-50/60 via-sky-50/40 to-cyan-50/60 dark:from-blue-900/25 dark:via-sky-900/20 dark:to-cyan-900/25 p-6 rounded-2xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100">
                 Development Mode (Two Services)
               </h3>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                 During development, run frontend and backend as separate
                 services over the network for faster iteration and
                 hot-reloading.
               </p>
-              <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono">
+              <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono border border-slate-700">
                 <div># Frontend (port 3000)</div>
                 <div>cd services/frontend/</div>
                 <div>npm run dev</div>
@@ -386,16 +386,16 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-green-50 dark:bg-green-900/30 p-6 rounded-2xl">
-              <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
+            <div className="bg-gradient-to-br from-emerald-50/60 via-green-50/40 to-teal-50/60 dark:from-emerald-900/25 dark:via-green-900/20 dark:to-teal-900/25 p-6 rounded-2xl border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100">
                 Production Mode (Single Service)
               </h3>
-              <p className="text-xs text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                 For Raspberry Pi deployment, the FastAPI backend serves
                 pre-rendered static frontend files, creating a unified,
                 resource-efficient service.
               </p>
-              <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono">
+              <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono border border-slate-700">
                 <div># Build and deploy on Pi</div>
                 <div>source scripts/build.sh</div>
                 <div>source scripts/deploy.sh</div>
@@ -405,21 +405,21 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4">
-            <h4 className="text-base font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+          <div className="mt-6 bg-gradient-to-r from-amber-50/70 via-yellow-50/50 to-orange-50/70 dark:from-amber-900/30 dark:via-yellow-900/25 dark:to-orange-900/30 border-l-4 border-amber-400 dark:border-amber-500 p-4 rounded-r-xl shadow-sm">
+            <h4 className="text-base font-semibold text-amber-800 dark:text-amber-200 mb-2">
               🏗️ Why This Architecture for Raspberry Pi?
             </h4>
-            <div className="grid md:grid-cols-2 gap-4 text-xs text-yellow-700 dark:text-yellow-200">
+            <div className="grid md:grid-cols-2 gap-4 text-xs text-amber-700 dark:text-amber-200">
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">⚡</span>
+                  <span className="text-emerald-500">⚡</span>
                   <span>
                     <strong>Resource Efficiency:</strong> Single process uses
                     less RAM and CPU
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">🔧</span>
+                  <span className="text-emerald-500">🔧</span>
                   <span>
                     <strong>Simplified Management:</strong> One service to
                     monitor and restart
@@ -428,14 +428,14 @@ export default function HomePage() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">🌐</span>
+                  <span className="text-emerald-500">🌐</span>
                   <span>
                     <strong>Network Simplicity:</strong> Only port 8081 to
                     expose
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-green-500">🚀</span>
+                  <span className="text-emerald-500">🚀</span>
                   <span>
                     <strong>Fast Startup:</strong> Quick boot times on Pi
                     hardware
@@ -451,10 +451,10 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
             Authentication
           </h2>
-          <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4 mb-4">
+          <div className="bg-gradient-to-r from-amber-50/70 via-yellow-50/50 to-orange-50/70 dark:from-amber-900/30 dark:via-yellow-900/25 dark:to-orange-900/30 border-l-4 border-amber-400 dark:border-amber-500 p-4 mb-4 rounded-r-xl shadow-sm">
             <div className="flex">
               <div className="ml-3">
-                <p className="text-xs text-yellow-700 dark:text-yellow-200">
+                <p className="text-sm text-amber-700 dark:text-amber-200 font-medium">
                   <strong>
                     ⚠️ This is a simple authentication system suitable for a
                     proof-of-concept and should not be used in production!
@@ -505,7 +505,7 @@ export default function HomePage() {
               <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
                 The secret is configured in the backend's `.env` file:
               </p>
-              <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto">
+              <pre className="bg-slate-800 dark:bg-slate-900 text-emerald-300 p-4 rounded-xl font-mono text-sm border border-slate-600 shadow-sm">
                 <div>AUTH_SECRET=your-super-secret-key</div>
               </pre>
             </div>
@@ -610,22 +610,22 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4">
+          <div className="bg-gradient-to-r from-amber-50/70 via-yellow-50/50 to-orange-50/70 dark:from-amber-900/30 dark:via-yellow-900/25 dark:to-orange-900/30 border-l-4 border-amber-400 dark:border-amber-500 p-4 rounded-r-xl shadow-sm">
             <div className="flex items-start">
               <div className="ml-3">
-                <h4 className="text-base font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                  🔬 Advanced Engineering Pattern
+                <h4 className="text-base font-semibold text-amber-800 dark:text-amber-200 mb-2">
+                  🔬 Shared Memory Pattern
                 </h4>
-                <p className="text-xs text-yellow-700 dark:text-yellow-200 mb-2">
-                  The session architecture enables a sophisticated pattern where
-                  each AI model gets its own isolated runner, but they all share
-                  the same conversation memory through the ADK session service.
-                  This means when you switch from Gemini 2.5 Flash to Gemini 2.5
-                  Pro mid-conversation, the Pro model automatically receives the
+                <p className="text-sm text-amber-700 dark:text-amber-200 mb-2">
+                  The session architecture enables a pattern where each AI model
+                  gets its own isolated runner, but they all share the same
+                  conversation memory through the ADK session service. This
+                  means when you switch from Gemini 2.5 Flash to Gemini 2.5 Pro
+                  mid-conversation, the Pro model automatically receives the
                   complete conversation history and remembers everything from
                   the Flash model's interactions.
                 </p>
-                <code className="text-xs bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+                <code className="text-xs bg-amber-100 dark:bg-amber-800 text-amber-800 dark:text-amber-200 px-2 py-1 rounded font-mono">
                   session_service=request.app.state.session_service # 🔑 THE
                   MAGIC
                 </code>
@@ -637,13 +637,13 @@ export default function HomePage() {
         {/* Try the Agent */}
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
-            Try AgentChat
+            Try Agent Interface
           </h2>
           <Button
             asChild
-            className="bg-primary text-white px-8 py-3 rounded-full hover:bg-primary/70 transition-colors text-base"
+            className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white px-8 py-3 rounded-full transition-all duration-200 text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
-            <Link href="/">Start Chat with AgentChat</Link>
+            <Link href="/">Start</Link>
           </Button>
         </div>
 
@@ -652,7 +652,7 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
             Repository Structure
           </h2>
-          <div className="bg-gray-800 text-green-400 p-4 rounded-2xl font-mono text-xs">
+          <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs border border-slate-600 shadow-sm">
             <div>.</div>
             <div>├── docs</div>
             <div>├── scripts</div>
@@ -718,7 +718,7 @@ export default function HomePage() {
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
               Automated Build for Pi
             </h3>
-            <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono mb-2">
+            <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono mb-2 border border-slate-600 shadow-sm">
               <div># From project root</div>
               <div>source scripts/build.sh</div>
             </div>
@@ -736,7 +736,7 @@ export default function HomePage() {
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
               Automated Deployment on Raspberry Pi
             </h3>
-            <div className="bg-gray-800 text-green-400 p-3 rounded-2xl text-xs font-mono mb-2">
+            <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono mb-2 border border-slate-600 shadow-sm">
               <div># On the Raspberry Pi</div>
               <div>source scripts/deploy.sh</div>
             </div>
@@ -759,7 +759,7 @@ export default function HomePage() {
               Pi-Optimized Architecture
             </h3>
             <div className="overflow-x-auto">
-              <pre className="bg-gray-100 dark:bg-gray-800 dark:text-gray-300 p-3 rounded text-xs font-mono whitespace-pre">
+              <pre className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 p-4 rounded-xl text-xs font-mono whitespace-pre border border-slate-200 dark:border-slate-600 shadow-sm">
                 {`Development:                 Production (Pi):
 [Next.js :3000]              [Static Files]
       ↓                           ↓
@@ -778,36 +778,36 @@ Ports: 3000 + 8081          Ports: 8081 only`}
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
               Raspberry Pi Server Management
             </h3>
-            <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
-              <p className="text-xs text-gray-700 dark:text-gray-300 mb-3">
+            <div className="bg-gradient-to-br from-blue-50/60 via-sky-50/40 to-cyan-50/60 dark:from-blue-900/25 dark:via-sky-900/20 dark:to-cyan-900/25 p-4 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
                 The deployment script uses{" "}
-                <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">
+                <code className="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-mono">
                   screen
                 </code>{" "}
                 sessions to run the server persistently on your Raspberry Pi:
               </p>
-              <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 space-y-1">
+              <ul className="text-sm text-slate-600 dark:text-slate-300 list-disc pl-5 space-y-1">
                 <li>
                   Connect to server:
-                  <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                  <code className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
                     screen -r backend
                   </code>
                 </li>
                 <li>
                   Detach (keep running):
-                  <span className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                  <span className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
                     Ctrl+A, then D
                   </span>
                 </li>
                 <li>
                   List sessions:
-                  <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                  <code className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
                     screen -list
                   </code>
                 </li>
                 <li>
                   Stop server:
-                  <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-1 ml-1 rounded">
+                  <code className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
                     screen -S backend -X quit
                   </code>
                 </li>
@@ -820,27 +820,29 @@ Ports: 3000 + 8081          Ports: 8081 only`}
               Pi Performance Characteristics
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl">
-                <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">
+              <div className="bg-gradient-to-br from-emerald-50/60 via-green-50/40 to-teal-50/60 dark:from-emerald-900/25 dark:via-green-900/20 dark:to-teal-900/25 p-4 rounded-xl border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm">
+                <h4 className="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">
                   Resource Usage
                 </h4>
-                <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
                   <li>• RAM: 150-300MB (depending on model)</li>
                   <li>• CPU: Low idle, moderate during AI calls</li>
                   <li>• Storage: ~500MB total footprint</li>
                   <li>• Port: 8081 (configurable)</li>
                 </ul>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-2xl">
+              <div className="bg-gradient-to-br from-blue-50/60 via-sky-50/40 to-cyan-50/60 dark:from-blue-900/25 dark:via-sky-900/20 dark:to-cyan-900/25 p-4 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
                 <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">
                   Access & Network
                 </h4>
-                <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
                   <li>
-                    • Local: <code>http://localhost:8081</code>
+                    • Local:{" "}
+                    <code className="font-mono">http://localhost:8081</code>
                   </li>
                   <li>
-                    • Network: <code>http://[pi-ip]:8081</code>
+                    • Network:{" "}
+                    <code className="font-mono">http://[pi-ip]:8081</code>
                   </li>
                   <li>• Dependencies: Pi-optimized packages</li>
                   <li>• Startup: ~5-10 seconds on Pi 5</li>
