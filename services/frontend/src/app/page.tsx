@@ -417,7 +417,7 @@ export default function ChatPage() {
   }, [isLoading]);
 
   const handleSend = useCallback(
-    async (userMessage: string, _botMessage: string) => {
+    async (userMessage: string, files?: File[]) => {
       // Prevent sending if already loading
       if (isLoading) {
         return;
@@ -445,7 +445,7 @@ export default function ChatPage() {
       setTimeout(scrollToBottom, 0);
 
       try {
-        const response = await sendMessage(userMessage, {
+        const response = await sendMessage(userMessage, files, {
           signal: abortControllerRef.current.signal,
           model: selectedModel,
         });

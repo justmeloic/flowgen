@@ -28,7 +28,7 @@ interface UploadedFile {
 }
 
 interface ChatInputProps extends React.HTMLAttributes<HTMLFormElement> {
-  onSend: (userMessage: string, audioUrl: string) => void;
+  onSend: (userMessage: string, files?: File[]) => void;
   isLoading?: boolean;
   disabled?: boolean;
 }
@@ -61,17 +61,19 @@ export function ChatInput({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (message.trim() && !isLoading) {
-      const userMessage = message;
+    if ((message.trim() || uploadedFiles.length > 0) && !isLoading) {
+      const userMessage = message.trim() || ""; // Allow empty message if files are present
+      const files = uploadedFiles.map((uf) => uf.file);
       setMessage("");
-      onSend(userMessage, "");
+      setUploadedFiles([]); // Clear files after sending
+      onSend(userMessage, files.length > 0 ? files : undefined);
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      if (message.trim() && !isLoading) {
+      if ((message.trim() || uploadedFiles.length > 0) && !isLoading) {
         handleSubmit(event as any);
       }
     }
@@ -228,7 +230,7 @@ export function ChatInput({
                 {isRecording ? "Stop recording" : "Start recording"}
               </span>
             </button>
-            {message.trim() && !isLoading ? (
+            {(message.trim() || uploadedFiles.length > 0) && !isLoading ? (
               <button
                 type="submit"
                 className={cn(

@@ -196,6 +196,60 @@ The session management flow works as follows:
 
 This stateful approach ensures conversation continuity and context preservation across multiple interactions.
 
+## File Upload Feature
+
+The Agent Interface supports file uploads that are seamlessly integrated with AI agent conversations. Files are processed immediately and their content is made available to agents as context.
+
+### Supported File Types
+
+- **Images**: PNG, JPEG, GIF, WebP
+- **Documents**: PDF, Plain text, Markdown
+- **Data**: JSON, CSV
+- **Code**: HTML, CSS, JavaScript, Python
+
+### How It Works
+
+1. **Unified Endpoint**: Files and messages are sent together to `/api/v1/root_agent/`
+2. **Immediate Processing**: Files are validated, stored as artifacts, and processed upon upload
+3. **Rich Context**: File content is extracted and embedded in the agent's prompt
+4. **Memory Storage**: Uses ADK's `InMemoryArtifactService` for efficient temporary storage
+
+### Usage
+
+1. Click the attachment button (📎) in the chat input
+2. Select files (up to 10MB each, 5 files max)
+3. Type your message and send
+4. The agent receives both your message and file content as context
+
+### Example Enhanced Prompt
+
+When you upload a CSV file with the message "Can you analyze this data?", the agent receives:
+
+```
+User: "Can you analyze this data?"
+
+[Files uploaded with this message:]
+File: sales_data.csv
+CSV file analysis:
+- Columns: 5 (date, product, sales, region, revenue)
+- Rows: 150 data rows
+Sample data: ['2023-01-01', 'Widget A', '45', 'North', '1350.00']
+```
+
+### Technical Implementation
+
+- **Backend**: File validation, artifact storage, content processing
+- **Frontend**: File attachment component with drag & drop (planned)
+- **Storage**: In-memory artifacts (temporary, cleared on restart)
+- **Processing**: Type-specific processors for optimal content extraction
+
+### Security
+
+- MIME type validation with magic byte verification
+- File size limits (10MB default)
+- Basic malicious content detection
+- Sandboxed file processing
+
 ## Authentication
 
 This application uses a simple header-based authentication system. It provides basic access control using a secret code that is validated on the server.
