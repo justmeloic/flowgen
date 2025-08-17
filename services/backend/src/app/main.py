@@ -37,6 +37,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from google.adk.artifacts import InMemoryArtifactService
 from google.adk.sessions import InMemorySessionService
 from loguru import logger as _logger
 
@@ -88,6 +89,11 @@ async def lifespan(app: FastAPI):
     _logger.info('Starting Agent Orchestration API...')
     configure_gcp_environment()
     app.state.session_service = InMemorySessionService()
+
+    # Initialize artifact service with ADK's InMemoryArtifactService
+    app.state.artifact_service = InMemoryArtifactService()
+    _logger.info('Initialized InMemoryArtifactService for artifacts')
+
     yield
     _logger.info('Shutting down Agent Orchestration API...')
 

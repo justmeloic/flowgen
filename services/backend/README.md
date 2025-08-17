@@ -196,3 +196,45 @@ uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The server will be available at `http://localhost:8000`. The `--reload` flag enables auto-reloading when code changes are detected during development.
+
+### Testing
+
+The project includes comprehensive tests for file upload functionality and core components. All tests are located in the `tests/` directory.
+
+#### Running Tests
+
+Run all tests using pytest:
+
+```bash
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_implementation.py
+
+# Run tests with coverage report
+pytest --cov=src --cov-report=term-missing
+```
+
+#### Test Structure
+
+- `tests/test_implementation.py` - Integration tests for file processors and validators
+- Test configuration is managed in `pyproject.toml`
+- Coverage target is set to 65% (configurable in pyproject.toml)
+
+#### Test Coverage
+
+The tests cover:
+
+- ✅ File processors (text, JSON, images, PDFs, code)
+- ✅ File validators (MIME type detection, size limits, security)
+- ✅ Component integration and error handling
+
+For development, you can also run the implementation test directly:
+
+```bash
+python tests/test_implementation.py
+```

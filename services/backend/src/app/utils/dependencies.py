@@ -176,6 +176,7 @@ def get_runner(
                 agent=agent,
                 app_name=config.app_name,
                 session_service=request.app.state.session_service,
+                artifact_service=request.app.state.artifact_service,
             )
             setattr(request.app.state, runner_key, runner)
             _logger.info(f'Created new Runner for model: {model_name}')
