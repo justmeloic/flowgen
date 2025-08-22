@@ -22,13 +22,14 @@ from google.adk.tools import google_search
 from loguru import logger as _logger
 
 try:
-    from ..app.core.config import settings
+    from src.lib.config import settings
+
     from .system_instructions import get_general_assistant_instructions
 except ImportError:
     # Handle direct script execution (for quick testing)
     from system_instructions import get_general_assistant_instructions
 
-    from src.app.core.config import settings
+    from src.lib.config import settings
 
 
 class AgentFactory:
