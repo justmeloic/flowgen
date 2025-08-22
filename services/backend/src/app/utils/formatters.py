@@ -23,8 +23,8 @@ from typing import Any
 
 from fastapi import Request
 
-from src.app.core.config import settings
 from src.app.utils.signed_url import generate_download_signed_url
+from src.lib.config import settings
 
 _logger = logging.getLogger(__name__)
 

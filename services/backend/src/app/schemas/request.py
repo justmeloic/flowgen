@@ -51,7 +51,7 @@ class Query(BaseModel):
         """Validates that the model is supported if provided."""
         if v is not None:
             # Import here to avoid circular imports
-            from src.app.core.config import settings
+            from src.lib.config import settings
 
             if v not in settings.AVAILABLE_MODELS:
                 available = list(settings.AVAILABLE_MODELS.keys())

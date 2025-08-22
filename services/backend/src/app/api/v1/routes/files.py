@@ -20,7 +20,7 @@ from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import FileResponse
 from loguru import logger as _logger
 
-from src.app.core.config import settings
+from src.lib.config import settings
 
 router = APIRouter()
 

@@ -24,9 +24,9 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from google.adk.sessions import Session
 from loguru import logger as _logger
 
-from src.app.core.config import settings
 from src.app.models.login import LoginRequest, LoginResponse, LogoutResponse
 from src.app.utils.dependencies import get_or_create_session
+from src.lib.config import settings
 
 router = APIRouter()
 

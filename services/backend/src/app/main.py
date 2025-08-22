@@ -42,10 +42,10 @@ from google.adk.sessions import InMemorySessionService
 from loguru import logger as _logger
 
 from src.app.api.v1.endpoints import main_v1_router
-from src.app.core.config import settings
-from src.app.core.logging import setup_logging
 from src.app.middleware.session_middleware import SessionMiddleware
 from src.app.staticfrontend.router import register_frontend_routes
+from src.lib.config import settings
+from src.lib.logging import setup_logging
 
 
 def configure_gcp_environment() -> None:

@@ -23,7 +23,7 @@ import subprocess
 from fastapi import APIRouter, HTTPException
 from loguru import logger as _logger
 
-from src.app.core.config import settings
+from src.lib.config import settings
 
 router = APIRouter()
 

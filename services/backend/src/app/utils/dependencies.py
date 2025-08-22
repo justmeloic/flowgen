@@ -27,8 +27,8 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService, Session
 
 from src.agents.agent_factory import agent_factory
-from src.app.core.config import settings
 from src.app.models import AgentConfig
+from src.lib.config import settings
 
 _logger = logging.getLogger(__name__)
 
