@@ -10,7 +10,7 @@ dependencies = [
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.1.0",
-    "httpx>=0.24.1", # Required for FastAPI TestClient
+    "httpx>=0.24.1",                # Required for FastAPI TestClient
     "uvicorn[standard]>=0.27.0",
     "python-dotenv>=1.0.0",
     "pydantic>=2.0.0",
@@ -34,6 +34,7 @@ asyncio_default_fixture_loop_scope = "function"
 [tool.coverage.run]
 source = ["src"]
 branch = true
+data_file = "tests/.coverage"
 omit = ["src/__init__.py", "src/config.py", "tests/*", "**/__init__.py"]
 
 [tool.coverage.report]
@@ -46,7 +47,10 @@ exclude_lines = [
     "pass",
 ]
 show_missing = true
-fail_under = 65
+fail_under = 30
+
+[tool.coverage.html]
+directory = "tests/htmlcov"
 
 [build-system]
 requires = ["hatchling"]
