@@ -1,6 +1,6 @@
 #Backend Makefile
 
-.PHONY: dev install clean help
+.PHONY: dev install clean test help
 
 # Default target
 dev:
@@ -11,6 +11,18 @@ install:
 	@echo "Installing dependencies..."
 	uv sync
 
+test:
+	@echo "Running tests..."
+	source .venv/bin/activate && python -m pytest
+
+test-verbose:
+	@echo "Running tests with verbose output..."
+	source .venv/bin/activate && python -m pytest -v
+
+test-coverage:
+	@echo "Running tests with coverage report..."
+	source .venv/bin/activate && python -m pytest --cov=src --cov-report=term-missing
+
 clean:
 	@echo "Cleaning up..."
 	find . -type f -name "*.pyc" -delete
@@ -18,7 +30,10 @@ clean:
 
 help:
 	@echo "Available commands:"
-	@echo "  make dev     - Start development server"
-	@echo "  make install - Install dependencies"
-	@echo "  make clean   - Clean Python cache files"
-	@echo "  make help    - Show this help message"
+	@echo "  make dev          - Start development server"
+	@echo "  make install      - Install dependencies"
+	@echo "  make test         - Run tests"
+	@echo "  make test-verbose - Run tests with verbose output"
+	@echo "  make test-coverage- Run tests with coverage report"
+	@echo "  make clean        - Clean Python cache files"
+	@echo "  make help         - Show this help message"
