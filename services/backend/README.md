@@ -192,10 +192,10 @@ If you prefer to use the Google AI Studio API directly, set `GOOGLE_GENAI_USE_VE
 Start the development server:
 
 ```bash
-uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
+make dev
 ```
 
-The server will be available at `http://localhost:8000`. The `--reload` flag enables auto-reloading when code changes are detected during development.
+The server will be available at `http://localhost:8000`. The development mode enables auto-reloading when code changes are detected during development.
 
 ### Testing
 

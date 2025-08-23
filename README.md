@@ -79,14 +79,14 @@ During development, you can run the frontend and backend as separate services ov
 
 ```bash
 cd services/frontend/
-npm run dev  # Runs on http://localhost:3000
+make dev  # Runs on http://localhost:3000
 ```
 
 **Backend API Server:**
 
 ```bash
 cd services/backend/
-uvicorn src.app.main:app --host 0.0.0.0 --port 8081  # Runs on http://localhost:8081
+make dev  # Runs on http://localhost:8081
 ```
 
 The frontend development server will proxy API calls to the backend service, allowing you to develop with full hot-reload capabilities.
@@ -103,7 +103,7 @@ For production deployment, especially on Raspberry Pi 5, the system uses a **uni
 
 ```bash
 # Build static frontend and deploy on Raspberry Pi
-make all
+make build
 ```
 
 ### Why This Architecture?
@@ -312,7 +312,7 @@ Use the build script to prepare the frontend for deployment:
 
 ```bash
 # From project root
-source scripts/build.sh
+make build
 ```
 
 This script:
@@ -327,8 +327,7 @@ Build the frontend manually if needed:
 
 ```bash
 cd services/frontend
-npm install                    # Install dependencies if needed
-npm run build-static          # Build and copy to backend
+make build          # Build and copy to backend
 ```
 
 ### Deployment Process

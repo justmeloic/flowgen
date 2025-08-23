@@ -27,13 +27,7 @@ Web interface for the AgentChat system. Built with Next.js for optimal performan
 ### Installation
 
 ```bash
-npm install
-```
-
-### or
-
-```bash
-yarn install
+make install
 ```
 
 ### Configuration
@@ -51,13 +45,7 @@ cp src/.env.local.example src/.env.local
 ### Running Development Server
 
 ```bash
-npm run dev
-```
-
-### or
-
-```bash
-yarn dev
+make dev
 ```
 
 The application will be available at `http://localhost:3000`
@@ -65,10 +53,10 @@ The application will be available at `http://localhost:3000`
 ## Local Static Build for Testing
 
 ```bash
-npm run build-local# This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend backend/build/static_frontend
+make build # This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend backend/build/static_frontend
 
 cd ../backend/src/
-uv run app.py # Services backend with backend/build/static_frontend mounted
+make dev # Services backend with backend/build/static_frontend mounted
 ```
 
 ## Project Structure

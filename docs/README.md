@@ -37,7 +37,7 @@ AgentChat is a versatile chat interface that allows users to interact with diffe
 ✅ **True Conversation Continuity**: Maintain full history across different models  
 ✅ **Performance Optimized**: Cached agents and runners for fast switching  
 ✅ **Modern UI**: Beautiful, responsive interface built with Next.js and Tailwind  
-✅ **Enterprise Architecture**: Production-ready patterns and scalable design  
+✅ **Enterprise Architecture**: Production-ready patterns and scalable design
 
 ## Architecture
 
@@ -146,6 +146,7 @@ graph TB
 ### Key Architecture Components
 
 1. **Agent Factory Pattern**
+
    ```python
    @lru_cache(maxsize=10)
    def get_agent(self, model_name: str) -> Agent:
@@ -153,6 +154,7 @@ graph TB
    ```
 
 2. **Runner Management**
+
    ```python
    runner_key = f'runner_{model_name.replace("-", "_").replace(".", "_")}'
    if not hasattr(request.app.state, runner_key):
@@ -173,19 +175,21 @@ graph TB
 ✅ **True Conversation Continuity**: Switch models without losing context  
 ✅ **Performance Optimization**: Cached runners and agents for fast switching  
 ✅ **Model-Specific Capabilities**: Each model maintains its unique characteristics  
-✅ **Unified Memory**: Shared session service ensures consistent experience  
+✅ **Unified Memory**: Shared session service ensures consistent experience
 
 ## Services
 
 The system is composed of two main services:
 
 ### Frontend Client (Next.js)
+
 - **Location**: `services/frontend/`
 - **Technology**: Next.js 14, React 18, TypeScript
 - **Purpose**: Web interface for AI agent interactions
 - **Features**: Model selector, chat interface, real-time responses
 
 ### Backend Orchestration (FastAPI)
+
 - **Location**: `services/backend/`
 - **Technology**: Python 3.13+, FastAPI, Google ADK
 - **Purpose**: AI agent coordination and management
@@ -206,33 +210,36 @@ The system is composed of two main services:
 ### Quick Start
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd agentchat
    ```
 
 2. **Backend Setup**
+
    ```bash
    cd services/backend
    uv venv
    uv sync
    cp .env.example .env
    # Configure your .env file
-   uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8000
+   make dev
    ```
 
 3. **Frontend Setup**
    ```bash
    cd services/frontend
-   npm install
+   make install
    cp src/.env.local.example src/.env.local
    # Configure your .env.local file
-   npm run dev
+   make dev
    ```
 
 ### Configuration Files
 
 #### Backend Environment (`.env`)
+
 ```bash
 # Google Cloud
 GOOGLE_CLOUD_PROJECT=your-project-id
@@ -249,6 +256,7 @@ CUSTOM_SEARCH_API_KEY=your-api-key
 ```
 
 #### Frontend Environment (`.env.local`)
+
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
@@ -258,16 +266,18 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 The system supports two deployment models:
 
 ### 1. Independent Services (Microservice)
+
 Deploy frontend and backend as separate services for maximum flexibility.
 
 ### 2. Modular Monolith (Recommended)
+
 Deploy as a single unit with backend serving pre-rendered frontend.
 
 #### Automated Build & Deploy
 
 ```bash
 # Build and upload to GCS
-source scripts/build.sh
+make build
 
 # Deploy from GCS to target server
 source scripts/deploy-vm.sh
@@ -298,6 +308,7 @@ graph LR
 Simple header-based authentication with session management:
 
 ### Flow
+
 1. Users access `/login` page
 2. Enter secret access code
 3. Backend validates and creates session
@@ -305,6 +316,7 @@ Simple header-based authentication with session management:
 5. All requests include `X-Session-ID` header
 
 ### Configuration
+
 ```bash
 AUTH_SECRET=your-super-secret-key
 ```
@@ -337,6 +349,7 @@ sequenceDiagram
 ```
 
 ### Key Features
+
 - **Persistent Sessions**: Conversations survive page refreshes
 - **Cross-Model Continuity**: Same session across all AI models
 - **Automatic Management**: Transparent to users
@@ -347,12 +360,15 @@ sequenceDiagram
 ### Core Endpoints
 
 #### Get Available Models
+
 ```
 GET /api/v1/root_agent/models
 ```
+
 Returns list of available AI models with configurations.
 
 #### Send Message
+
 ```
 POST /api/v1/root_agent/
 Content-Type: application/json
@@ -365,6 +381,7 @@ X-Session-ID: {session-id}
 ```
 
 #### Authentication
+
 ```
 POST /api/v1/auth/login
 Content-Type: application/json
@@ -380,6 +397,7 @@ X-Session-ID: {session-id}
 ```
 
 ### Response Format
+
 ```json
 {
   "response": "I'm Gemini 2.5 Flash, ready to help!",
