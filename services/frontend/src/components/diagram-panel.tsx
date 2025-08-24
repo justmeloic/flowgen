@@ -39,6 +39,7 @@ export function DiagramPanel({
   isDarkMode = false,
 }: DiagramPanelProps) {
   const [mermaidLoaded, setMermaidLoaded] = useState(false);
+  const [showRawCode, setShowRawCode] = useState(false);
 
   useEffect(() => {
     // Initialize mermaid
@@ -185,15 +186,39 @@ export function DiagramPanel({
       )}
 
       {/* Panel content */}
-      <div className="p-6">
+      <div className="p-6 ">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
             {diagram.title || "Architecture Diagram"}
           </h3>
-          <div className="flex gap-2 mr-12">
+        </div>
+
+        {diagram.description && (
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            {diagram.description}
+          </p>
+        )}
+
+        <div className="border mx-6 rounded-3xl p-6 bg-white dark:bg-gray-800">
+          <div
+            id="mermaid-diagram"
+            className="w-full overflow-auto flex items-center justify-center"
+            style={{ minHeight: "400px" }}
+          >
+            {!mermaidLoaded && (
+              <div className="flex items-center justify-center h-32">
+                <div className="text-gray-500">Loading diagram...</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* All buttons centered under the diagram */}
+        <div className="mt-6 flex justify-center">
+          <div className="flex gap-2">
             <button
               onClick={copyDiagramCode}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
             >
               <svg
                 className="w-3 h-3"
@@ -212,7 +237,7 @@ export function DiagramPanel({
             </button>
             <button
               onClick={downloadDiagram}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
             >
               <svg
                 className="w-3 h-3"
@@ -229,38 +254,36 @@ export function DiagramPanel({
               </svg>
               Download
             </button>
+            <button
+              onClick={() => setShowRawCode(!showRawCode)}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
+            >
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                />
+              </svg>
+              {showRawCode ? "Hide Code" : "View Code"}
+            </button>
           </div>
         </div>
 
-        {diagram.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            {diagram.description}
-          </p>
+        {/* Raw code section (conditionally shown) */}
+        {showRawCode && (
+          <div className="mt-4">
+            <pre className="p-4 bg-gray-100 dark:bg-gray-900 text-xs overflow-auto rounded-xl">
+              <code>{cleanMermaidCode(diagram.diagram_code)}</code>
+            </pre>
+          </div>
         )}
-
-        <div className="border rounded-lg p-6 bg-white dark:bg-gray-800">
-          <div
-            id="mermaid-diagram"
-            className="w-full overflow-auto flex items-center justify-center"
-            style={{ minHeight: "400px" }}
-          >
-            {!mermaidLoaded && (
-              <div className="flex items-center justify-center h-32">
-                <div className="text-gray-500">Loading diagram...</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Raw code section (collapsible) */}
-        <details className="mt-6">
-          <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
-            View Raw Code
-          </summary>
-          <pre className="mt-3 p-4 bg-gray-100 dark:bg-gray-900 rounded text-xs overflow-auto">
-            <code>{cleanMermaidCode(diagram.diagram_code)}</code>
-          </pre>
-        </details>
       </div>
     </div>
   );

@@ -673,7 +673,7 @@ export default function ChatPage() {
             {/* Diagram panel - centered and larger */}
             <div
               data-diagram-panel
-              className={`fixed top-1/2 left-1/2 w-[90vw] max-w-[1200px] h-[85vh] bg-blue-50 dark:bg-secondary-dark overflow-y-auto rounded-3xl shadow-2xl z-40 transition-all duration-700 ease-in-out ${
+              className={`fixed mt-10 top-1/2 left-1/2 w-[90vw] max-w-[1200px] h-[85vh] bg-blue-50 dark:bg-secondary-dark overflow-y-auto rounded-3xl shadow-2xl z-40 transition-all duration-700 ease-in-out ${
                 isDiagramHidden
                   ? "transform -translate-x-1/2 -translate-y-1/2 scale-95 opacity-0 pointer-events-none"
                   : "transform -translate-x-1/2 -translate-y-1/2 scale-100 opacity-100"
