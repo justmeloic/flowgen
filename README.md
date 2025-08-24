@@ -1,6 +1,6 @@
 <div align="center">
   <img src="services/frontend/public/logo-banner.png">
-  <p>A Multi-Model AI Agent Interface</p>
+  <p>Architecture Designer - AI-Powered System Architecture Solutions</p>
 
   <br>
 
@@ -10,31 +10,56 @@
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Raspberry Pi](https://img.shields.io/badge/Optimized%20for-Raspberry%20Pi%205-red.svg)
+![Mermaid](https://img.shields.io/badge/Mermaid-Architecture%20Diagrams-FF6B6B.svg)
 
 **Owner / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
 </div>
-An interface that allows users to interact with different AI agents powered by various models and equipped with specialized tools. **Optimized for deployment on Raspberry Pi 5** with a streamlined single-service architecture.
+An intelligent agent that helps you draft architecture solutions and system diagrams for end-to-end solutions. The agent interacts with users to gather requirements, understand technical constraints, and generates comprehensive Mermaid architecture diagrams with detailed explanations. **Optimized for deployment on Raspberry Pi 5** with a streamlined single-service architecture.
+
+## ✨ Key Features
+
+- 🎯 **Interactive Requirements Gathering**: AI-powered questioning to understand your system needs
+- 🏗️ **Architecture Pattern Recognition**: Automatic identification of suitable architectural patterns
+- 📊 **Mermaid Diagram Generation**: Beautiful, interactive architecture diagrams
+- 🔍 **Constraint Analysis**: Technical, budgetary, and operational constraint evaluation
+- 📚 **Implementation Guidance**: Step-by-step development recommendations
+- 🔄 **Real-time Refinement**: Iterative design improvement through conversation
+
+## 🎯 Use Cases
+
+- **Microservices Architecture**: Design scalable, distributed systems
+- **Serverless Solutions**: Cloud-native, event-driven architectures
+- **Data Pipeline Design**: ETL/ELT processes and data flow architectures
+- **API Gateway Patterns**: Service mesh and API management solutions
+- **Security Architecture**: Zero-trust and defense-in-depth designs
+- **Cloud Migration**: Hybrid and multi-cloud architecture planning
 
 ## Services
 
 Each service has its own README with specific setup instructions. Please refer to:
 
 - [Frontend Setup](services/frontend/README.md)
-- [Agent Orchestration Setup](services/backend/README.md)
+- [Architecture Agent API Setup](services/backend/README.md)
 
 ### Frontend Client (services/frontend)
 
-A Next.js web application that provides the user interface for interacting with AI agents across different models and capabilities.
+A Next.js web application that provides an interactive interface for working with the Architecture Solution Designer. Features include:
 
-### Agent Orchestration API (services/backend)
+- Interactive chat interface for requirement gathering
+- Real-time Mermaid diagram rendering and visualization
+- Architecture pattern recommendations and best practices
+- Technical constraint analysis and solution optimization
 
-The backend service that coordinates AI agents for:
+### Architecture Agent API (services/backend)
 
-- Multi-model AI interactions
-- Agent selection and routing
-- Tool integration and execution
-- Response generation and formatting
+The backend service that orchestrates the AI agent for architecture design:
+
+- Requirements analysis and constraint identification
+- Architecture pattern matching and recommendations
+- Mermaid diagram generation for complex system architectures
+- Technical documentation and implementation guidance
+- Solution validation and optimization suggestions
 
 ## Repository Structure
 
@@ -65,7 +90,22 @@ The backend service that coordinates AI agents for:
 
 ## Architecture
 
-![AgentChat Architecture](docs/architecture-diagram.png)
+![Architecture Designer System Diagram](docs/architecture-diagram.png)
+
+The Architecture Solution Designer leverages AI to understand user requirements and generate comprehensive system diagrams:
+
+```mermaid
+graph TD
+    A[User Requirements] --> B[AI Analysis Engine]
+    B --> C[Pattern Recognition]
+    B --> D[Constraint Analysis]
+    C --> E[Architecture Generation]
+    D --> E
+    E --> F[Mermaid Diagram Output]
+    E --> G[Technical Documentation]
+    F --> H[Frontend Visualization]
+    G --> H
+```
 
 ## Deployment Models
 
@@ -131,13 +171,13 @@ graph TD
 
   subgraph "Production (Single Service)"
     B1[FastAPI Backend :8081] --> B2[Static Frontend Files]
-    B1 --> B3[API Endpoints]
+    B1 --> B3[Architecture Design API]
   end
 ```
 
-## Session Management
+## Session Management & Design Continuity
 
-The following diagram illustrates how session IDs are managed between the frontend and backend:
+The Architecture Designer maintains design continuity throughout your architecture discovery process. The following diagram illustrates how design sessions are managed between the frontend and backend:
 
 ```mermaid
 sequenceDiagram
@@ -145,110 +185,112 @@ sequenceDiagram
     participant LocalStorage
     participant Frontend
     participant Backend
-    participant SessionService
+    participant DesignService
 
-    %% Initial Request without Session ID
-    Client->>Frontend: Start conversation
+    %% Initial Design Request without Session ID
+    Client->>Frontend: Start architecture design
     Frontend->>LocalStorage: Check for existing sessionId
     alt No existing session
         Frontend->>Backend: POST /api/v1/root_agent (no X-Session-ID header)
-        Backend->>SessionService: Create new session
+        Backend->>DesignService: Create new design session
         Backend-->>Frontend: Response with new X-Session-ID header
         Frontend->>LocalStorage: Store sessionId
     else Has existing session
         LocalStorage-->>Frontend: Return stored sessionId
         Frontend->>Backend: POST /api/v1/root_agent (with X-Session-ID header)
-        Backend->>SessionService: Validate & use existing session
+        Backend->>DesignService: Validate & use existing session
         Backend-->>Frontend: Response with same X-Session-ID
     end
 
-    %% Subsequent Requests
-    Note over Client,SessionService: Subsequent Requests
-    Client->>Frontend: Send message
+    %% Subsequent Design Iterations
+    Note over Client,DesignService: Design Refinement Requests
+    Client->>Frontend: Refine architecture requirements
     Frontend->>LocalStorage: Get stored sessionId
     LocalStorage-->>Frontend: Return sessionId
     Frontend->>Backend: POST with X-Session-ID header
-    Backend->>SessionService: Get existing session
-    SessionService-->>Backend: Return session
-    Backend-->>Frontend: Response with same X-Session-ID
+    Backend->>DesignService: Get existing design session
+    DesignService-->>Backend: Return session with design context
+    Backend-->>Frontend: Response with refined architecture
 ```
 
-The session management flow works as follows:
+The design session management flow works as follows:
 
-1. **Initial Request**:
+1. **Initial Design Session**:
 
    - If no session exists, the frontend makes a request without a session ID
-   - The backend generates a new UUID and creates a new session
+   - The backend generates a new UUID and creates a new design session
    - The session ID is returned in the X-Session-ID header
    - The frontend stores this ID in localStorage
 
-2. **Subsequent Requests**:
+2. **Design Iteration Requests**:
 
    - The frontend retrieves the session ID from localStorage
-   - All requests include the X-Session-ID header
+   - All requests include the X-Session-ID header with design context
    - The backend validates and uses the existing session
    - The same session ID is returned in responses
 
-3. **Session State**:
-   - The backend maintains session state using ADK's InMemorySessionService
-   - Each session tracks conversation history and user context
-   - Sessions persist as long as the backend service is running
+3. **Design State Management**:
+   - The backend maintains design state using ADK's InMemorySessionService
+   - Each session tracks requirements, constraints, and architectural decisions
+   - Design context persists across multiple refinement iterations
+   - Sessions maintain conversation history for context-aware improvements
 
-This stateful approach ensures conversation continuity and context preservation across multiple interactions.
+This stateful approach ensures design continuity and context preservation across multiple interactions, allowing for iterative architecture refinement.
 
-## File Upload Feature
+## File Upload for Architecture Context
 
-The Agent Interface supports file uploads that are seamlessly integrated with AI agent conversations. Files are processed immediately and their content is made available to agents as context.
+The Architecture Designer supports file uploads to provide additional context for your system design. Files are processed immediately and their content is made available to the AI agent to inform architecture decisions.
 
 ### Supported File Types
 
-- **Images**: PNG, JPEG, GIF, WebP
-- **Documents**: PDF, Plain text, Markdown
-- **Data**: JSON, CSV
-- **Code**: HTML, CSS, JavaScript, Python
+- **Architecture Documents**: PDF, Markdown, Plain text
+- **Existing Diagrams**: PNG, JPEG, GIF, WebP (for reference)
+- **Requirements**: JSON, CSV (structured requirements)
+- **Code Samples**: Python, JavaScript, Java, etc. (for understanding existing systems)
+- **Configuration Files**: YAML, JSON, XML (infrastructure configs)
 
 ### How It Works
 
-1. **Unified Endpoint**: Files and messages are sent together to `/api/v1/root_agent/`
-2. **Immediate Processing**: Files are validated, stored as artifacts, and processed upon upload
-3. **Rich Context**: File content is extracted and embedded in the agent's prompt
+1. **Unified Processing**: Files and requirements are sent together to `/api/v1/root_agent/`
+2. **Context Integration**: Files are validated, stored as artifacts, and processed upon upload
+3. **Architecture Awareness**: File content is analyzed and integrated into the design process
 4. **Memory Storage**: Uses ADK's `InMemoryArtifactService` for efficient temporary storage
 
-### Usage
+### Usage in Architecture Design
 
 1. Click the attachment button (📎) in the chat input
-2. Select files (up to 10MB each, 5 files max)
-3. Type your message and send
-4. The agent receives both your message and file content as context
+2. Select relevant files (up to 10MB each, 5 files max)
+3. Describe your architecture requirements
+4. The agent receives both your requirements and file content as context
 
-### Example Enhanced Prompt
+### Example Enhanced Architecture Process
 
-When you upload a CSV file with the message "Can you analyze this data?", the agent receives:
+When you upload a requirements document with the message "Design a microservices architecture for this system", the agent receives:
 
 ```
-User: "Can you analyze this data?"
+User: "Design a microservices architecture for this system"
 
 [Files uploaded with this message:]
-File: sales_data.csv
-CSV file analysis:
-- Columns: 5 (date, product, sales, region, revenue)
-- Rows: 150 data rows
-Sample data: ['2023-01-01', 'Widget A', '45', 'North', '1350.00']
+File: system-requirements.pdf
+Document analysis:
+- Functional Requirements: User management, payment processing, inventory
+- Non-functional: 1M+ users, 99.9% uptime, PCI compliance
+- Constraints: 6-month timeline, AWS only, existing PostgreSQL
 ```
 
 ### Technical Implementation
 
-- **Backend**: File validation, artifact storage, content processing
+- **Backend**: File validation, artifact storage, architecture-aware content processing
 - **Frontend**: File attachment component with drag & drop (planned)
 - **Storage**: In-memory artifacts (temporary, cleared on restart)
-- **Processing**: Type-specific processors for optimal content extraction
+- **Processing**: Architecture-focused processors for optimal design context extraction
 
 ### Security
 
 - MIME type validation with magic byte verification
 - File size limits (10MB default)
 - Basic malicious content detection
-- Sandboxed file processing
+- Sandboxed file processing for architecture documents
 
 ## Building and Deploying
 
@@ -371,10 +413,11 @@ The deployment uses Raspberry Pi optimized settings:
 
 ### Raspberry Pi Performance Notes
 
-- **Memory Usage**: Typically uses 150-300MB RAM (depending on model usage)
-- **CPU Usage**: Low CPU usage during idle, moderate during AI processing
+- **Memory Usage**: Typically uses 150-300MB RAM (depending on model complexity and diagram generation)
+- **CPU Usage**: Low CPU usage during idle, moderate during AI processing and diagram generation
 - **Storage**: Requires ~500MB for application and dependencies
 - **Network**: Accessible via Pi's IP address on port 8081
+- **Architecture Generation**: Real-time Mermaid diagram generation with sub-second response times
 
 ## License
 

@@ -1,7 +1,7 @@
 [project]
-name = "backend"
+name = "architecture-designer-backend"
 version = "0.3.2"
-description = "Add your description here"
+description = "AI-powered architecture design assistant with Mermaid diagram generation"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

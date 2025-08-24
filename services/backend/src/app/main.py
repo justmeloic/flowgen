@@ -15,14 +15,15 @@
 """
 Main FastAPI application entry point.
 
-This module contains the core FastAPI application setup for the Agent
-Orchestration service. It handles application configuration, middleware setup,
+This module contains the core FastAPI application setup for the Architecture
+Designer service. It handles application configuration, middleware setup,
 routing, and serves both API endpoints and static frontend files. The
-application integrates with Google Cloud Platform services and provides session
-management capabilities.
+application integrates with Google Cloud Platform services and provides
+session management capabilities for architecture design workflows.
 
 Features:
-- RESTful API endpoints for agent orchestration
+- RESTful API endpoints for architecture design assistance
+- AI-powered system architecture analysis and diagram generation
 - Static file serving for frontend applications
 - CORS middleware for cross-origin requests
 - Session management with in-memory storage
@@ -86,7 +87,7 @@ async def lifespan(app: FastAPI):
         startup and shutdown phases.
     """
     setup_logging()
-    _logger.info('Starting Agent Orchestration API...')
+    _logger.info('Starting Architecture Designer API...')
     configure_gcp_environment()
     app.state.session_service = InMemorySessionService()
 
@@ -95,7 +96,7 @@ async def lifespan(app: FastAPI):
     _logger.info('Initialized InMemoryArtifactService for artifacts')
 
     yield
-    _logger.info('Shutting down Agent Orchestration API...')
+    _logger.info('Shutting down Architecture Designer API...')
 
 
 app = FastAPI(

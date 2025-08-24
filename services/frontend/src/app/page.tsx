@@ -17,6 +17,7 @@
 "use client";
 
 import { ChatInput } from "@/components/chat-input";
+import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { MessageActions } from "@/components/message-actions";
 import { ModelSelector } from "@/components/model-selector";
 import { ReferencesPanel } from "@/components/references-panel";
@@ -84,7 +85,7 @@ export default function ChatPage() {
       : "Hello!";
 
   const subtitleText =
-    "Your Multi-Model AI Agent Interface. Interact with specialized AI agents powered by various models and equipped with advanced tools. Ask me anything and I'll help you get the answers you need!";
+    "AI-Powered Architecture Solution Designer. I help you design comprehensive system architectures by gathering requirements, analyzing constraints, and generating detailed Mermaid diagrams. Let's build something amazing together!";
 
   const { displayText: displayGreeting, isComplete: greetingComplete } =
     useTypewriter(greetingText, 80);
@@ -207,13 +208,20 @@ export default function ChatPage() {
     [references]
   );
 
-  // Component to render message content with clickable citations
+  // Component to render message content with clickable citations and Mermaid diagrams
   const MessageContent = ({ content }: { content: string }) => {
     const cleanContent = content
       .split("\n\nReferences:")[0]
       .replace(/\n\n/g, "\n\n")
       .trim();
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Extract Mermaid diagrams from content
+    const mermaidPattern = /```mermaid\n([\s\S]*?)\n```/g;
+    const mermaidMatches = [...cleanContent.matchAll(mermaidPattern)];
+    const contentWithoutMermaid = cleanContent
+      .replace(mermaidPattern, "")
+      .trim();
 
     useEffect(() => {
       if (containerRef.current) {
@@ -373,17 +381,33 @@ export default function ChatPage() {
 
     return (
       <div ref={containerRef} className="prose prose-xs max-w-none">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkBreaks, remarkParse]}
-          skipHtml={false}
-          components={{
-            p: ({ children }) => (
-              <p className="mb-3 last:mb-0 text-sm">{children}</p>
-            ),
-          }}
-        >
-          {cleanContent}
-        </ReactMarkdown>
+        {/* Render text content */}
+        {contentWithoutMermaid && (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkBreaks, remarkParse]}
+            skipHtml={false}
+            components={{
+              p: ({ children }) => (
+                <p className="mb-3 last:mb-0 text-sm">{children}</p>
+              ),
+            }}
+          >
+            {contentWithoutMermaid}
+          </ReactMarkdown>
+        )}
+
+        {/* Render Mermaid diagrams */}
+        {mermaidMatches.map((match, index) => (
+          <div
+            key={index}
+            className="my-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+          >
+            <h4 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+              Architecture Diagram
+            </h4>
+            <MermaidDiagram chart={match[1]} className="w-full" />
+          </div>
+        ))}
       </div>
     );
   };

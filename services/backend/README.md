@@ -1,142 +1,136 @@
-# Agent Orchestration
+# Architecture Designer API
 
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
 ![Google ADK](https://img.shields.io/badge/Google_ADK-0.2.0+-4285F4.svg)
 ![GCP](https://img.shields.io/badge/Google_Cloud-4285F4?logo=google-cloud&logoColor=white)
+![Mermaid](https://img.shields.io/badge/Mermaid-Architecture%20Diagrams-FF6B6B.svg)
 
-Backend service that coordinates AI agents for the AgentChat system.
+Backend service that provides AI-powered architecture design assistance, generating comprehensive system diagrams and technical documentation.
 
 ## System Architecture
 
 ### High-Level Architecture
 
-The following diagram illustrates the high-level architecture of the agent orchestration system:
+The following diagram illustrates the high-level architecture of the architecture design system:
 
 ```mermaid
 graph TD
-    A[User] -- Sends Message --> B(Agent Orchestrator);
-    B -- Routes to Appropriate Agent --> C{Multi-Model Agents};
-    C -- Agent A: GPT-4 --> D[OpenAI API];
-    C -- Agent B: Claude --> E[Anthropic API];
-    C -- Agent C: Gemini --> F[Vertex AI API];
-    D -- Response --> B;
-    E -- Response --> B;
-    F -- Response --> B;
-    B -- Formatted Response --> A;
+    A[User] -- Describes Requirements --> B(Architecture Designer Agent);
+    B -- Analyzes & Questions --> C{Requirement Analysis};
+    C -- Gathers Context --> D[Requirements Database];
+    C -- Identifies Patterns --> E[Architecture Patterns];
+    C -- Analyzes Constraints --> F[Technical Constraints];
+    D --> G[Solution Generation];
+    E --> G;
+    F --> G;
+    G -- Generates --> H[Mermaid Diagram];
+    G -- Provides --> I[Implementation Guide];
+    H --> J[Frontend Visualization];
+    I --> J;
+    J -- Interactive Diagram --> A;
 
     style B fill:#f9f,stroke:#333,stroke-width:2px
     style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#lightgreen,stroke:#333,stroke-width:2px
-    style E fill:#lightblue,stroke:#333,stroke-width:2px
-    style F fill:#orange,stroke:#333,stroke-width:2px
+    style G fill:#lightgreen,stroke:#333,stroke-width:2px
+    style H fill:#orange,stroke:#333,stroke-width:2px
+    style J fill:#lightblue,stroke:#333,stroke-width:2px
 ```
 
-### Multi-Model Conversation Continuity
+### Architecture Design Workflow
 
-One elegant feature of this system is **seamless model switching mid-conversation**. Users can switch between different AI models (e.g., Gemini 2.5 Flash ↔ Gemini 2.5 Pro) while maintaining complete conversation history and context.
+The Architecture Designer provides intelligent assistance throughout the design process, leveraging AI to understand requirements and generate comprehensive solutions.
 
 #### How It Works
 
-Our architecture leverages Google ADK's session management to provide true conversation continuity across different models:
+Our system guides users through a structured architecture design process:
 
 ```mermaid
 graph TB
-    subgraph "Frontend"
+    subgraph "Frontend Interface"
         UI[User Interface]
-        MS[Model Selector]
+        VIZ[Diagram Visualization]
     end
 
-    subgraph "Backend - FastAPI"
-        EP[Agent Endpoint]
-        AF[Agent Factory]
-        DEP[Dependencies]
+    subgraph "Backend - Architecture Designer"
+        EP[Design Endpoint]
+        AA[Architecture Analyzer]
+        PG[Pattern Generator]
     end
 
-    subgraph "Google ADK Session Layer"
-        SS[Session Service<br/>📝 Shared Memory]
-        SES[Session<br/>🆔 c5e10550-...]
+    subgraph "AI Processing Layer"
+        REQ[Requirements Analysis]
+        CON[Constraint Evaluation]
+        PAT[Pattern Matching]
     end
 
-    subgraph "Model-Specific Runners"
-        R1[Runner: Flash<br/>🏃‍♂️ Cached]
-        R2[Runner: Pro<br/>🏃‍♂️ Cached]
-        A1[Agent: Flash<br/>🤖 LRU Cached]
-        A2[Agent: Pro<br/>🤖 LRU Cached]
+    subgraph "Generation Engine"
+        MG[Mermaid Generator]
+        DG[Documentation Generator]
+        VG[Validation Engine]
     end
 
     subgraph "Google Vertex AI"
-        V1[Gemini 2.5 Flash]
-        V2[Gemini 2.5 Pro]
+        GM[Gemini Models]
     end
 
-    UI --> |"Switch Model"| MS
-    MS --> |"model: gemini-2.5-pro"| EP
-    EP --> |"Get Agent"| AF
-    AF --> |"LRU Cache"| A1
-    AF --> |"LRU Cache"| A2
-    EP --> |"Get Runner"| DEP
-    DEP --> |"Create if needed"| R1
-    DEP --> |"Create if needed"| R2
+    UI --> |"Describe System"| EP
+    EP --> |"Process"| AA
+    AA --> |"Analyze"| REQ
+    AA --> |"Evaluate"| CON
+    AA --> |"Match"| PAT
 
-    R1 --> |"SAME session_service"| SS
-    R2 --> |"SAME session_service"| SS
-    SS --> |"SAME session_id"| SES
+    REQ --> |"Context"| MG
+    CON --> |"Constraints"| MG
+    PAT --> |"Patterns"| MG
 
-    R1 --> |"Model-specific"| A1
-    R2 --> |"Model-specific"| A2
-    A1 --> V1
-    A2 --> V2
+    MG --> |"Generate"| DG
+    DG --> |"Validate"| VG
+    VG --> |"Refined Output"| VIZ
 
-    SES --> |"📚 Full History<br/>Auto-loaded"| R1
-    SES --> |"📚 Full History<br/>Auto-loaded"| R2
+    AA --> GM
+    MG --> GM
+    DG --> GM
 
-    style SS fill:#e1f5fe,stroke:#0277bd,stroke-width:3px
-    style SES fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    style R1 fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    style R2 fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
-    style AF fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style AA fill:#e1f5fe,stroke:#0277bd,stroke-width:3px
+    style MG fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style VIZ fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    style GM fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
 ```
 
 #### Key Architecture Components
 
-1. **Agent Factory Pattern**
+1. **Architecture Analyzer**
 
    ```python
-   @lru_cache(maxsize=10)
-   def get_agent(self, model_name: str) -> Agent:
-       # Creates and caches model-specific agents
+   def analyze_requirements(self, description: str) -> ArchitectureAnalysis:
+       # Processes user requirements and identifies key patterns
    ```
 
-2. **Runner Management**
+2. **Mermaid Generator**
 
    ```python
-   runner_key = f'runner_{model_name.replace("-", "_").replace(".", "_")}'
-   if not hasattr(request.app.state, runner_key):
-       runner = Runner(
-           agent=agent,                                    # Model-specific
-           app_name=config.app_name,                      # Shared
-           session_service=request.app.state.session_service,  # 🔑 THE MAGIC
-       )
+   def generate_diagram(self, analysis: ArchitectureAnalysis) -> str:
+       # Creates comprehensive Mermaid diagrams based on analysis
    ```
 
-3. **Shared Session Service**
-   - **Single Session ID**: All models use the same session identifier
-   - **Automatic History Loading**: ADK automatically provides full conversation context
-   - **Seamless Continuity**: Users experience uninterrupted conversations
+3. **Pattern Matching Engine**
+   - **Common Patterns**: Identifies microservices, monolithic, serverless patterns
+   - **Best Practices**: Applies industry standards and architectural principles
+   - **Constraint Optimization**: Balances requirements with technical constraints
 
 #### Benefits
 
-✅ **True Conversation Continuity**: Switch models without losing context  
-✅ **Performance Optimization**: Cached runners and agents for fast switching  
-✅ **Model-Specific Capabilities**: Each model maintains its unique characteristics  
-✅ **Unified Memory**: Shared session service ensures consistent experience
+✅ **Comprehensive Analysis**: Deep understanding of requirements and constraints  
+✅ **Pattern Recognition**: Automatic identification of appropriate architectural patterns  
+✅ **Visual Diagrams**: Beautiful, interactive Mermaid diagrams  
+✅ **Implementation Guidance**: Step-by-step recommendations for development
 
 The diagram shows the interaction between different components of the system:
 
-- User Interaction: How users interact with different AI agents
-- Core Agent System: The orchestrator that routes requests to appropriate agents
-- Multi-Model Support: Various AI models and their APIs
-- Tool Integration: Specialized capabilities available to each agent
+- User Requirements: How users describe their system needs
+- AI Analysis: Intelligent processing and pattern recognition
+- Diagram Generation: Creation of comprehensive Mermaid visualizations
+- Interactive Feedback: Real-time refinement and optimization
 
 ## Development Setup
 

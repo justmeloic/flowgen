@@ -1,10 +1,11 @@
-# Frontend Client Service
+# Architecture Designer Frontend
 
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
 ![React](https://img.shields.io/badge/react-18.0.0+-blue.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0.0+-3178C6.svg)
+![Mermaid](https://img.shields.io/badge/Mermaid-Architecture%20Diagrams-FF6B6B.svg)
 
-Web interface for the AgentChat system. Built with Next.js for optimal performance and developer experience.
+Interactive web interface for the Architecture Designer system. Built with Next.js for optimal performance and real-time diagram visualization.
 
 ## Interface
 

@@ -70,8 +70,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = 'development'
 
     # API settings
-    API_TITLE: str = 'AgentChat API'
-    API_DESCRIPTION: str = 'API for interacting with multi-model AI agents'
+    API_TITLE: str = 'Architecture Designer API'
+    API_DESCRIPTION: str = (
+        'API for AI-powered architecture solution design and diagram generation'
+    )
     API_VERSION: str = '1.0.0'
 
     # Frontend URL for CORS
