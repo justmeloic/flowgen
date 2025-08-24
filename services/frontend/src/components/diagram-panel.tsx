@@ -16,7 +16,6 @@
 
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   cleanMermaidCode,
   generateMermaidId,
@@ -126,20 +125,28 @@ export function DiagramPanel({
       const img = new Image();
 
       img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx?.drawImage(img, 0, 0);
+        // Scale factor for higher resolution but more reasonable
+        const scaleFactor = 2;
+        canvas.width = img.width * scaleFactor;
+        canvas.height = img.height * scaleFactor;
 
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.download = `${diagram?.title || "diagram"}.png`;
-            link.href = url;
-            link.click();
-            URL.revokeObjectURL(url);
-          }
-        });
+        // Draw the image at the scaled size
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.download = `${diagram?.title || "diagram"}.png`;
+              link.href = url;
+              link.click();
+              URL.revokeObjectURL(url);
+            }
+          },
+          "image/png",
+          1.0
+        );
       };
 
       img.src = "data:image/svg+xml;base64," + btoa(svgData);
@@ -158,8 +165,8 @@ export function DiagramPanel({
       {!isHidden && (
         <button
           onClick={onToggleVisibility}
-          className="absolute right-4 z-10 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
-          aria-label="Hide diagram"
+          className="absolute right-4 top-3 z-10 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
+          aria-label="Close diagram"
         >
           <svg
             className="w-5 h-5 text-gray-600 dark:text-gray-300"
@@ -171,49 +178,71 @@ export function DiagramPanel({
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M9 5l7 7-7 7"
+              d="M6 18L18 6M6 6l12 12"
             />
           </svg>
         </button>
       )}
 
       {/* Panel content */}
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
             {diagram.title || "Architecture Diagram"}
           </h3>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
+          <div className="flex gap-2 mr-12">
+            <button
               onClick={copyDiagramCode}
-              className="text-xs"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
             >
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
               Copy Code
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
+            </button>
+            <button
               onClick={downloadDiagram}
-              className="text-xs"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
             >
+              <svg
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
               Download
-            </Button>
+            </button>
           </div>
         </div>
 
         {diagram.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             {diagram.description}
           </p>
         )}
 
-        <div className="border rounded-lg p-4 bg-white dark:bg-gray-800">
+        <div className="border rounded-lg p-6 bg-white dark:bg-gray-800">
           <div
             id="mermaid-diagram"
-            className="w-full overflow-auto"
-            style={{ minHeight: "200px" }}
+            className="w-full overflow-auto flex items-center justify-center"
+            style={{ minHeight: "400px" }}
           >
             {!mermaidLoaded && (
               <div className="flex items-center justify-center h-32">
@@ -224,11 +253,11 @@ export function DiagramPanel({
         </div>
 
         {/* Raw code section (collapsible) */}
-        <details className="mt-4">
+        <details className="mt-6">
           <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
             View Raw Code
           </summary>
-          <pre className="mt-2 p-3 bg-gray-100 dark:bg-gray-900 rounded text-xs overflow-auto">
+          <pre className="mt-3 p-4 bg-gray-100 dark:bg-gray-900 rounded text-xs overflow-auto">
             <code>{cleanMermaidCode(diagram.diagram_code)}</code>
           </pre>
         </details>
