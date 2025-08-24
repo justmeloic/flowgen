@@ -24,6 +24,9 @@ import {
 } from "@/lib/mermaid-config";
 import { Diagram } from "@/types";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
 
 interface DiagramPanelProps {
   diagram: Diagram | null;
@@ -194,9 +197,11 @@ export function DiagramPanel({
         </div>
 
         {diagram.description && (
-          <p className="mx-7 text-sm text-gray-600 dark:text-gray-400 mb-6">
-            {diagram.description}
-          </p>
+          <div className="mx-7 mb-6 prose prose-sm dark:prose-invert text-gray-600 dark:text-gray-400">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+              {diagram.description}
+            </ReactMarkdown>
+          </div>
         )}
 
         <div className="border mx-6 rounded-3xl p-6 bg-white dark:bg-gray-800">

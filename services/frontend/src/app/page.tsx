@@ -27,7 +27,7 @@ import { toast } from "@/components/ui/use-toast";
 import { sendMessage, startNewSession } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ChatMessage, Diagram } from "@/types";
-import { SquarePen } from "lucide-react";
+import { Maximize2, SquarePen } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -484,6 +484,13 @@ export default function ChatPage() {
     setIsDiagramHidden((prev: boolean) => !prev);
   };
 
+  const openDiagramPanel = () => {
+    // Ensure the diagram panel is visible (no toggle close)
+    if (diagram) {
+      setIsDiagramHidden(false);
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 h-full">
       <div
@@ -495,14 +502,14 @@ export default function ChatPage() {
           onClick={handleNewConversation}
           disabled={isStartingNew}
           className={cn(
-            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             isStartingNew && "opacity-50 cursor-not-allowed"
           )}
           aria-label="New conversation"
         >
           <SquarePen
             className={cn(
-              "w-5 h-5 text-gray-600/80 dark:text-gray-300",
+              "w-4 h-4 text-gray-600/80 dark:text-gray-300",
               isStartingNew && "animate-pulse"
             )}
           />
@@ -621,7 +628,23 @@ export default function ChatPage() {
                               {loadingText}
                             </span>
                           ) : (
-                            <MessageContent content={message.content} />
+                            <>
+                              <MessageContent content={message.content} />
+                              {diagram?.diagram_code &&
+                                index === chatHistory.length - 1 &&
+                                !isLoading && (
+                                  <div className="mt-6 flex justify-start">
+                                    <button
+                                      onClick={openDiagramPanel}
+                                      className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500 animate-bounce motion-reduce:animate-none"
+                                      aria-label="Expand diagram"
+                                    >
+                                      <Maximize2 className="w-3 h-3" />
+                                      Expand diagram
+                                    </button>
+                                  </div>
+                                )}
+                            </>
                           )
                         ) : (
                           <span className="text-sm">{message.content}</span>
@@ -660,29 +683,6 @@ export default function ChatPage() {
 
         {diagram && (
           <>
-            {/* Show diagram button when panel is hidden */}
-            {isDiagramHidden && (
-              <button
-                onClick={toggleDiagramVisibility}
-                className="fixed right-4 top-40 z-20 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
-                aria-label="Show diagram"
-              >
-                <svg
-                  className="w-5 h-5 text-gray-600 dark:text-gray-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-            )}
-
             {/* Backdrop overlay */}
             {!isDiagramHidden && (
               <div
