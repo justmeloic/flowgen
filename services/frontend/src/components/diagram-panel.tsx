@@ -187,14 +187,14 @@ export function DiagramPanel({
 
       {/* Panel content */}
       <div className="p-6 ">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex mx-7 items-center justify-between mb-6">
           <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
             {diagram.title || "Architecture Diagram"}
           </h3>
         </div>
 
         {diagram.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <p className="mx-7 text-sm text-gray-600 dark:text-gray-400 mb-6">
             {diagram.description}
           </p>
         )}
@@ -279,9 +279,22 @@ export function DiagramPanel({
         {/* Raw code section (conditionally shown) */}
         {showRawCode && (
           <div className="mt-4">
-            <pre className="p-4 bg-gray-100 dark:bg-gray-900 text-xs overflow-auto rounded-xl">
-              <code>{cleanMermaidCode(diagram.diagram_code)}</code>
-            </pre>
+            <div className="bg-gray-800 mx-64 rounded-xl border border-gray-700 overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 bg-gray-900 border-b border-gray-700">
+                <span className="text-xs font-medium text-gray-300">
+                  Mermaid Code
+                </span>
+                <span className="text-xs text-gray-400">
+                  {cleanMermaidCode(diagram.diagram_code).split("\n").length}{" "}
+                  lines
+                </span>
+              </div>
+              <pre className="p-3 overflow-auto max-h-48 bg-gray-800">
+                <code className="text-xs font-mono text-gray-200 leading-relaxed">
+                  {cleanMermaidCode(diagram.diagram_code)}
+                </code>
+              </pre>
+            </div>
           </div>
         )}
       </div>
