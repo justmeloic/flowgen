@@ -40,7 +40,7 @@ export default function HomePage() {
       <div className="space-y-8 max-w-4xl mx-auto">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-4 dark:text-gray-100" id="top">
-            Agent Interface
+            Flowgen - AI Architecture Designer
           </h1>
           <div className="flex justify-center items-center space-x-4 mb-6">
             <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
@@ -62,8 +62,12 @@ export default function HomePage() {
             </span>
           </div>
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-            An interface that allows users to interact with different AI agents
-            powered by various models and equipped with specialized tools.
+            Flowgen is an AI-powered architecture solution designer that helps
+            you design comprehensive system architectures by gathering
+            requirements, analyzing constraints, and generating detailed Mermaid
+            diagrams. This interface allows users to interact with different AI
+            agents powered by various models and equipped with specialized
+            tools.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             <strong>Author / Maintainer:</strong>{" "}
@@ -91,6 +95,126 @@ export default function HomePage() {
               height={600}
               className="rounded-2xl shadow-lg dark:shadow-gray-800"
             />
+          </div>
+        </div>
+
+        {/* AI Architecture Design Capabilities */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
+            AI Architecture Design Capabilities
+          </h2>
+          <p className="text-xs text-gray-700 dark:text-gray-300 mb-6">
+            Flowgen specializes in transforming high-level requirements into
+            detailed system architectures through intelligent analysis and
+            automated diagram generation.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="bg-gradient-to-br from-emerald-50/70 via-teal-50/50 to-cyan-50/70 dark:from-emerald-900/20 dark:via-teal-900/15 dark:to-cyan-900/20 p-6 rounded-2xl border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
+                <span className="mr-2">🏗️</span>
+                Requirement Analysis
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                Flowgen analyzes user requirements, identifies key components,
+                and understands system constraints to create optimal
+                architecture solutions.
+              </p>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    Functional requirement extraction
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    Non-functional constraint identification
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    Technology stack recommendations
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-violet-50/70 via-purple-50/50 to-fuchsia-50/70 dark:from-violet-900/20 dark:via-purple-900/15 dark:to-fuchsia-900/20 p-6 rounded-2xl border border-violet-200/50 dark:border-violet-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
+                <span className="mr-2">📊</span>
+                Mermaid Diagram Generation
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                Automatically generates professional Mermaid diagrams that
+                visualize system architecture, data flows, and component
+                relationships.
+              </p>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    System architecture diagrams
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    Data flow and sequence diagrams
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
+                  <span className="text-slate-700 dark:text-slate-300">
+                    Interactive diagram exploration
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-50/60 via-indigo-50/40 to-purple-50/60 dark:from-blue-900/25 dark:via-indigo-900/20 dark:to-purple-900/25 p-6 rounded-2xl mb-6 border border-blue-200/50 dark:border-blue-700/50 shadow-sm backdrop-blur-sm">
+            <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
+              <span className="mr-2">🎯</span>
+              Supported Architecture Patterns
+            </h3>
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm">
+                <h4 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">
+                  🏢 Enterprise Systems
+                </h4>
+                <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
+                  <li>• Microservices architecture</li>
+                  <li>• Service-oriented architecture</li>
+                  <li>• Event-driven systems</li>
+                  <li>• API gateway patterns</li>
+                </ul>
+              </div>
+              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 shadow-sm">
+                <h4 className="font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
+                  ☁️ Cloud Native
+                </h4>
+                <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
+                  <li>• Container orchestration</li>
+                  <li>• Serverless architectures</li>
+                  <li>• Multi-cloud strategies</li>
+                  <li>• CI/CD pipelines</li>
+                </ul>
+              </div>
+              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-purple-100 dark:border-purple-900/50 shadow-sm">
+                <h4 className="font-semibold text-purple-600 dark:text-purple-400 mb-2">
+                  📱 Modern Applications
+                </h4>
+                <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
+                  <li>• Web application architectures</li>
+                  <li>• Mobile backend systems</li>
+                  <li>• Real-time communication</li>
+                  <li>• Data processing pipelines</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -286,6 +410,98 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Typography & Design System */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
+            Typography & Design System
+          </h2>
+          <p className="text-xs text-gray-700 dark:text-gray-300 mb-6">
+            Flowgen uses a carefully selected typography system combining Google
+            Fonts for optimal readability and brand consistency across different
+            interface elements.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-gradient-to-br from-blue-50/70 via-indigo-50/50 to-purple-50/70 dark:from-blue-900/20 dark:via-indigo-900/15 dark:to-purple-900/20 p-6 rounded-2xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
+                <span className="mr-2 font-sans">Aa</span>
+                Inter (Primary)
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                The main system font used for body text, buttons, and interface
+                elements. Provides excellent readability and professional
+                appearance.
+              </p>
+              <div className="bg-white/80 dark:bg-slate-700/50 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                <code className="text-xs text-blue-700 dark:text-blue-300 font-medium">
+                  font-sans, --font-sans
+                </code>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-emerald-50/70 via-teal-50/50 to-cyan-50/70 dark:from-emerald-900/20 dark:via-teal-900/15 dark:to-cyan-900/20 p-6 rounded-2xl border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
+                <span className="mr-2 font-poppins">Aa</span>
+                Poppins (Subtitle)
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                Used for subtitle text and descriptive content. Clean, modern,
+                and highly readable for longer text passages.
+              </p>
+              <div className="bg-white/80 dark:bg-slate-700/50 p-3 rounded-lg border border-emerald-100 dark:border-emerald-900/30">
+                <code className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+                  font-poppins, --font-poppins
+                </code>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-violet-50/70 via-purple-50/50 to-fuchsia-50/70 dark:from-violet-900/20 dark:via-purple-900/15 dark:to-fuchsia-900/20 p-6 rounded-2xl border border-violet-200/50 dark:border-violet-700/50 shadow-sm backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
+                <span className="mr-2 font-cursive">Aa</span>
+                Dancing Script (Accent)
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                Reserved for special headings and branding elements. Adds
+                personality and warmth to the interface.
+              </p>
+              <div className="bg-white/80 dark:bg-slate-700/50 p-3 rounded-lg border border-violet-100 dark:border-violet-900/30">
+                <code className="text-xs text-violet-700 dark:text-violet-300 font-medium">
+                  font-cursive, --font-cursive
+                </code>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-amber-50/70 via-yellow-50/50 to-orange-50/70 dark:from-amber-900/30 dark:via-yellow-900/25 dark:to-orange-900/30 border-l-4 border-amber-400 dark:border-amber-500 p-4 rounded-r-xl shadow-sm">
+            <h4 className="text-base font-semibold text-amber-800 dark:text-amber-200 mb-2">
+              🎨 Font Weight & Loading Strategy
+            </h4>
+            <p className="text-sm text-amber-700 dark:text-amber-200 mb-2">
+              All fonts are loaded with optimized weight ranges to balance
+              visual hierarchy with performance. The fonts are preloaded using
+              Next.js font optimization for fast rendering.
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 text-xs text-amber-700 dark:text-amber-200">
+              <div className="space-y-1">
+                <div>
+                  <strong>Inter:</strong> Sans-serif, variable font
+                </div>
+                <div>
+                  <strong>Poppins:</strong> 300, 400, 500, 600 weights
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div>
+                  <strong>Dancing Script:</strong> 400, 500, 600, 700 weights
+                </div>
+                <div>
+                  <strong>Loading:</strong> Automatic font display swap
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Component Usage */}
         <div>
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
@@ -341,6 +557,30 @@ export default function HomePage() {
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
                     Agent Development Kit providing session management and
                     conversation continuity
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Google Fonts
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Typography System
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Inter (primary), Poppins (subtitles), Dancing Script
+                    (accents) for optimal readability
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Mermaid.js
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Diagram Rendering
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Client-side rendering of architecture diagrams with
+                    interactive features
                   </td>
                 </tr>
               </tbody>
@@ -567,16 +807,20 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Try the Agent */}
+        {/* Try Flowgen */}
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
-            Try Agent Interface
+            Try Flowgen Architecture Designer
           </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            Start designing your system architecture with AI-powered analysis
+            and automated Mermaid diagram generation.
+          </p>
           <Button
             asChild
             className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white px-8 py-3 rounded-full transition-all duration-200 text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
-            <Link href="/">Start</Link>
+            <Link href="/">Design Architecture</Link>
           </Button>
         </div>
 
@@ -619,11 +863,10 @@ export default function HomePage() {
               Production Deployment Strategy
             </h3>
             <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
-              The system uses a streamlined deployment approach optimized for
-              Raspberry Pi 5. The Next.js frontend is pre-rendered into static
-              HTML, CSS, and JS files, then served by the FastAPI backend as a
-              single unified service. This reduces resource usage and simplifies
-              management on Pi hardware.
+              The system uses a streamlined deployment approach. The Next.js
+              frontend is pre-rendered into static HTML, CSS, and JS files, then
+              served by the FastAPI backend as a single unified service. This
+              reduces resource usage and simplifies management.
             </p>
             <div className="grid md:grid-cols-2 gap-4 mt-4">
               <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
@@ -640,146 +883,8 @@ export default function HomePage() {
                   Production Benefits
                 </h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Single-service mode optimized for Pi's memory and processing
-                  constraints
+                  Single-service mode optimized for constrained environments
                 </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Automated Build for Pi
-            </h3>
-            <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono mb-2 border border-slate-600 shadow-sm">
-              <div># From project root</div>
-              <div>source scripts/build.sh</div>
-            </div>
-            <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 mb-2">
-              <li>
-                Builds Next.js frontend into static files optimized for Pi
-                serving
-              </li>
-              <li>Copies static assets to backend directory structure</li>
-              <li>Validates build completion and file integrity</li>
-            </ul>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Automated Deployment on Raspberry Pi
-            </h3>
-            <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono mb-2 border border-slate-600 shadow-sm">
-              <div># On the Raspberry Pi</div>
-              <div>source scripts/deploy.sh</div>
-            </div>
-            <ul className="text-xs text-gray-700 dark:text-gray-300 list-disc pl-5 mb-2">
-              <li>
-                Sets up Python virtual environment with Pi-optimized
-                dependencies
-              </li>
-              <li>Clears Python cache and manages port 8081 availability</li>
-              <li>
-                Starts Uvicorn server in a detached screen session for
-                persistence
-              </li>
-              <li>Provides server management commands for Pi administration</li>
-            </ul>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Pi-Optimized Architecture
-            </h3>
-            <div className="overflow-x-auto">
-              <pre className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 p-4 rounded-xl text-xs font-mono whitespace-pre border border-slate-200 dark:border-slate-600 shadow-sm">
-                {`Development:                 Production (Pi):
-[Next.js :3000]              [Static Files]
-      ↓                           ↓
-[API Proxy]                  [FastAPI :8081]
-      ↓                           ↓
-[FastAPI :8081]              [Unified Service]
-
-Network: 2 services          Network: 1 service
-Memory: ~400MB               Memory: ~200MB
-Ports: 3000 + 8081          Ports: 8081 only`}
-              </pre>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Raspberry Pi Server Management
-            </h3>
-            <div className="bg-gradient-to-br from-blue-50/60 via-sky-50/40 to-cyan-50/60 dark:from-blue-900/25 dark:via-sky-900/20 dark:to-cyan-900/25 p-4 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
-              <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
-                The deployment script uses{" "}
-                <code className="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-slate-700 dark:text-slate-300 font-mono">
-                  screen
-                </code>{" "}
-                sessions to run the server persistently on your Raspberry Pi:
-              </p>
-              <ul className="text-sm text-slate-600 dark:text-slate-300 list-disc pl-5 space-y-1">
-                <li>
-                  Connect to server:
-                  <code className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
-                    screen -r backend
-                  </code>
-                </li>
-                <li>
-                  Detach (keep running):
-                  <span className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
-                    Ctrl+A, then D
-                  </span>
-                </li>
-                <li>
-                  List sessions:
-                  <code className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
-                    screen -list
-                  </code>
-                </li>
-                <li>
-                  Stop server:
-                  <code className="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-1 ml-1 rounded font-mono">
-                    screen -S backend -X quit
-                  </code>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-base font-semibold mb-2 dark:text-gray-100">
-              Pi Performance Characteristics
-            </h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-emerald-50/60 via-green-50/40 to-teal-50/60 dark:from-emerald-900/25 dark:via-green-900/20 dark:to-teal-900/25 p-4 rounded-xl border border-emerald-200/50 dark:border-emerald-700/50 shadow-sm">
-                <h4 className="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">
-                  Resource Usage
-                </h4>
-                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-                  <li>• RAM: 150-300MB (depending on model)</li>
-                  <li>• CPU: Low idle, moderate during AI calls</li>
-                  <li>• Storage: ~500MB total footprint</li>
-                  <li>• Port: 8081 (configurable)</li>
-                </ul>
-              </div>
-              <div className="bg-gradient-to-br from-blue-50/60 via-sky-50/40 to-cyan-50/60 dark:from-blue-900/25 dark:via-sky-900/20 dark:to-cyan-900/25 p-4 rounded-xl border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
-                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">
-                  Access & Network
-                </h4>
-                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-                  <li>
-                    • Local:{" "}
-                    <code className="font-mono">http://localhost:8081</code>
-                  </li>
-                  <li>
-                    • Network:{" "}
-                    <code className="font-mono">http://[pi-ip]:8081</code>
-                  </li>
-                  <li>• Dependencies: Pi-optimized packages</li>
-                  <li>• Startup: ~5-10 seconds on Pi 5</li>
-                </ul>
               </div>
             </div>
           </div>
