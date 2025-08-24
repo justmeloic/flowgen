@@ -16,50 +16,59 @@
 
 "use client";
 
+import {
+  cleanMermaidCode,
+  generateMermaidId,
+  initializeMermaid,
+  validateMermaidSyntax,
+} from "@/lib/mermaid-config";
 import mermaid from "mermaid";
 import { useEffect, useRef, useState } from "react";
 
 interface MermaidDiagramProps {
   chart: string;
   className?: string;
+  isDarkMode?: boolean;
 }
 
-export function MermaidDiagram({ chart, className = "" }: MermaidDiagramProps) {
+export function MermaidDiagram({
+  chart,
+  className = "",
+  isDarkMode = false,
+}: MermaidDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mermaidInitialized, setMermaidInitialized] = useState(false);
 
   useEffect(() => {
     // Initialize mermaid with configuration
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: "default",
-      securityLevel: "loose",
-      fontFamily: "Arial, sans-serif",
-      fontSize: 14,
-      flowchart: {
-        useMaxWidth: true,
-        htmlLabels: true,
-        curve: "basis",
-      },
-      themeVariables: {
-        primaryColor: "#3b82f6",
-        primaryTextColor: "#1f2937",
-        primaryBorderColor: "#2563eb",
-        lineColor: "#6b7280",
-        secondaryColor: "#e5e7eb",
-        tertiaryColor: "#f3f4f6",
-        background: "#ffffff",
-        mainBkg: "#ffffff",
-        secondBkg: "#f9fafb",
-        tertiaryBkg: "#f3f4f6",
-      },
-    });
-  }, []);
+    const setupMermaid = async () => {
+      try {
+        const success = await initializeMermaid(isDarkMode);
+        if (success) {
+          setMermaidInitialized(true);
+        } else {
+          throw new Error("Failed to initialize Mermaid");
+        }
+      } catch (error) {
+        console.error("Failed to initialize mermaid:", error);
+        setError("Failed to initialize diagram renderer");
+        setIsLoading(false);
+      }
+    };
+
+    setupMermaid();
+  }, [isDarkMode]);
 
   useEffect(() => {
+    if (!mermaidInitialized || !chart.trim()) {
+      setIsLoading(false);
+      return;
+    }
+
     const renderChart = async () => {
-      if (!ref.current || !chart.trim()) return;
+      if (!ref.current) return;
 
       setIsLoading(true);
       setError(null);
@@ -68,32 +77,51 @@ export function MermaidDiagram({ chart, className = "" }: MermaidDiagramProps) {
         // Clear previous content
         ref.current.innerHTML = "";
 
-        // Generate unique ID for this diagram
-        const id = `mermaid-${Date.now()}-${Math.random()
-          .toString(36)
-          .substr(2, 9)}`;
+        // Clean and validate the chart input
+        const cleanChart = cleanMermaidCode(chart);
+        const validation = validateMermaidSyntax(cleanChart);
 
-        // Create a temporary element for mermaid to render into
-        const tempDiv = document.createElement("div");
-        tempDiv.id = id;
-        ref.current.appendChild(tempDiv);
+        if (!validation.isValid) {
+          throw new Error(validation.error || "Invalid diagram syntax");
+        }
+
+        // Generate unique ID for this diagram
+        const id = generateMermaidId();
 
         // Render the mermaid diagram
-        const { svg } = await mermaid.render(id, chart);
+        const { svg } = await mermaid.render(id, cleanChart);
 
-        // Replace the temporary div with the SVG
+        // Replace the content with the SVG
         ref.current.innerHTML = svg;
 
         setIsLoading(false);
       } catch (err) {
         console.error("Mermaid rendering error:", err);
-        setError("Failed to render diagram");
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+        setError(`Failed to render diagram: ${errorMessage}`);
         setIsLoading(false);
+
+        // Show error with the problematic code
+        if (ref.current) {
+          ref.current.innerHTML = `
+            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-red-600 text-sm font-medium">Failed to render diagram</p>
+              <p class="text-red-500 text-xs mt-1">${errorMessage}</p>
+              <details class="mt-2">
+                <summary class="text-xs text-gray-600 cursor-pointer">View code</summary>
+                <pre class="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto"><code>${cleanMermaidCode(
+                  chart
+                )}</code></pre>
+              </details>
+            </div>
+          `;
+        }
       }
     };
 
     renderChart();
-  }, [chart]);
+  }, [chart, mermaidInitialized]);
 
   if (!chart.trim()) {
     return null;
@@ -105,14 +133,17 @@ export function MermaidDiagram({ chart, className = "" }: MermaidDiagramProps) {
         <div className="flex items-center justify-center p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           <span className="ml-2 text-sm text-gray-600">
-            Rendering diagram...
+            {mermaidInitialized
+              ? "Rendering diagram..."
+              : "Initializing renderer..."}
           </span>
         </div>
       )}
 
-      {error && (
+      {error && !isLoading && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 text-sm">{error}</p>
+          <p className="text-red-600 text-sm font-medium">Error</p>
+          <p className="text-red-500 text-xs">{error}</p>
         </div>
       )}
 

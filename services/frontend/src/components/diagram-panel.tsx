@@ -17,6 +17,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  cleanMermaidCode,
+  generateMermaidId,
+  initializeMermaid,
+  validateMermaidSyntax,
+} from "@/lib/mermaid-config";
 import { Diagram } from "@/types";
 import { useEffect, useState } from "react";
 
@@ -24,37 +30,34 @@ interface DiagramPanelProps {
   diagram: Diagram | null;
   isHidden: boolean;
   onToggleVisibility: () => void;
+  isDarkMode?: boolean;
 }
 
 export function DiagramPanel({
   diagram,
   isHidden,
   onToggleVisibility,
+  isDarkMode = false,
 }: DiagramPanelProps) {
   const [mermaidLoaded, setMermaidLoaded] = useState(false);
 
   useEffect(() => {
-    // Dynamically import mermaid
-    const loadMermaid = async () => {
+    // Initialize mermaid
+    const setupMermaid = async () => {
       try {
-        const mermaid = await import("mermaid");
-        mermaid.default.initialize({
-          startOnLoad: true,
-          theme: "default",
-          securityLevel: "loose",
-          flowchart: {
-            useMaxWidth: true,
-            htmlLabels: true,
-          },
-        });
-        setMermaidLoaded(true);
+        const success = await initializeMermaid(isDarkMode);
+        if (success) {
+          setMermaidLoaded(true);
+        } else {
+          console.error("Failed to initialize mermaid");
+        }
       } catch (error) {
         console.error("Failed to load mermaid:", error);
       }
     };
 
-    loadMermaid();
-  }, []);
+    setupMermaid();
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (mermaidLoaded && diagram?.diagram_code) {
@@ -64,13 +67,42 @@ export function DiagramPanel({
           const mermaid = (await import("mermaid")).default;
           const element = document.getElementById("mermaid-diagram");
           if (element) {
-            element.innerHTML = diagram.diagram_code;
-            await mermaid.run({
-              nodes: [element],
-            });
+            // Clear previous content
+            element.innerHTML = "";
+
+            // Clean and validate the diagram code
+            const cleanChart = cleanMermaidCode(diagram.diagram_code);
+            const validation = validateMermaidSyntax(cleanChart);
+
+            if (!validation.isValid) {
+              throw new Error(validation.error || "Invalid diagram syntax");
+            }
+
+            // Generate unique ID for this diagram
+            const id = generateMermaidId();
+
+            // Use modern render API
+            const { svg } = await mermaid.render(id, cleanChart);
+            element.innerHTML = svg;
           }
         } catch (error) {
           console.error("Failed to render diagram:", error);
+          const element = document.getElementById("mermaid-diagram");
+          if (element) {
+            const errorMessage =
+              error instanceof Error ? error.message : "Unknown error";
+            const cleanChart = cleanMermaidCode(diagram.diagram_code);
+            element.innerHTML = `
+              <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p class="text-red-600 text-sm font-medium">Failed to render diagram</p>
+                <p class="text-red-500 text-xs mt-1">${errorMessage}</p>
+                <details class="mt-2">
+                  <summary class="text-xs text-gray-600 cursor-pointer">View original code</summary>
+                  <pre class="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto"><code>${cleanChart}</code></pre>
+                </details>
+              </div>
+            `;
+          }
         }
       };
 
@@ -80,7 +112,8 @@ export function DiagramPanel({
 
   const copyDiagramCode = () => {
     if (diagram?.diagram_code) {
-      navigator.clipboard.writeText(diagram.diagram_code);
+      const cleanedCode = cleanMermaidCode(diagram.diagram_code);
+      navigator.clipboard.writeText(cleanedCode);
     }
   };
 
@@ -196,7 +229,7 @@ export function DiagramPanel({
             View Raw Code
           </summary>
           <pre className="mt-2 p-3 bg-gray-100 dark:bg-gray-900 rounded text-xs overflow-auto">
-            <code>{diagram.diagram_code}</code>
+            <code>{cleanMermaidCode(diagram.diagram_code)}</code>
           </pre>
         </details>
       </div>
