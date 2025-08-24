@@ -5,6 +5,7 @@ This guide covers deploying AgentChat to production environments, including air-
 ## Deployment Overview
 
 AgentChat uses a **modular monolith** deployment strategy where:
+
 - Frontend is pre-rendered into static files
 - Backend serves both API endpoints and static frontend
 - Single deployable unit for simplified operations
@@ -19,22 +20,22 @@ graph TB
         BUILD[Build Process]
         GCS[GCS Bucket<br/>gs://agentchat-builds]
     end
-    
+
     subgraph "Production Environment"
         SERVER[Target Server]
         DEPLOY[Deploy Process]
         APP[Running Application]
     end
-    
+
     DEV --> BUILD
     BUILD --> GCS
     GCS --> DEPLOY
     DEPLOY --> APP
-    
+
     BUILD --> |"1. npm run build-static"| BUILD
     BUILD --> |"2. zip backend + static"| BUILD
     BUILD --> |"3. upload to GCS"| GCS
-    
+
     DEPLOY --> |"1. download from GCS"| DEPLOY
     DEPLOY --> |"2. extract & setup"| DEPLOY
     DEPLOY --> |"3. start FastAPI server"| APP
@@ -43,11 +44,13 @@ graph TB
 ## Prerequisites
 
 ### Development Machine
+
 - **Google Cloud CLI** configured
 - **Access to GCS bucket** `gs://agentchat-builds`
 - **Build dependencies**: Node.js, Python, uv
 
 ### Target Server
+
 - **Python 3.13+**
 - **Google Cloud CLI** (for GCS access)
 - **Screen** (for background process management)
@@ -68,6 +71,7 @@ source scripts/build.sh
 ```
 
 This script performs:
+
 1. 🎨 **Frontend Build**: Installs dependencies and builds static files
 2. 📦 **Archive Creation**: Creates timestamped zip of backend + static frontend
 3. 🧹 **GCS Cleanup**: Removes old build archives
@@ -87,6 +91,7 @@ source scripts/deploy-vm.sh
 ```
 
 This script performs:
+
 1. 📁 **Setup**: Creates deployment directory at `$PROJECT_ROOT/test_serving`
 2. 🔍 **Discovery**: Finds latest build archive in GCS bucket
 3. ⬇️ **Download**: Downloads and extracts build archive
@@ -140,24 +145,13 @@ uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --workers 4
 Create `.env` file in backend directory:
 
 ```bash
-# Google Cloud Configuration
-GOOGLE_CLOUD_PROJECT=your-production-project
+# Environment Configuration
+GOOGLE_CLOUD_PROJECT=your-project-id
 GOOGLE_CLOUD_LOCATION=us-central1
 GOOGLE_GENAI_USE_VERTEXAI=TRUE
-
-# Authentication
-AUTH_SECRET=your-production-secret-key
-
-# Application Configuration
-FRONTEND_URL=https://your-domain.com
-LOG_LEVEL=INFO
-
-# Optional: Custom Search
-GOOGLE_CSE_ID=your-cse-id
-CUSTOM_SEARCH_API_KEY=your-api-key
-
-# Production Settings
-WORKERS=4
+GCS_BUCKET_NAME=your-bucket-name
+SERVICE_ACCOUNT_EMAIL=your-service-account@your-project.iam.gserviceaccount.com
+SIGNED_URL_LIFETIME=3600
 ```
 
 ### Google Cloud Authentication
@@ -257,6 +251,7 @@ gunicorn src.app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8
 ### Security Considerations
 
 1. **HTTPS Configuration**
+
    ```bash
    # Use reverse proxy (nginx/Apache)
    # Or configure TLS directly
@@ -264,6 +259,7 @@ gunicorn src.app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8
    ```
 
 2. **Firewall Configuration**
+
    ```bash
    # Allow only necessary ports
    ufw allow 8000/tcp
@@ -356,11 +352,13 @@ unzip build-YYYYMMDD_HHMMSS.zip
 ### Common Issues
 
 1. **Port Already in Use**
+
    ```bash
    lsof -ti:8000 | xargs kill -9
    ```
 
 2. **Permission Errors**
+
    ```bash
    # Fix file permissions
    chmod +x scripts/*.sh
@@ -368,6 +366,7 @@ unzip build-YYYYMMDD_HHMMSS.zip
    ```
 
 3. **Google Cloud Authentication**
+
    ```bash
    # Verify authentication
    gcloud auth list
@@ -418,16 +417,19 @@ ulimit -m 4194304  # 4GB
 ### Regular Maintenance Tasks
 
 1. **Log Rotation**
+
    ```bash
    logrotate /etc/logrotate.d/agentchat
    ```
 
 2. **Dependency Updates**
+
    ```bash
    uv sync --upgrade
    ```
 
 3. **Security Updates**
+
    ```bash
    apt update && apt upgrade -y
    ```

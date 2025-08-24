@@ -27,29 +27,6 @@ def test_api_endpoints_exist(client):
     assert response.status_code == 200
     assert 'title' in response.json()
 
-    # Test auth status endpoint (should work even without authentication)
-    response = client.get('/api/v1/auth/status')
-    assert response.status_code == 200
-    assert 'authenticated' in response.json()
-
-
-def test_authentication_flow(client):
-    """Test basic authentication flow without deep integration."""
-    # Test login with wrong secret
-    response = client.post(
-        '/api/v1/auth/login', json={'secret': 'wrong-secret', 'name': 'Test User'}
-    )
-    assert response.status_code == 401
-
-    # Test login with correct secret
-    response = client.post(
-        '/api/v1/auth/login', json={'secret': 'test-secret-123', 'name': 'Test User'}
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data['success'] is True
-    assert 'session_id' in data
-
 
 def test_agent_models_endpoint(client):
     """Test that agent models endpoint works."""

@@ -89,10 +89,6 @@ class Settings(BaseSettings):
     GEMINI_MODEL_PRO: str = 'gemini-2.5-pro'
     DEFAULT_MODEL: str = 'gemini-2.5-flash'
 
-    # Authentication settings
-    AUTH_SECRET: str
-    SESSION_TIMEOUT_HOURS: int = 24
-
     # Model configuration
     AVAILABLE_MODELS: dict = {
         'gemini-2.5-flash': {

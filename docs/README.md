@@ -303,24 +303,6 @@ graph LR
     end
 ```
 
-## Authentication
-
-Simple header-based authentication with session management:
-
-### Flow
-
-1. Users access `/login` page
-2. Enter secret access code
-3. Backend validates and creates session
-4. Session ID stored in localStorage
-5. All requests include `X-Session-ID` header
-
-### Configuration
-
-```bash
-AUTH_SECRET=your-super-secret-key
-```
-
 ## Session Management
 
 The system uses sophisticated session management for conversation continuity:

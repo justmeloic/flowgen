@@ -17,11 +17,9 @@
 "use client";
 
 import { Header } from "@/components/header";
-import { ProtectedRoute } from "@/components/protected-route";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Dancing_Script, Inter } from "next/font/google";
-import { usePathname } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import "../styles/globals.css";
@@ -39,10 +37,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const pathname = usePathname();
-
-  // Don't protect the login page
-  const isLoginPage = pathname === "/login";
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -59,36 +53,28 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {isLoginPage ? (
-            // Login page without protection
-            children
-          ) : (
-            // Protected pages
-            <ProtectedRoute>
-              <div className="relative flex min-h-screen flex-col">
-                <Header />
-                <div className="flex-1">
-                  <div className="">
-                    <div className="bg-background">
-                      <div className="flex">
-                        <Sidebar
-                          isCollapsed={isCollapsed}
-                          onToggle={() => setIsCollapsed(!isCollapsed)}
-                        />
-                        <main
-                          className={`flex-1 p-8 transition-all duration-700 ease-out ${
-                            isCollapsed ? "ml-20" : "ml-0"
-                          }`}
-                        >
-                          {children}
-                        </main>
-                      </div>
-                    </div>
+          <div className="relative flex min-h-screen flex-col">
+            <Header />
+            <div className="flex-1">
+              <div className="">
+                <div className="bg-background">
+                  <div className="flex">
+                    <Sidebar
+                      isCollapsed={isCollapsed}
+                      onToggle={() => setIsCollapsed(!isCollapsed)}
+                    />
+                    <main
+                      className={`flex-1 p-8 transition-all duration-700 ease-out ${
+                        isCollapsed ? "ml-20" : "ml-0"
+                      }`}
+                    >
+                      {children}
+                    </main>
                   </div>
                 </div>
               </div>
-            </ProtectedRoute>
-          )}
+            </div>
+          </div>
         </ThemeProvider>
       </body>
     </html>

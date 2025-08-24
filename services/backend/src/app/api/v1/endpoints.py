@@ -18,7 +18,6 @@ from fastapi import APIRouter
 
 from src.app.api.v1.routes import (
     agent,
-    auth,
     files,
     utility,
 )
@@ -30,12 +29,6 @@ main_v1_router.include_router(
     agent.router,
     prefix='/root_agent',
     tags=['root_agent'],
-)
-
-main_v1_router.include_router(
-    auth.router,
-    prefix='/auth',
-    tags=['authentication'],
 )
 
 main_v1_router.include_router(

@@ -15,7 +15,6 @@ os.environ.setdefault('GOOGLE_CLOUD_LOCATION', 'us-central1')
 os.environ.setdefault('GCS_BUCKET_NAME', 'test-bucket')
 os.environ.setdefault('SERVICE_ACCOUNT_EMAIL', 'test@test.iam.gserviceaccount.com')
 os.environ.setdefault('SIGNED_URL_LIFETIME', '3600')
-os.environ.setdefault('AUTH_SECRET', 'test-secret-123')
 
 from src.app.main import app
 

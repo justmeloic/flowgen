@@ -5,6 +5,7 @@ This guide provides detailed instructions for setting up and developing AgentCha
 ## Prerequisites
 
 ### System Requirements
+
 - **Operating System**: macOS, Linux, or Windows with WSL2
 - **Python**: 3.13+ (backend)
 - **Node.js**: 18+ (frontend)
@@ -12,20 +13,23 @@ This guide provides detailed instructions for setting up and developing AgentCha
 - **Git**: For version control
 
 ### Google Cloud Setup
+
 1. **Create GCP Project**
+
    ```bash
    gcloud projects create agentchat-project
    gcloud config set project agentchat-project
    ```
 
 2. **Enable Required APIs**
+
    ```bash
    gcloud services enable aiplatform.googleapis.com
    gcloud services enable storage.googleapis.com
    gcloud services enable logging.googleapis.com
    ```
 
-3. **Authentication**
+3. **Set up Google Cloud Authentication**
    ```bash
    gcloud auth application-default login
    ```
@@ -35,43 +39,48 @@ This guide provides detailed instructions for setting up and developing AgentCha
 ### Environment Setup
 
 1. **Clone and Navigate**
+
    ```bash
    git clone <repository-url>
    cd agentchat/services/backend
    ```
 
 2. **Install uv Package Manager**
+
    ```bash
    pip install uv
    ```
 
 3. **Create Virtual Environment**
+
    ```bash
    uv venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
 
 4. **Install Dependencies**
+
    ```bash
    uv sync
    ```
 
 5. **Environment Configuration**
+
    ```bash
    cp .env.example .env
    ```
 
    Configure your `.env` file:
+
    ```bash
    # Google Cloud Configuration
    GOOGLE_CLOUD_PROJECT=your-project-id
    GOOGLE_CLOUD_LOCATION=us-central1
    GOOGLE_GENAI_USE_VERTEXAI=TRUE
-   
+
    # Application Configuration
-   AUTH_SECRET=your-development-secret
    FRONTEND_URL=http://localhost:3000
-   
+
    # Optional: Google Custom Search
    GOOGLE_CSE_ID=your-cse-id
    CUSTOM_SEARCH_API_KEY=your-api-key
@@ -93,6 +102,7 @@ The backend will be available at `http://localhost:8000`
 ### Backend API Documentation
 
 Once running, visit:
+
 - **Swagger UI**: `http://localhost:8000/docs`
 - **ReDoc**: `http://localhost:8000/redoc`
 
@@ -101,11 +111,13 @@ Once running, visit:
 ### Environment Setup
 
 1. **Navigate to Frontend**
+
    ```bash
    cd agentchat/services/frontend
    ```
 
 2. **Install Dependencies**
+
    ```bash
    npm install
    # or
@@ -113,11 +125,13 @@ Once running, visit:
    ```
 
 3. **Environment Configuration**
+
    ```bash
    cp src/.env.local.example src/.env.local
    ```
 
    Configure your `.env.local` file:
+
    ```bash
    NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
    ```
@@ -192,7 +206,8 @@ services/backend/src/
 │   ├── api/v1/              # API routes
 │   │   └── routes/
 │   │       ├── agent.py     # Main agent endpoints
-│   │       └── auth.py      # Authentication endpoints
+│   │       ├── files.py     # File handling endpoints
+│   │       └── utility.py   # Utility endpoints
 │   ├── core/                # Core configuration
 │   │   ├── config.py        # Application settings
 │   │   └── logging.py       # Logging configuration
@@ -213,20 +228,21 @@ services/backend/src/
 ```
 services/frontend/src/
 ├── app/                      # Next.js app directory
-│   ├── login/               # Authentication pages
 │   ├── layout.tsx           # Root layout
-│   └── page.tsx             # Main chat page
+│   ├── page.tsx             # Main chat page
+│   └── doc/                 # Documentation page
 ├── components/              # React components
 │   ├── ui/                  # Base UI components
 │   ├── chat-input.tsx       # Message input component
 │   ├── model-selector.tsx   # Model selection component
-│   └── protected-route.tsx  # Authentication wrapper
+│   ├── header.tsx           # Application header
+│   └── sidebar.tsx          # Navigation sidebar
 ├── hooks/                   # Custom React hooks
-│   ├── useAuth.ts          # Authentication logic
-│   └── use-toast.ts        # Toast notifications
+│   ├── use-mobile.tsx       # Mobile detection
+│   └── use-toast.ts         # Toast notifications
 ├── lib/                    # Utilities
 │   ├── api.ts              # API client functions
-│   ├── auth-config.ts      # Authentication configuration
+│   ├── env.ts              # Environment configuration
 │   └── utils.ts            # General utilities
 └── types/                  # TypeScript type definitions
     └── index.ts            # Shared types
@@ -269,12 +285,14 @@ npm run test:e2e
 ### Backend Debugging
 
 1. **Enable Debug Logging**
+
    ```python
    # In src/app/core/config.py
    LOG_LEVEL = "DEBUG"
    ```
 
 2. **Use Python Debugger**
+
    ```python
    import pdb; pdb.set_trace()
    ```
@@ -288,11 +306,13 @@ npm run test:e2e
 ### Frontend Debugging
 
 1. **Browser DevTools**
+
    - Network tab for API calls
    - Console for JavaScript errors
    - React DevTools for component inspection
 
 2. **Next.js Debugging**
+
    ```bash
    NODE_OPTIONS='--inspect' npm run dev
    ```
@@ -305,15 +325,17 @@ npm run test:e2e
 ### Backend Issues
 
 1. **Google Cloud Authentication**
+
    ```bash
    # Re-authenticate
    gcloud auth application-default login
-   
+
    # Check current project
    gcloud config get-value project
    ```
 
 2. **Port Already in Use**
+
    ```bash
    # Find and kill process using port 8000
    lsof -ti:8000 | xargs kill -9
@@ -330,6 +352,7 @@ npm run test:e2e
 ### Frontend Issues
 
 1. **Node Modules Issues**
+
    ```bash
    # Clear and reinstall
    rm -rf node_modules package-lock.json
@@ -337,6 +360,7 @@ npm run test:e2e
    ```
 
 2. **Environment Variables**
+
    - Ensure `.env.local` exists
    - Check `NEXT_PUBLIC_API_BASE_URL` is correct
    - Restart development server after changes
@@ -353,6 +377,7 @@ npm run test:e2e
 ### Backend Performance
 
 1. **Enable ADK Caching**
+
    - Agent Factory uses LRU cache
    - Runners are cached per model
    - Session service manages memory efficiently
@@ -365,6 +390,7 @@ npm run test:e2e
 ### Frontend Performance
 
 1. **Next.js Optimizations**
+
    - Use Next.js Image component
    - Implement code splitting
    - Enable static generation where possible

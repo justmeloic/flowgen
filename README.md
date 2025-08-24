@@ -250,48 +250,6 @@ Sample data: ['2023-01-01', 'Widget A', '45', 'North', '1350.00']
 - Basic malicious content detection
 - Sandboxed file processing
 
-## Authentication
-
-This application uses a simple header-based authentication system. It provides basic access control using a secret code that is validated on the server.
-
-### How it Works
-
-1.  **Login Page**: Users are redirected to `/login` when they try to access any protected page.
-2.  **Secret Code**: Users must enter the correct access code to gain access.
-3.  **Authentication Endpoint**: The frontend sends the secret to the `/api/v1/auth/login` endpoint on the backend.
-4.  **Session Management**: If the secret is correct, the backend creates an authenticated session and returns a session ID to the frontend.
-5.  **Session ID**: The frontend stores the session ID in local storage and includes it in the `X-Session-ID` header of all subsequent requests.
-6.  **Middleware**: A middleware on the backend validates the session ID on all protected routes.
-7.  **Logout**: When a user logs out, the frontend calls the `/api/v1/auth/logout` endpoint to invalidate the session on the server.
-
-### Configuration
-
-The authentication is configured in the backend's `.env` file:
-
-```bash
-# Authentication
-AUTH_SECRET=your-super-secret-key
-```
-
-### Components
-
-- **Login Page**: `services/frontend/src/app/login/page.tsx` - The login form.
-- **Authentication API**: `services/backend/src/app/api/v1/auth.py` - The login and logout endpoints.
-- **Session Middleware**: `services/backend/src/app/middleware/session_middleware.py` - The middleware that protects routes.
-- **useAuth Hook**: `services/frontend/src/hooks/useAuth.ts` - The frontend logic for handling authentication state.
-- **ProtectedRoute**: `services/frontend/src/components/protected-route.tsx` - The component that wraps protected pages.
-
-### Security Notes
-
-This is a simple authentication system suitable for a proof-of-concept. For production use, consider implementing more robust security measures such as:
-
-- JWT tokens
-- Database user management
-- Password hashing
-- Rate limiting
-- HTTPS enforcement
-- Security headers
-
 ## Building and Deploying
 
 This project uses a **streamlined deployment model optimized for Raspberry Pi 5**, where the frontend is pre-rendered into static files and served by the FastAPI backend as a single deployable unit.
