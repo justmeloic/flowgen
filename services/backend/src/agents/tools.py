@@ -101,6 +101,8 @@ def _sanitize_mermaid(code: str) -> str:
     """Best-effort cleanup to improve Mermaid parse success.
 
     - Remove newlines within square-bracket node labels: [ ... ]
+    - Remove newlines within parentheses (and double-paren shapes): ( ... ), (( ... ))
+    - Remove newlines within curly-brace diamond labels: { ... }
     - Remove newlines within quoted labels: " ... "
     - Normalize line endings and trim extraneous fences/whitespace
     """
@@ -130,6 +132,44 @@ def _sanitize_mermaid(code: str) -> str:
             out_chars.append(ch)
             continue
         if bracket_depth > 0 and ch == '\n':
+            out_chars.append(' ')
+            continue
+        out_chars.append(ch)
+    s = ''.join(out_chars)
+
+    # Collapse newlines inside parentheses (...) including double-paren shapes
+    out_chars = []
+    paren_depth = 0
+    for ch in s:
+        if ch == '(':
+            paren_depth += 1
+            out_chars.append(ch)
+            continue
+        if ch == ')':
+            if paren_depth > 0:
+                paren_depth -= 1
+            out_chars.append(ch)
+            continue
+        if paren_depth > 0 and ch == '\n':
+            out_chars.append(' ')
+            continue
+        out_chars.append(ch)
+    s = ''.join(out_chars)
+
+    # Collapse newlines inside curly braces {...} (e.g., decision diamonds)
+    out_chars = []
+    brace_depth = 0
+    for ch in s:
+        if ch == '{':
+            brace_depth += 1
+            out_chars.append(ch)
+            continue
+        if ch == '}':
+            if brace_depth > 0:
+                brace_depth -= 1
+            out_chars.append(ch)
+            continue
+        if brace_depth > 0 and ch == '\n':
             out_chars.append(' ')
             continue
         out_chars.append(ch)
