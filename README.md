@@ -1,6 +1,6 @@
 <div align="center">
   <img src="services/frontend/public/logo-banner.png">
-  <p>Architecture Designer - AI-Powered System Architecture Solutions</p>
+  <p>Flowgen - AI-Powered System Architecture Solutions</p>
 
   <br>
 
@@ -15,7 +15,7 @@
 **Owner / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
 </div>
-An intelligent agent that helps you draft architecture solutions and system diagrams for end-to-end solutions. The agent interacts with users to gather requirements, understand technical constraints, and generates comprehensive Mermaid architecture diagrams with detailed explanations. **Optimized for deployment on Raspberry Pi 5** with a streamlined single-service architecture.
+An intelligent agent that helps you draft end-to-end solutions solutions architectures. The agent interacts with users to gather requirements, understand technical constraints, and generates comprehensive Mermaid architecture diagrams with detailed explanations. **Optimized for deployment on Raspberry Pi 5** with a streamlined single-service architecture.
 
 ## ✨ Key Features
 
