@@ -76,6 +76,7 @@ export default function ChatPage() {
   const [selectedModel, setSelectedModel] =
     useState<string>("gemini-2.5-flash");
   const [isStartingNew, setIsStartingNew] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(true);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -86,7 +87,7 @@ export default function ChatPage() {
       : "Hello!";
 
   const subtitleText =
-    "AI-Powered Architecture Solution Designer. I help you design comprehensive system architectures by gathering requirements, analyzing constraints, and generating detailed Mermaid diagrams. Let's build something amazing together!";
+    "I help you design comprehensive system architectures by gathering requirements, analyzing constraints, and generating detailed Mermaid diagrams";
 
   const { displayText: displayGreeting, isComplete: greetingComplete } =
     useTypewriter(greetingText, 80);
@@ -188,6 +189,26 @@ export default function ChatPage() {
   useEffect(() => {
     localStorage.setItem("isFirstPrompt", JSON.stringify(isFirstPrompt));
   }, [isFirstPrompt]);
+
+  // Listen for sidebar toggle events from layout
+  useEffect(() => {
+    const onSidebarToggled = (e: Event) => {
+      const ev = e as CustomEvent<{ isCollapsed: boolean }>;
+      if (typeof ev.detail?.isCollapsed === "boolean") {
+        setIsSidebarCollapsed(ev.detail.isCollapsed);
+      }
+    };
+    window.addEventListener(
+      "sidebarToggled",
+      onSidebarToggled as EventListener
+    );
+    return () => {
+      window.removeEventListener(
+        "sidebarToggled",
+        onSidebarToggled as EventListener
+      );
+    };
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (chatContainerRef.current) {
@@ -468,20 +489,20 @@ export default function ChatPage() {
       <div
         className={`flex items-center justify-between transition-all duration-1700 ease-in-out ${
           diagram && !isDiagramHidden ? "blur-sm" : ""
-        }`}
+        } ${!isSidebarCollapsed ? "hidden" : ""}`}
       >
         <Button
           onClick={handleNewConversation}
           disabled={isStartingNew}
           className={cn(
-            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg",
+            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             isStartingNew && "opacity-50 cursor-not-allowed"
           )}
           aria-label="New conversation"
         >
           <SquarePen
             className={cn(
-              "w-5 h-5 text-gray-600 dark:text-gray-300",
+              "w-5 h-5 text-gray-600/80 dark:text-gray-300",
               isStartingNew && "animate-pulse"
             )}
           />
@@ -522,9 +543,9 @@ export default function ChatPage() {
                     </span>
                   </h1>
                   {greetingComplete && (
-                    <h3 className="text-center text-base md:text-lg w-[500px] transition-opacity duration-500 ease-in-out">
+                    <h3 className="text-center text-base md:text-lg w-[600px] transition-opacity duration-500 ease-in-out">
                       <span
-                        className="bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent font-cursive dark:from-gray-400 dark:to-gray-200"
+                        className="bg-gradient-to-r text-sm from-gray-600 to-gray-800 bg-clip-text text-transparent font-poppins dark:from-gray-400 dark:to-gray-200"
                         style={{
                           fontWeight: 400,
                           letterSpacing: "0.01em",

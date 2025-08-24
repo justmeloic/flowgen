@@ -19,9 +19,9 @@
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Dancing_Script, Inter } from "next/font/google";
+import { Dancing_Script, Inter, Poppins } from "next/font/google";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -30,22 +30,51 @@ const dancingScript = Dancing_Script({
   variable: "--font-cursive",
   weight: ["400", "500", "600", "700"],
 });
+const poppins = Poppins({
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  weight: ["300", "400", "500", "600"],
+});
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+
+  // Hydrate from localStorage post-mount to avoid SSR mismatch
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sidebar:isCollapsed");
+      if (saved !== null) {
+        setIsCollapsed(JSON.parse(saved));
+      }
+    } catch {
+      // ignore parsing errors
+    }
+  }, []);
+
+  // Broadcast sidebar state so pages can react (e.g., hide duplicate buttons)
+  useEffect(() => {
+    try {
+      localStorage.setItem("sidebar:isCollapsed", JSON.stringify(isCollapsed));
+      window.dispatchEvent(
+        new CustomEvent("sidebarToggled", { detail: { isCollapsed } })
+      );
+    } catch {
+      // no-op in non-browser environments
+    }
+  }, [isCollapsed]);
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Agent Interface</title>
+        <title>Flowgen</title>
         <link rel="icon" href="/logo-dark.png" type="image/png" />
       </head>
       <body
-        className={`${inter.variable} ${dancingScript.variable} font-sans antialiased`}
+        className={`${inter.variable} ${dancingScript.variable} ${poppins.variable} font-sans antialiased`}
       >
         <ThemeProvider
           attribute="class"
