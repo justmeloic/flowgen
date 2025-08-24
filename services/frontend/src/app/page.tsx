@@ -445,13 +445,31 @@ export default function ChatPage() {
     };
   }, []);
 
+  // Handle Escape key to close diagram panel
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && diagram && !isDiagramHidden) {
+        setIsDiagramHidden(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [diagram, isDiagramHidden]);
+
   const toggleDiagramVisibility = () => {
     setIsDiagramHidden((prev: boolean) => !prev);
   };
 
   return (
     <div className="flex flex-col flex-1 h-full">
-      <div className="flex items-center justify-between">
+      <div
+        className={`flex items-center justify-between transition-all duration-1700 ease-in-out ${
+          diagram && !isDiagramHidden ? "blur-sm" : ""
+        }`}
+      >
         <Button
           onClick={handleNewConversation}
           disabled={isStartingNew}
@@ -474,7 +492,7 @@ export default function ChatPage() {
       <div className="flex flex-1 overflow-hidden">
         <main
           className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${
-            diagram && !isDiagramHidden ? "mr-[28rem]" : ""
+            diagram && !isDiagramHidden ? "blur-sm" : ""
           }`}
         >
           <div
@@ -608,7 +626,9 @@ export default function ChatPage() {
             className={`w-full max-w-[850px] mx-auto sticky transition-all duration-700 ease-in-out ${
               isFirstPrompt && chatHistory.length === 0
                 ? "opacity-0"
-                : "opacity-100 bottom-0 bg-chatInput-light dark:bg-background py-2 px-4 dark:border-gray-700"
+                : `opacity-100 bottom-0 bg-chatInput-light dark:bg-background py-2 px-4 dark:border-gray-700 ${
+                    diagram && !isDiagramHidden ? "blur-sm" : ""
+                  }`
             }`}
           >
             {(!isFirstPrompt || chatHistory.length > 0) && (
@@ -642,11 +662,21 @@ export default function ChatPage() {
               </button>
             )}
 
-            {/* Diagram panel */}
+            {/* Backdrop overlay */}
+            {!isDiagramHidden && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-700 ease-in-out"
+                onClick={toggleDiagramVisibility}
+              />
+            )}
+
+            {/* Diagram panel - centered and larger */}
             <div
               data-diagram-panel
-              className={`fixed right-0 w-[28rem] bg-blue-50 dark:bg-secondary-dark overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-700 ease-in-out shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] ${
-                isDiagramHidden ? "translate-x-[120%]" : "translate-x-0"
+              className={`fixed top-1/2 left-1/2 w-[90vw] max-w-[1200px] h-[85vh] bg-blue-50 dark:bg-secondary-dark overflow-y-auto rounded-3xl shadow-2xl z-40 transition-all duration-700 ease-in-out ${
+                isDiagramHidden
+                  ? "transform -translate-x-1/2 -translate-y-1/2 scale-95 opacity-0 pointer-events-none"
+                  : "transform -translate-x-1/2 -translate-y-1/2 scale-100 opacity-100"
               }`}
             >
               <DiagramPanel
