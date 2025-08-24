@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "google-adk>=0.2.0",
+    "google-genai>=0.3.0",
     "fastapi>=0.104.0",
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
