@@ -171,10 +171,10 @@ class AgentService:
             model_name: The model being used for this query.
 
         Returns:
-            A tuple of (final_response_text, references_json).
+            A tuple of (final_response_text, diagram_json).
         """
         final_response_text = 'Agent did not produce a final response.'
-        references_json = {}
+        diagram_json = {}
         session_id = session.id
 
         async for event in runner.run_async(
@@ -184,20 +184,12 @@ class AgentService:
         ):
             await session_service.append_event(session, event)
 
-            # Check if this is a tool call event
-            if hasattr(event, 'actions') and event.actions:
-                if hasattr(event.actions, 'tool_call') and event.actions.tool_call:
-                    tool_name = getattr(event.actions.tool_call, 'name', 'unknown_tool')
-                    await sse_manager.send_tool_start(session_id, tool_name)
-                    self._logger.info(
-                        f'Tool started: {tool_name} for session {session_id}'
-                    )
-
             if event.is_final_response() and event.content and event.content.parts:
                 response_text = event.content.parts[0].text
-                final_response_text, references_json = format_text_response(
-                    response_text=response_text, request=request
-                )
+                if response_text:
+                    final_response_text, diagram_json = format_text_response(
+                        response_text=response_text, request=request
+                    )
 
                 # Send final response via SSE
                 await sse_manager.send_final_response(session_id, final_response_text)
@@ -219,7 +211,7 @@ class AgentService:
                 )
                 await session_service.append_event(session, state_update_event)
 
-        return final_response_text, references_json
+        return final_response_text, diagram_json
 
     async def process_query(
         self,
@@ -244,7 +236,7 @@ class AgentService:
             HTTPException: If an unexpected error occurs during processing.
 
         Returns:
-            An AgentResponse object containing the final response and any references.
+            An AgentResponse object containing the final response and any diagram.
         """
         session_id = getattr(request.state, 'actual_session_id', 'UNKNOWN')
 
@@ -275,7 +267,7 @@ class AgentService:
                 session_service, session, enhanced_query_text, model_name
             )
 
-            final_response_text, references_json = await self._process_agent_events(
+            final_response_text, diagram_json = await self._process_agent_events(
                 request,
                 session_service,
                 runner,
@@ -293,9 +285,10 @@ class AgentService:
 
             return AgentResponse(
                 response=final_response_text,
-                references=references_json,
+                diagram=diagram_json,
                 session_id=session_id,
                 model=model_name,
+                confidence=None,
             )
 
         except Exception as e:

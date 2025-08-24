@@ -17,15 +17,15 @@
 "use client";
 
 import { ChatInput } from "@/components/chat-input";
+import { DiagramPanel } from "@/components/diagram-panel";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { MessageActions } from "@/components/message-actions";
 import { ModelSelector } from "@/components/model-selector";
-import { ReferencesPanel } from "@/components/references-panel";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
 import { sendMessage } from "@/lib/api";
-import { ChatMessage, Reference } from "@/types";
+import { ChatMessage, Diagram } from "@/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -66,13 +66,11 @@ const packageVersion = packageJson.version;
 
 export default function ChatPage() {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
-  const [references, setReferences] = useState<{ [key: string]: Reference }>(
-    {}
-  );
+  const [diagram, setDiagram] = useState<Diagram | null>(null);
   const [isFirstPrompt, setIsFirstPrompt] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Thinking...");
-  const [isReferencesHidden, setIsReferencesHidden] = useState(false);
+  const [isDiagramHidden, setIsDiagramHidden] = useState(false);
   const [selectedModel, setSelectedModel] =
     useState<string>("gemini-2.5-flash");
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -94,9 +92,9 @@ export default function ChatPage() {
 
   // Persist and restore chat state
   useEffect(() => {
-    // Restore chat history and references when component mounts
+    // Restore chat history and diagram when component mounts
     const storedChatHistory = localStorage.getItem("chatHistory");
-    const storedReferences = localStorage.getItem("chatReferences");
+    const storedDiagram = localStorage.getItem("chatDiagram");
     const storedIsFirstPrompt = localStorage.getItem("isFirstPrompt");
 
     if (storedChatHistory) {
@@ -123,12 +121,12 @@ export default function ChatPage() {
       }
     }
 
-    if (storedReferences) {
+    if (storedDiagram) {
       try {
-        const parsedReferences = JSON.parse(storedReferences);
-        setReferences(parsedReferences);
+        const parsedDiagram = JSON.parse(storedDiagram);
+        setDiagram(parsedDiagram);
       } catch (error) {
-        console.error("Error parsing stored references:", error);
+        console.error("Error parsing stored diagram:", error);
       }
     }
 
@@ -146,8 +144,8 @@ export default function ChatPage() {
       if (e.key === "chatHistory" && !e.newValue) {
         setChatHistory([]);
       }
-      if (e.key === "chatReferences" && !e.newValue) {
-        setReferences({});
+      if (e.key === "chatDiagram" && !e.newValue) {
+        setDiagram(null);
       }
       if (e.key === "isFirstPrompt" && !e.newValue) {
         setIsFirstPrompt(true);
@@ -174,14 +172,14 @@ export default function ChatPage() {
     }
   }, [chatHistory]);
 
-  // Save references to localStorage whenever they change
+  // Save diagram to localStorage whenever it changes
   useEffect(() => {
-    if (Object.keys(references).length > 0) {
-      localStorage.setItem("chatReferences", JSON.stringify(references));
+    if (diagram) {
+      localStorage.setItem("chatDiagram", JSON.stringify(diagram));
     } else {
-      localStorage.removeItem("chatReferences");
+      localStorage.removeItem("chatDiagram");
     }
-  }, [references]);
+  }, [diagram]);
 
   // Save isFirstPrompt to localStorage whenever it changes
   useEffect(() => {
@@ -197,18 +195,13 @@ export default function ChatPage() {
     }
   }, []);
 
-  // Function to handle citation clicks
-  const handleCitationClick = useCallback(
-    (citationNumber: string) => {
-      const reference = references[citationNumber];
-      if (reference && reference.link) {
-        window.open(reference.link, "_blank");
-      }
-    },
-    [references]
-  );
+  // Function to handle citation clicks - simplified for diagram mode
+  const handleCitationClick = useCallback((citationNumber: string) => {
+    // In diagram mode, citations might not have clickable links
+    console.log(`Citation ${citationNumber} clicked`);
+  }, []);
 
-  // Component to render message content with clickable citations and Mermaid diagrams
+  // Component to render message content with Mermaid diagrams
   const MessageContent = ({ content }: { content: string }) => {
     const cleanContent = content
       .split("\n\nReferences:")[0]
@@ -222,162 +215,6 @@ export default function ChatPage() {
     const contentWithoutMermaid = cleanContent
       .replace(mermaidPattern, "")
       .trim();
-
-    useEffect(() => {
-      if (containerRef.current) {
-        // Clear any existing citation buttons to prevent duplicates
-        const existingButtons = containerRef.current.querySelectorAll(
-          "button[data-citation]"
-        );
-        existingButtons.forEach((button) => {
-          const parent = button.parentNode;
-          if (parent) {
-            parent.replaceChild(
-              document.createTextNode(
-                `[${button.getAttribute("data-citation")}]`
-              ),
-              button
-            );
-          }
-        });
-
-        // Find all text nodes that contain citations and replace them with buttons
-        const walker = document.createTreeWalker(
-          containerRef.current,
-          NodeFilter.SHOW_TEXT,
-          null
-        );
-
-        const textNodes: Text[] = [];
-        let node;
-        while ((node = walker.nextNode())) {
-          const textContent = node.textContent || "";
-          if (/\[\d+(?:\s*,\s*\d+)*\]/.test(textContent)) {
-            textNodes.push(node as Text);
-          }
-        }
-
-        textNodes.forEach((textNode) => {
-          const parent = textNode.parentNode;
-          if (!parent) return;
-
-          const text = textNode.textContent || "";
-          // Enhanced regex to match both [number] and [number, number, ...] patterns
-          const citationRegex = /\[(\d+(?:\s*,\s*\d+)*)\]/g;
-
-          const matches = [...text.matchAll(citationRegex)];
-
-          if (matches.length > 0) {
-            const fragment = document.createDocumentFragment();
-            let lastIndex = 0;
-
-            matches.forEach((match) => {
-              const citationNumbers = match[1].split(",").map((n) => n.trim());
-              const matchStart = match.index!;
-              const matchEnd = matchStart + match[0].length;
-
-              // Add text before the citation
-              if (matchStart > lastIndex) {
-                const beforeText = text.substring(lastIndex, matchStart);
-                fragment.appendChild(document.createTextNode(beforeText));
-              }
-
-              // Create a container for multiple citations
-              if (citationNumbers.length === 1) {
-                // Single citation - keep existing behavior
-                const citationNumber = citationNumbers[0];
-                const reference = references[citationNumber];
-                if (reference) {
-                  const button = document.createElement("button");
-                  button.textContent = `[${citationNumber}]`;
-                  button.setAttribute("data-citation", citationNumber);
-                  button.className =
-                    "relative text-blue-600/80 hover:text-blue-800 hover:underline bg-blue-50 hover:bg-blue-100 rounded-full px-1.5 py-1 text-sm font-medium transition-colors duration-200 mx-0.5 dark:text-blue-400/60 dark:hover:text-blue-300 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 group";
-
-                  // Create tooltip element
-                  const tooltip = document.createElement("div");
-                  tooltip.className =
-                    "absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-5 py-5 bg-gray-100 text-gray-800 text-xs rounded-full shadow-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none  dark:bg-secondary-dark dark:text-gray-200 dark:border-gray-600";
-                  tooltip.innerHTML = `<div class="font-semibold text-gray-600 dark:text-gray-200">${reference.title}</div>`;
-
-                  // Add arrow to tooltip
-                  const arrow = document.createElement("div");
-                  arrow.className =
-                    "absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-100 dark:border-b-secondary-dark";
-                  tooltip.appendChild(arrow);
-
-                  button.appendChild(tooltip);
-                  button.addEventListener("click", () =>
-                    handleCitationClick(citationNumber)
-                  );
-                  fragment.appendChild(button);
-                } else {
-                  fragment.appendChild(
-                    document.createTextNode(`[${citationNumber}]`)
-                  );
-                }
-              } else {
-                // Multiple citations - create a wrapper with individual buttons
-                const wrapper = document.createElement("span");
-                wrapper.textContent = "[";
-                fragment.appendChild(wrapper);
-
-                citationNumbers.forEach((citationNumber, index) => {
-                  const reference = references[citationNumber];
-                  if (reference) {
-                    const button = document.createElement("button");
-                    button.textContent = citationNumber;
-                    button.setAttribute("data-citation", citationNumber);
-                    button.className =
-                      "relative text-blue-600/80 hover:text-blue-800 hover:underline bg-blue-50 hover:bg-blue-100 rounded-full px-1.5 py-0.5 text-sm font-medium transition-colors duration-200 mx-0.5 dark:text-blue-400/60 dark:hover:text-blue-300 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 group";
-
-                    // Create tooltip element
-                    const tooltip = document.createElement("div");
-                    tooltip.className =
-                      "absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-5 py-5 bg-gray-100 text-gray-800 text-xs rounded-full shadow-lg whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none  dark:bg-secondary-dark dark:text-gray-200 dark:border-gray-600";
-                    tooltip.innerHTML = `<div class="font-semibold text-gray-600 dark:text-gray-200">${reference.title}</div>`;
-
-                    // Add arrow to tooltip
-                    const arrow = document.createElement("div");
-                    arrow.className =
-                      "absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-100 dark:border-b-secondary-dark";
-                    tooltip.appendChild(arrow);
-
-                    button.appendChild(tooltip);
-                    button.addEventListener("click", () =>
-                      handleCitationClick(citationNumber)
-                    );
-                    wrapper.appendChild(button);
-                  } else {
-                    const textNode = document.createTextNode(citationNumber);
-                    wrapper.appendChild(textNode);
-                  }
-
-                  // Add comma separator except for the last item
-                  if (index < citationNumbers.length - 1) {
-                    wrapper.appendChild(document.createTextNode(", "));
-                  }
-                });
-
-                const closingBracket = document.createTextNode("]");
-                wrapper.appendChild(closingBracket);
-                fragment.appendChild(wrapper);
-              }
-
-              lastIndex = matchEnd;
-            });
-
-            // Add remaining text after the last citation
-            if (lastIndex < text.length) {
-              const remainingText = text.substring(lastIndex);
-              fragment.appendChild(document.createTextNode(remainingText));
-            }
-
-            parent.replaceChild(fragment, textNode);
-          }
-        });
-      }
-    }, [cleanContent, references, handleCitationClick]);
 
     return (
       <div ref={containerRef} className="prose prose-xs max-w-none">
@@ -479,14 +316,11 @@ export default function ChatPage() {
           return;
         }
 
-        // Only update references if the new response has references
-        if (
-          response.references &&
-          Object.keys(response.references).length > 0
-        ) {
-          setReferences(response.references);
+        // Only update diagram if the new response has a diagram
+        if (response.diagram && response.diagram.diagram_code) {
+          setDiagram(response.diagram);
         }
-        // Otherwise keep the previous references
+        // Otherwise keep the previous diagram
 
         setChatHistory((prev) => {
           const newHistory = [...prev];
@@ -556,15 +390,15 @@ export default function ChatPage() {
       // Reset all state to initial values after a short delay for smooth transition
       setTimeout(() => {
         setChatHistory([]);
-        setReferences({});
+        setDiagram(null);
         setIsFirstPrompt(true);
         setIsLoading(false);
         setLoadingText("Thinking...");
-        setIsReferencesHidden(false);
+        setIsDiagramHidden(false);
 
         // Clear persisted data from localStorage
         localStorage.removeItem("chatHistory");
-        localStorage.removeItem("chatReferences");
+        localStorage.removeItem("chatDiagram");
         localStorage.removeItem("isFirstPrompt");
 
         // Scroll to top and restore visibility
@@ -589,8 +423,8 @@ export default function ChatPage() {
     };
   }, []);
 
-  const toggleReferencesVisibility = () => {
-    setIsReferencesHidden((prev) => !prev);
+  const toggleDiagramVisibility = () => {
+    setIsDiagramHidden((prev: boolean) => !prev);
   };
 
   return (
@@ -606,9 +440,7 @@ export default function ChatPage() {
       <div className="flex flex-1 overflow-hidden">
         <main
           className={`flex-1 flex flex-col items-center w-full relative overflow-hidden h-[calc(100vh-11rem)] transition-all duration-1700 ease-in-out ${
-            Object.keys(references).length > 0 && !isReferencesHidden
-              ? "mr-[28rem]"
-              : ""
+            diagram && !isDiagramHidden ? "mr-[28rem]" : ""
           }`}
         >
           <div
@@ -761,14 +593,14 @@ export default function ChatPage() {
           </div>
         </main>
 
-        {Object.keys(references).length > 0 && (
+        {diagram && (
           <>
-            {/* Show references button when panel is hidden */}
-            {isReferencesHidden && (
+            {/* Show diagram button when panel is hidden */}
+            {isDiagramHidden && (
               <button
-                onClick={toggleReferencesVisibility}
+                onClick={toggleDiagramVisibility}
                 className="fixed right-4 top-40 z-20 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
-                aria-label="Show references"
+                aria-label="Show diagram"
               >
                 <svg
                   className="w-5 h-5 text-gray-600 dark:text-gray-300"
@@ -786,17 +618,17 @@ export default function ChatPage() {
               </button>
             )}
 
-            {/* References panel */}
+            {/* Diagram panel */}
             <div
-              data-references-panel
+              data-diagram-panel
               className={`fixed right-0 w-[28rem] bg-blue-50 dark:bg-secondary-dark overflow-y-auto rounded-3xl m-2 mr-10 mt-16 min-h-[200px] max-h-[calc(100vh-14rem)] transition-transform duration-700 ease-in-out shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] ${
-                isReferencesHidden ? "translate-x-[120%]" : "translate-x-0"
+                isDiagramHidden ? "translate-x-[120%]" : "translate-x-0"
               }`}
             >
-              <ReferencesPanel
-                references={references}
-                isHidden={isReferencesHidden}
-                onToggleVisibility={toggleReferencesVisibility}
+              <DiagramPanel
+                diagram={diagram}
+                isHidden={isDiagramHidden}
+                onToggleVisibility={toggleDiagramVisibility}
               />
             </div>
           </>

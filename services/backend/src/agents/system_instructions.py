@@ -64,6 +64,7 @@ def get_general_assistant_instructions() -> str:
         - Include implementation guidance and next steps
 
         **When generating Mermaid diagrams:**
+        - Use the `generate_architecture_diagram` tool to create diagrams
         - Use appropriate diagram types (flowchart, sequence, architecture, etc.)
         - Include clear labels and descriptions
         - Show data flow directions

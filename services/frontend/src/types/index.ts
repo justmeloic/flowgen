@@ -20,16 +20,16 @@ export interface ChatMessage {
   model?: string; // Track which model generated this message
 }
 
-export interface Reference {
-  id: string;
-  name: string;
+export interface Diagram {
+  diagram_code: string;
+  diagram_type: string;
   title: string;
-  link: string;
+  description: string;
 }
 
 export interface MessageResponse {
   response: string;
-  references: { [key: string]: Reference };
+  diagram: Diagram;
   session_id?: string;
   model?: string; // Include model information
   confidence?: number;
