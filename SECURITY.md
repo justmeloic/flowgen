@@ -56,7 +56,7 @@ When deploying this application:
 2. **Use HTTPS**: Deploy with TLS/SSL certificates in production environments
 3. **Secure Environment Files**: Protect `.env` files and never commit them to version control
 4. **Regular Updates**: Keep dependencies updated and monitor for security advisories
-5. **Access Control**: Implement proper network access controls, especially on Raspberry Pi deployments
+5. **Access Control**: Implement proper network access controls for production deployments
 6. **File Permissions**: Ensure proper file permissions on deployed systems
 
 ### Scope

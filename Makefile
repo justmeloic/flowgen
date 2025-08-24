@@ -1,5 +1,5 @@
 # Agent Interface Makefile
-# Raspberry Pi 5 optimized build and deployment automation
+# Build and deployment automation
 #
 # Usage:
 #   make build         - Build frontend static files
@@ -120,7 +120,7 @@ stop:
 
 # Show help
 help:
-	@echo "🍓 Agent Interface - Raspberry Pi 5 Build & Deploy"
+	@echo "🚀 Agent Interface - Build & Deploy"
 	@echo ""
 	@echo "Available targets:"
 	@echo "  build         🎨 Build frontend static files"
@@ -145,4 +145,3 @@ help:
 	@echo "  screen -r agent-interface-ngrok  # Attach to ngrok tunnel"
 	@echo "  screen -list                   # List all sessions"
 	@echo ""
-	@echo "🍓 Optimized for Raspberry Pi 5 deployment"

@@ -9,13 +9,12 @@
 ![Python](https://img.shields.io/badge/python-v3.13+-blue.svg)
 ![Next.js](https://img.shields.io/badge/next.js-14.0.0+-success.svg)
 [![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://opensource.org/licenses/Apache-2.0)
-![Raspberry Pi](https://img.shields.io/badge/Optimized%20for-Raspberry%20Pi%205-red.svg)
 ![Mermaid](https://img.shields.io/badge/Mermaid-Architecture%20Diagrams-FF6B6B.svg)
 
 **Owner / Maintainer:** [Loïc Muhirwa](https://github.com/justmeloic)
 
 </div>
-An intelligent agent that helps you draft end-to-end solutions solutions architectures. The agent interacts with users to gather requirements, understand technical constraints, and generates comprehensive Mermaid architecture diagrams with detailed explanations. **Optimized for deployment on Raspberry Pi 5** with a streamlined single-service architecture.
+An intelligent agent that helps you draft end-to-end solutions solutions architectures. The agent interacts with users to gather requirements, understand technical constraints, and generates comprehensive Mermaid architecture diagrams with detailed explanations.
 
 ## ✨ Key Features
 
@@ -109,7 +108,7 @@ graph TD
 
 ## Deployment Models
 
-This project is **optimized for Raspberry Pi 5 deployment** and supports flexible development and deployment patterns:
+This project supports flexible development and deployment patterns:
 
 ### Development Mode (Two Services)
 
@@ -133,7 +132,7 @@ The frontend development server will proxy API calls to the backend service, all
 
 ### Production Deployment (Single Service)
 
-For production deployment, especially on Raspberry Pi 5, the system uses a **unified deployment model** where:
+For production deployment, the system uses a **unified deployment model** where:
 
 1. **Static Build**: The Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
 2. **Single Service**: The FastAPI backend serves both API endpoints and the static frontend files
@@ -142,13 +141,13 @@ For production deployment, especially on Raspberry Pi 5, the system uses a **uni
 **Production Build & Deploy:**
 
 ```bash
-# Build static frontend and deploy on Raspberry Pi
+# Build static frontend and deploy
 make build
 ```
 
 ### Why This Architecture?
 
-**For Raspberry Pi 5 Optimization:**
+**Benefits:**
 
 - **Resource Efficiency**: Single service reduces memory and CPU overhead
 - **Simplified Networking**: No need to manage cross-service communication
@@ -294,15 +293,15 @@ Document analysis:
 
 ## Building and Deploying
 
-This project uses a **streamlined deployment model optimized for Raspberry Pi 5**, where the frontend is pre-rendered into static files and served by the FastAPI backend as a single deployable unit.
+This project uses a **streamlined deployment model** where the frontend is pre-rendered into static files and served by the FastAPI backend as a single deployable unit.
 
 ### Deployment Strategy
 
-The deployment process is designed specifically for Raspberry Pi environments:
+The deployment process provides:
 
 1. **Static Frontend Build**: Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
 2. **Single Service Deployment**: FastAPI backend serves both API endpoints and static frontend files
-3. **Local Deployment**: Optimized for local Raspberry Pi hosting without external dependencies
+3. **Local Deployment**: Optimized for local hosting without external dependencies
 
 ### Build Process
 
@@ -332,58 +331,58 @@ make build          # Build and copy to backend
 
 ### Deployment Process
 
-#### Automated Deployment on Raspberry Pi
+#### Automated Deployment
 
-Deploy the application on your Raspberry Pi:
+Deploy the application:
 
 ```bash
-# From project root (on Raspberry Pi)
+# From project root
 source scripts/deploy.sh
 ```
 
 This script:
 
-1. � **Environment Setup**: Creates Python virtual environment and installs dependencies from `requirements-raspberry-pi.txt`
+1. 🛠️ **Environment Setup**: Creates Python virtual environment and installs dependencies
 2. 🧹 **Cleanup**: Clears Python cache and kills existing server processes
 3. 🛑 **Port Management**: Ensures port 8081 is available for the server
 4. 📺 **Server Start**: Starts Uvicorn server in a detached screen session
 5. 📊 **Summary**: Provides deployment summary and management commands
 
-#### Deployment Architecture for Raspberry Pi
+#### Deployment Architecture
 
 ```mermaid
 graph LR
     A[Development Machine] -->|build.sh| B[Static Files]
-    B -->|Copy to Pi| C[Raspberry Pi 5]
+    B -->|Deploy| C[Production Server]
 
     subgraph "Build Process"
         A1[Frontend Build] --> A2[Static Files]
         A2 --> A3[Copy to Backend]
     end
 
-    subgraph "Deploy Process (Pi)"
+    subgraph "Deploy Process"
         C1[Setup Environment] --> C2[Install Dependencies]
         C2 --> C3[Start Uvicorn Server]
         C3 --> C4[Serve Static + API]
     end
 ```
 
-#### Why This Approach for Raspberry Pi?
+#### Why This Approach?
 
 **Single Service Benefits**:
 
-- **Resource Efficiency**: Minimal memory and CPU usage on Pi hardware
+- **Resource Efficiency**: Minimal memory and CPU usage
 - **Simplified Management**: One process to monitor and manage
 - **Network Simplicity**: Only one port (8081) to expose
-- **Fast Startup**: Quick boot times suitable for Pi environments
+- **Fast Startup**: Quick boot times
 
 **Static Frontend Benefits**:
 
-- **Performance**: Pre-rendered content loads faster on Pi hardware
-- **Lower Resource Usage**: No Node.js runtime required on Pi
+- **Performance**: Pre-rendered content loads faster
+- **Lower Resource Usage**: No Node.js runtime required in production
 - **Reliability**: Fewer moving parts reduce potential failure points
 
-### Server Management on Raspberry Pi
+### Server Management
 
 After deployment, manage the server using screen:
 
@@ -403,20 +402,19 @@ screen -S backend -X quit
 
 ### Environment Configuration
 
-The deployment uses Raspberry Pi optimized settings:
+The deployment uses optimized settings:
 
 - **Server Host**: `0.0.0.0` (accessible from network)
 - **Server Port**: `8081` (avoids conflicts with common services)
-- **Dependencies**: `requirements-raspberry-pi.txt` (Pi-optimized packages)
 - **Python Environment**: Virtual environment in `services/backend/.venv`
 - **Static Files**: Served from `services/backend/build/static_frontend/`
 
-### Raspberry Pi Performance Notes
+### Performance Notes
 
 - **Memory Usage**: Typically uses 150-300MB RAM (depending on model complexity and diagram generation)
 - **CPU Usage**: Low CPU usage during idle, moderate during AI processing and diagram generation
 - **Storage**: Requires ~500MB for application and dependencies
-- **Network**: Accessible via Pi's IP address on port 8081
+- **Network**: Accessible via server's IP address on port 8081
 - **Architecture Generation**: Real-time Mermaid diagram generation with sub-second response times
 
 ## License

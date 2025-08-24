@@ -64,7 +64,6 @@ export default function HomePage() {
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
             An interface that allows users to interact with different AI agents
             powered by various models and equipped with specialized tools.
-            Optimized for Raspberry Pi 5 🍓.
           </p>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             <strong>Author / Maintainer:</strong>{" "}
@@ -354,15 +353,15 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
             Deployment Architecture
           </h2>
-          <div className="bg-gradient-to-br from-rose-50/60 via-red-50/40 to-orange-50/60 dark:from-rose-900/25 dark:via-red-900/20 dark:to-orange-900/25 p-6 rounded-2xl mb-6 border border-rose-200/50 dark:border-rose-700/50 shadow-sm backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-blue-50/60 via-indigo-50/40 to-purple-50/60 dark:from-blue-900/25 dark:via-indigo-900/20 dark:to-purple-900/25 p-6 rounded-2xl mb-6 border border-blue-200/50 dark:border-blue-700/50 shadow-sm backdrop-blur-sm">
             <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
-              <span className="mr-2">🍓</span>
-              Raspberry Pi 5 Optimized
+              <span className="mr-2">🚀</span>
+              Production Optimized
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
-              This project is specifically optimized for deployment on Raspberry
-              Pi 5, using a streamlined single-service architecture that
-              maximizes performance and minimizes resource usage on Pi hardware.
+              This project uses a streamlined single-service architecture that
+              maximizes performance and minimizes resource usage for production
+              deployment.
             </p>
           </div>
 
@@ -391,12 +390,12 @@ export default function HomePage() {
                 Production Mode (Single Service)
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
-                For Raspberry Pi deployment, the FastAPI backend serves
+                For production deployment, the FastAPI backend serves
                 pre-rendered static frontend files, creating a unified,
                 resource-efficient service.
               </p>
               <div className="bg-slate-800 dark:bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono border border-slate-700">
-                <div># Build and deploy on Pi</div>
+                <div># Build and deploy</div>
                 <div>source scripts/build.sh</div>
                 <div>source scripts/deploy.sh</div>
                 <div className="mt-2"># Single service on port 8081</div>
@@ -407,7 +406,7 @@ export default function HomePage() {
 
           <div className="mt-6 bg-gradient-to-r from-amber-50/70 via-yellow-50/50 to-orange-50/70 dark:from-amber-900/30 dark:via-yellow-900/25 dark:to-orange-900/30 border-l-4 border-amber-400 dark:border-amber-500 p-4 rounded-r-xl shadow-sm">
             <h4 className="text-base font-semibold text-amber-800 dark:text-amber-200 mb-2">
-              🏗️ Why This Architecture for Raspberry Pi?
+              🏗️ Why This Architecture?
             </h4>
             <div className="grid md:grid-cols-2 gap-4 text-xs text-amber-700 dark:text-amber-200">
               <div className="space-y-2">
@@ -612,12 +611,12 @@ export default function HomePage() {
         {/* Build & Deploy Section */}
         <div>
           <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
-            Build & Deploy for Raspberry Pi
+            Build & Deploy
           </h2>
           <div className="bg-red-50 dark:bg-red-900/30 p-6 rounded-2xl mb-6 border border-red-200 dark:border-red-700">
             <h3 className="text-base font-semibold mb-2 dark:text-gray-100 flex items-center">
               <span className="mr-2">🎯</span>
-              Raspberry Pi 5 Deployment Strategy
+              Production Deployment Strategy
             </h3>
             <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
               The system uses a streamlined deployment approach optimized for
