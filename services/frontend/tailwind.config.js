@@ -65,6 +65,7 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         cursive: ["var(--font-cursive)", "Dancing Script", "cursive"],
+        poppins: ["var(--font-poppins)", "Poppins", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {

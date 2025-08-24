@@ -1,5 +1,5 @@
 // Global custom event typing for sidebar state broadcasts
-export {}; // ensure this file is treated as a module
+export { }; // ensure this file is treated as a module
 
 declare global {
   interface SidebarToggledDetail {

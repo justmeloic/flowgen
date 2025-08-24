@@ -95,7 +95,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
 
   const sidebarLinks = [
     {
-      title: "Agent Chat",
+      title: "Architecture Agent",
       icon: MessageSquare,
       variant: "default",
       href: "/",

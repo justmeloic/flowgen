@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="services/frontend/public/logo-banner.png">
+  <img src="services/frontend/public/banner.png">
   <p>Flowgen - AI-Powered System Architecture Solutions</p>
 
   <br>
