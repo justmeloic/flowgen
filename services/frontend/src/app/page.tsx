@@ -20,12 +20,14 @@ import { ChatInput } from "@/components/chat-input";
 import { DiagramPanel } from "@/components/diagram-panel";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { MessageActions } from "@/components/message-actions";
-import { ModelSelector } from "@/components/model-selector";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
-import { sendMessage } from "@/lib/api";
+import { sendMessage, startNewSession } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { ChatMessage, Diagram } from "@/types";
+import { SquarePen } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -73,6 +75,7 @@ export default function ChatPage() {
   const [isDiagramHidden, setIsDiagramHidden] = useState(false);
   const [selectedModel, setSelectedModel] =
     useState<string>("gemini-2.5-flash");
+  const [isStartingNew, setIsStartingNew] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -373,6 +376,25 @@ export default function ChatPage() {
     scrollToBottom();
   }, [chatHistory, scrollToBottom]);
 
+  // Handler for new conversation button
+  const handleNewConversation = () => {
+    setIsStartingNew(true);
+    try {
+      // Clear the session ID to start a new session
+      startNewSession();
+
+      // Dispatch a custom event to notify other components (like the chat page)
+      window.dispatchEvent(new CustomEvent("newSessionStarted"));
+
+      console.log("New session started from button");
+      // Show success feedback for a moment
+      setTimeout(() => setIsStartingNew(false), 1500);
+    } catch (error) {
+      console.error("Error starting new session:", error);
+      setIsStartingNew(false);
+    }
+  };
+
   // Listen for new session events from the sidebar
   useEffect(() => {
     const handleNewSession = () => {
@@ -430,10 +452,22 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col flex-1 h-full">
       <div className="flex items-center justify-between">
-        <ModelSelector
-          selectedModel={selectedModel}
-          onModelChange={setSelectedModel}
-        />
+        <Button
+          onClick={handleNewConversation}
+          disabled={isStartingNew}
+          className={cn(
+            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg",
+            isStartingNew && "opacity-50 cursor-not-allowed"
+          )}
+          aria-label="New conversation"
+        >
+          <SquarePen
+            className={cn(
+              "w-5 h-5 text-gray-600 dark:text-gray-300",
+              isStartingNew && "animate-pulse"
+            )}
+          />
+        </Button>
         <div className="w-[110px]" />
       </div>
 
@@ -568,16 +602,6 @@ export default function ChatPage() {
               </div>
             )}
           </div>
-
-          {/* Top Gradient Overlay */}
-          {(!isFirstPrompt || chatHistory.length > 0) && (
-            <div className="pointer-events-none absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-chatInput-light to-transparent dark:hidden z-10" />
-          )}
-
-          {/* Bottom Gradient Overlay */}
-          {(!isFirstPrompt || chatHistory.length > 0) && (
-            <div className="pointer-events-none absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-chatInput-light to-transparent dark:hidden z-10" />
-          )}
 
           {/* Move the ChatInput outside the conditional render and add transition */}
           <div
