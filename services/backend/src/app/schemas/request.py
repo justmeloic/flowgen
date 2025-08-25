@@ -33,7 +33,7 @@ class Query(BaseModel):
         default=None,
         description='Model to use for this query. If not provided, uses default',
     )
-    platform: Optional[Literal['aws', 'gcp', 'azure']] = Field(
+    platform: Optional[Literal['aws', 'gcp', 'azure', 'general']] = Field(
         default=None,
         description='Target cloud platform for provider-specific guidance',
     )
@@ -69,13 +69,13 @@ class Query(BaseModel):
     @classmethod
     def validate_platform(
         cls, v: Optional[str]
-    ) -> Optional['Literal["aws","gcp","azure"]']:
+    ) -> Optional['Literal["aws","gcp","azure","general"]']:
         """Normalizes and validates platform value if provided."""
         if v is None:
             return None
         v_norm = v.lower().strip()
-        if v_norm not in {'aws', 'gcp', 'azure'}:
-            raise ValueError('platform must be one of: aws, gcp, azure')
+        if v_norm not in {'aws', 'gcp', 'azure', 'general'}:
+            raise ValueError('platform must be one of: aws, gcp, azure, general')
         return v_norm  # type: ignore[return-value]
 
     class Config:
@@ -85,6 +85,6 @@ class Query(BaseModel):
             'example': {
                 'text': 'What are the latest developments in AI?',
                 'model': 'gemini-2.5-pro',
-                'platform': 'azure',
+                'platform': 'general',
             }
         }

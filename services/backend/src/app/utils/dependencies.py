@@ -87,11 +87,11 @@ async def get_session_model(
 async def get_session_platform(request: Request) -> str:
     """Determine which cloud platform to use for this request.
 
-    Returns 'aws', 'gcp', or 'general' when unspecified.
+    Returns 'aws', 'gcp', 'azure', or 'general' when unspecified.
     """
     platform = getattr(request.state, 'selected_platform', None)
     platform = (platform or '').lower().strip()
-    if platform not in {'aws', 'gcp', 'azure'}:
+    if platform not in {'aws', 'gcp', 'azure', 'general'}:
         platform = 'general'
     _logger.info(f'Selected platform: {platform}')
     return platform

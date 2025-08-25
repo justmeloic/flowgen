@@ -97,8 +97,28 @@ def get_general_assistant_instructions() -> str:
 
 
 def _platform_appendix(platform: str | None) -> str:
-    """Return platform-specific guidance block for AWS, GCP, or Azure."""
+    """Return platform-specific guidance block for AWS, GCP, Azure, or General."""
     p = (platform or '').lower()
+    if p == 'general':
+        return textwrap.dedent(
+            """
+                  Platform focus: General/Platform-Agnostic
+                  - Use generic, vendor-neutral terminology in proposals and diagrams.
+                  - Common building blocks: Load Balancer, Application Server, 
+                     Container Platform, Serverless Functions, API Gateway, 
+                     Message Queue, Event Bus, Relational Database, NoSQL Database, 
+                     Cache, Object Storage, Identity Service, Monitoring Service, 
+                     Log Aggregation.
+                  - Best practices: high availability, fault tolerance, scalability,
+                     security by design, observability, data encryption, least privilege
+                     access, network segmentation, backup and disaster recovery.
+                  - Focus on architectural patterns rather than specific cloud services:
+                     microservices, event-driven architecture, CQRS, circuit breaker,
+                     bulkhead, saga pattern, API gateway pattern.
+                  - When invoking tools, pass platform='general' so outputs use
+                     generic terminology.
+                  """
+        )
     if p == 'aws':
         return textwrap.dedent(
             """
@@ -134,27 +154,27 @@ def _platform_appendix(platform: str | None) -> str:
                      services.
                   """
         )
-        if p == 'azure':
-            return textwrap.dedent(
-                """
-                        Platform focus: Azure
-                        - Prefer Azure-native services and correct names in proposals and
-                            diagrams.
-                        - Common building blocks: VNets, Subnets, Azure Load Balancer/
-                            Application Gateway, Azure Functions, App Service, AKS,
-                            Container Apps, API Management, Logic Apps, Event Grid,
-                            Service Bus, Storage Queues, Cosmos DB, Azure SQL,
-                            PostgreSQL Flexible Server, Redis (Azure Cache for Redis),
-                            Blob Storage, Key Vault, Managed Identity, Azure Monitor,
-                            Log Analytics, Application Insights, Front Door, WAF,
-                            Defender for Cloud.
-                        - Best practices: Availability Zones, Private Endpoints, RBAC &
-                            least privilege, NSGs, encryption at rest/in transit,
-                            hub-spoke network, centralized logging/monitoring.
-                        - When invoking tools, pass platform='azure' so outputs reflect
-                            Azure services.
-                        """
-            )
+    if p == 'azure':
+        return textwrap.dedent(
+            """
+                  Platform focus: Azure
+                  - Prefer Azure-native services and correct names in proposals and
+                     diagrams.
+                  - Common building blocks: VNets, Subnets, Azure Load Balancer/
+                     Application Gateway, Azure Functions, App Service, AKS,
+                     Container Apps, API Management, Logic Apps, Event Grid,
+                     Service Bus, Storage Queues, Cosmos DB, Azure SQL,
+                     PostgreSQL Flexible Server, Redis (Azure Cache for Redis),
+                     Blob Storage, Key Vault, Managed Identity, Azure Monitor,
+                     Log Analytics, Application Insights, Front Door, WAF,
+                     Defender for Cloud.
+                  - Best practices: Availability Zones, Private Endpoints, RBAC &
+                     least privilege, NSGs, encryption at rest/in transit,
+                     hub-spoke network, centralized logging/monitoring.
+                  - When invoking tools, pass platform='azure' so outputs reflect
+                     Azure services.
+                  """
+        )
     return ''
 
 
@@ -166,8 +186,8 @@ def get_platform_assistant_instructions(platform: str | None) -> str:
         """
       Tool usage notes:
       - Always use the generate_architecture_diagram tool; do not inline Mermaid.
-            - Include the parameter platform set to 'aws', 'gcp', or 'azure'
-                when you know the target.
+            - Include the parameter platform set to 'aws', 'gcp', 'azure', or 
+                'general' when you know the target.
       - If platform is unspecified, omit the parameter.
       """
     )
@@ -218,6 +238,17 @@ def get_diagram_generator_instructions(platform: str | None = None) -> str:
             """
     )
     p = (platform or '').lower()
+    if p == 'general':
+        addon = textwrap.dedent(
+            """
+                  Provider focus: General/Platform-Agnostic. Use generic, vendor-neutral
+                  service names (e.g., Load Balancer, Application Server, 
+                  Container Platform, API Gateway, Message Queue, Database, Cache, 
+                  Object Storage). Focus on architectural patterns and logical 
+                  components rather than specific cloud services.
+                  """
+        )
+        return f'{base}\n{addon}'
     if p == 'aws':
         addon = textwrap.dedent(
             """
