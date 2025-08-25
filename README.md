@@ -16,16 +16,23 @@
 </div>
 An intelligent agent that helps you draft end-to-end solutions solutions architectures. The agent interacts with users to gather requirements, understand technical constraints, and generates comprehensive Mermaid architecture diagrams with detailed explanations.
 
-## ✨ Key Features
+## Key Features
 
-- 🎯 **Interactive Requirements Gathering**: AI-powered questioning to understand your system needs
-- 🏗️ **Architecture Pattern Recognition**: Automatic identification of suitable architectural patterns
-- 📊 **Mermaid Diagram Generation**: Beautiful, interactive architecture diagrams
-- 🔍 **Constraint Analysis**: Technical, budgetary, and operational constraint evaluation
-- 📚 **Implementation Guidance**: Step-by-step development recommendations
-- 🔄 **Real-time Refinement**: Iterative design improvement through conversation
+- **Interactive Requirements Gathering**: AI-powered questioning to understand your system needs
+- **Architecture Pattern Recognition**: Automatic identification of suitable architectural patterns
+- **Mermaid Diagram Generation**: Beautiful, interactive architecture diagrams
+- **Constraint Analysis**: Technical, budgetary, and operational constraint evaluation
+- **Implementation Guidance**: Step-by-step development recommendations
+- **Real-time Refinement**: Iterative design improvement through conversation
 
-## 🎯 Use Cases
+### Interactive Diagram Generation
+
+<div align="center">
+  <img src="docs/diagram-panel.gif" alt="Interactive Diagram Generation" style="border-radius: 10px; max-width: 100%;">
+  <p><em>Real-time Mermaid diagram generation with interactive panel</em></p>
+</div>
+
+## Use Cases
 
 - **Microservices Architecture**: Design scalable, distributed systems
 - **Serverless Solutions**: Cloud-native, event-driven architectures
@@ -89,21 +96,66 @@ The backend service that orchestrates the AI agent for architecture design:
 
 ## Architecture
 
-![Architecture Designer System Diagram](docs/architecture-diagram.png)
-
 The Architecture Solution Designer leverages AI to understand user requirements and generate comprehensive system diagrams:
 
 ```mermaid
-graph TD
-    A[User Requirements] --> B[AI Analysis Engine]
-    B --> C[Pattern Recognition]
-    B --> D[Constraint Analysis]
-    C --> E[Architecture Generation]
-    D --> E
-    E --> F[Mermaid Diagram Output]
-    E --> G[Technical Documentation]
-    F --> H[Frontend Visualization]
-    G --> H
+graph TB
+    %% User Interface Layer
+    User[👤 User] --> UI[🖥️ Next.js Frontend]
+
+    %% Frontend Components
+    UI --> Chat[💬 Chat Interface]
+    UI --> FileUpload[📎 File Upload]
+    UI --> DiagramView[📊 Diagram Viewer]
+
+    %% API Gateway
+    Chat --> API[🔗 FastAPI Backend]
+    FileUpload --> API
+
+    %% Backend Services
+    API --> Agent[🤖 AI Agent]
+    API --> SessionMgr[🗂️ Session Manager]
+    API --> FileProcessor[📄 File Processor]
+
+    %% AI Processing Layer
+    Agent --> Requirements[📋 Requirements Analysis]
+    Agent --> Patterns[🏗️ Pattern Recognition]
+    Agent --> Constraints[⚖️ Constraint Analysis]
+
+    %% Generation Layer
+    Requirements --> Generator[⚡ Architecture Generator]
+    Patterns --> Generator
+    Constraints --> Generator
+
+    %% Output Layer
+    Generator --> MermaidCode[📐 Mermaid Code]
+    Generator --> Documentation[📚 Tech Documentation]
+    Generator --> Recommendations[💡 Implementation Guide]
+
+    %% File Processing
+    FileProcessor --> ArtifactStore[🗃️ Artifact Storage]
+    ArtifactStore --> Agent
+
+    %% Session Management
+    SessionMgr --> SessionStore[💾 Session Storage]
+    SessionStore --> Agent
+
+    %% Frontend Rendering
+    MermaidCode --> DiagramView
+    Documentation --> Chat
+    Recommendations --> Chat
+
+    %% Styling
+    classDef userLayer fill:#e1f5fe
+    classDef frontendLayer fill:#f3e5f5
+    classDef backendLayer fill:#e8f5e8
+    classDef aiLayer fill:#fff3e0
+    classDef outputLayer fill:#fce4ec
+
+    class User,UI,Chat,FileUpload,DiagramView userLayer
+    class API,SessionMgr,FileProcessor frontendLayer
+    class Agent,Requirements,Patterns,Constraints,Generator backendLayer
+    class MermaidCode,Documentation,Recommendations,ArtifactStore,SessionStore aiLayer
 ```
 
 ## Deployment Models
@@ -316,9 +368,9 @@ make build
 
 This script:
 
-1. 🎨 **Frontend Build**: Installs dependencies and runs `npm run build-static`
-2. � **Static Copy**: Copies static files to `services/backend/build/static_frontend/`
-3. ✅ **Validation**: Ensures build completed successfully
+1. **Frontend Build**: Installs dependencies and runs `npm run build-static`
+2. **Static Copy**: Copies static files to `services/backend/build/static_frontend/`
+3. **Validation**: Ensures build completed successfully
 
 #### Manual Frontend Build
 
@@ -342,11 +394,11 @@ source scripts/deploy.sh
 
 This script:
 
-1. 🛠️ **Environment Setup**: Creates Python virtual environment and installs dependencies
-2. 🧹 **Cleanup**: Clears Python cache and kills existing server processes
-3. 🛑 **Port Management**: Ensures port 8081 is available for the server
-4. 📺 **Server Start**: Starts Uvicorn server in a detached screen session
-5. 📊 **Summary**: Provides deployment summary and management commands
+1. **Environment Setup**: Creates Python virtual environment and installs dependencies
+2. **Cleanup**: Clears Python cache and kills existing server processes
+3. **Port Management**: Ensures port 8081 is available for the server
+4. **Server Start**: Starts Uvicorn server in a detached screen session
+5. **Summary**: Provides deployment summary and management commands
 
 #### Deployment Architecture
 
