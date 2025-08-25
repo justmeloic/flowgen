@@ -20,7 +20,7 @@ import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { Mic, Plus, SendHorizontal, Square } from "lucide-react";
 import * as React from "react";
-import { FileChip } from "./file-chip";
+import { FileChip } from "../Forms/FileChip";
 
 interface UploadedFile {
   id: string;

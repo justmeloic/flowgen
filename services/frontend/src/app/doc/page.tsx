@@ -25,7 +25,7 @@
 
 "use client";
 
-import { Shell } from "@/components/shell";
+import { Shell } from "@/components/Layout/Shell";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";

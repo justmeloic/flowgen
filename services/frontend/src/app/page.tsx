@@ -16,11 +16,11 @@
 
 "use client";
 
-import { ChatInput } from "@/components/chat-input";
-import { DiagramPanel } from "@/components/diagram-panel";
-import { MermaidDiagram } from "@/components/mermaid-diagram";
-import { MessageActions } from "@/components/message-actions";
-import { PlatformSelector } from "@/components/platform-selector";
+import { ChatInput } from "@/components/Agent/ChatInput";
+import { DiagramPanel } from "@/components/Agent/DiagramPanel";
+import { MermaidDiagram } from "@/components/Agent/MermaidDiagram";
+import { MessageActions } from "@/components/Agent/MessageActions";
+import { PlatformSelector } from "@/components/Agent/PlatformSelector";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";

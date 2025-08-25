@@ -16,9 +16,9 @@
 
 "use client";
 
-import { Header } from "@/components/header";
-import { Sidebar } from "@/components/sidebar";
-import { ThemeProvider } from "@/components/theme-provider";
+import { Header } from "@/components/Layout/Header";
+import { Sidebar } from "@/components/Layout/Sidebar";
+import { ThemeProvider } from "@/components/System/ThemeProvider";
 import { Dancing_Script, Inter, Poppins } from "next/font/google";
 import type React from "react";
 import { useEffect, useState } from "react";
