@@ -128,12 +128,8 @@ class AgentService:
         user_content = genai_types.Content(
             role='user', parts=[genai_types.Part(text=query_text)]
         )
-
-        # Get agent name from the factory
-        agent = agent_factory.get_agent(model_name)
-
         user_event = Event(
-            author=agent.name,
+            author='user',
             content=user_content,
             timestamp=time.time(),
             actions=EventActions(
@@ -200,8 +196,11 @@ class AgentService:
                     'model_name': model_name,
                 }
 
-                # Get agent name from the factory
-                agent = agent_factory.get_agent(model_name)
+                # Get agent name from the factory (respect platform)
+                agent = agent_factory.get_agent(
+                    model_name,
+                    getattr(request.state, 'selected_platform', 'general'),
+                )
 
                 state_update_event = Event(
                     author=agent.name,

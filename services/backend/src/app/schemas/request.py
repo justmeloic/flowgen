@@ -22,6 +22,7 @@ from __future__ import annotations
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator
+from typing_extensions import Literal
 
 
 class Query(BaseModel):
@@ -31,6 +32,10 @@ class Query(BaseModel):
     model: Optional[str] = Field(
         default=None,
         description='Model to use for this query. If not provided, uses default',
+    )
+    platform: Optional[Literal['aws', 'gcp', 'azure']] = Field(
+        default=None,
+        description='Target cloud platform for provider-specific guidance',
     )
     file_artifacts: Optional[List[str]] = Field(
         default=None,
@@ -60,6 +65,19 @@ class Query(BaseModel):
                 )
         return v
 
+    @field_validator('platform')
+    @classmethod
+    def validate_platform(
+        cls, v: Optional[str]
+    ) -> Optional['Literal["aws","gcp","azure"]']:
+        """Normalizes and validates platform value if provided."""
+        if v is None:
+            return None
+        v_norm = v.lower().strip()
+        if v_norm not in {'aws', 'gcp', 'azure'}:
+            raise ValueError('platform must be one of: aws, gcp, azure')
+        return v_norm  # type: ignore[return-value]
+
     class Config:
         """Pydantic configuration."""
 
@@ -67,5 +85,6 @@ class Query(BaseModel):
             'example': {
                 'text': 'What are the latest developments in AI?',
                 'model': 'gemini-2.5-pro',
+                'platform': 'azure',
             }
         }

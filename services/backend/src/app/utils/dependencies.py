@@ -84,6 +84,19 @@ async def get_session_model(
     return model_name
 
 
+async def get_session_platform(request: Request) -> str:
+    """Determine which cloud platform to use for this request.
+
+    Returns 'aws', 'gcp', or 'general' when unspecified.
+    """
+    platform = getattr(request.state, 'selected_platform', None)
+    platform = (platform or '').lower().strip()
+    if platform not in {'aws', 'gcp', 'azure'}:
+        platform = 'general'
+    _logger.info(f'Selected platform: {platform}')
+    return platform
+
+
 async def get_or_create_session(
     request: Request,
     response: Response,
@@ -149,6 +162,7 @@ def get_runner(
     request: Request,
     config: Annotated[AgentConfig, Depends(get_agent_config)],
     model_name: Annotated[str, Depends(get_session_model)],
+    platform: Annotated[str, Depends(get_session_platform)] = 'general',
 ) -> Runner:
     """Gets or creates a model-specific Runner instance.
 
@@ -164,12 +178,12 @@ def get_runner(
         A model-specific Runner instance.
     """
     # Create unique runner for each model
-    runner_key = f'runner_{model_name.replace("-", "_").replace(".", "_")}'
+    runner_key = f'runner_{model_name.replace("-", "_").replace(".", "_")}__{platform}'
 
     if not hasattr(request.app.state, runner_key):
         try:
             # Get the model-specific agent from the factory
-            agent = agent_factory.get_agent(model_name)
+            agent = agent_factory.get_agent(model_name, platform=platform)
 
             # Create runner with the model-specific agent
             runner = Runner(

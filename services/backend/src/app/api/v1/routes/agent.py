@@ -118,6 +118,7 @@ async def agent_endpoint(
     text: str = Form(''),  # Allow empty text
     model: str | None = Form(None),
     files: list[UploadFile] | None = File(None),
+    platform: str | None = Form(None),
 ) -> AgentResponse:
     """
     Unified endpoint: processes user message with optional file attachments.
@@ -147,15 +148,21 @@ async def agent_endpoint(
         )
 
     # Create Query object from form data
-    query = Query(text=text, model=model)
+    query = Query(text=text, model=model, platform=platform)
 
-    # Set the selected model in request state for dependencies to use
+    # Set the selected model/platform in request state for dependencies to use
     request.state.selected_model = query.model
+    request.state.selected_platform = query.platform
 
     # Get dependencies with model-specific configurations
     session = await get_or_create_session(request, response, config)
     model_name = await get_session_model(request)
-    runner = get_runner(request, config, model_name)
+    # runner depends on platform via dependency as well;
+    # reuse selected_platform from state
+    from src.app.utils.dependencies import get_session_platform
+
+    platform_value = await get_session_platform(request)
+    runner = get_runner(request, config, model_name, platform_value)
 
     _logger.info('Received query for model %s: %s...', model_name, query.text[:50])
 

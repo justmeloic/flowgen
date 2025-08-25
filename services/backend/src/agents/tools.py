@@ -109,6 +109,23 @@ def _sanitize_mermaid(code: str) -> str:
     if not code:
         return code
 
+    # Normalize problematic Unicode separators/spaces that break Mermaid parser:
+    # - U+2028 (LINE SEPARATOR) and U+2029 (PARAGRAPH SEPARATOR)
+    # - U+0085 (NEXT LINE)
+    # - Non-breaking spaces U+00A0 and U+202F -> regular spaces
+    # - Remove zero-width chars: U+200B, U+200C, U+200D, U+FEFF
+    code = (
+        code.replace('\u2028', '\n')
+        .replace('\u2029', '\n')
+        .replace('\u0085', '\n')
+        .replace('\u00a0', ' ')
+        .replace('\u202f', ' ')
+        .replace('\u200b', '')
+        .replace('\u200c', '')
+        .replace('\u200d', '')
+        .replace('\ufeff', '')
+    )
+
     s = code.replace('\r\n', '\n').replace('\r', '\n').strip()
 
     # Remove surrounding markdown fences if present
@@ -205,7 +222,9 @@ def _sanitize_mermaid(code: str) -> str:
     return s.strip()
 
 
-def generate_architecture_diagram(description: str) -> Dict[str, Any]:
+def generate_architecture_diagram(
+    description: str, platform: Optional[str] = None
+) -> Dict[str, Any]:
     """Generate a Mermaid architecture diagram from a free-text description.
 
     Uses Gemini Pro with thinking enabled and a dedicated system instruction to
@@ -216,10 +235,7 @@ def generate_architecture_diagram(description: str) -> Dict[str, Any]:
         description: Description of the system or workflow to diagram
 
     Returns:
-    A dictionary with status and diagram information.
-    On success: {'status': 'success', 'diagram_code': '...',
-             'diagram_type': 'mermaid', ...}
-    On error: {'status': 'error', 'error_message': '...'}
+        Dictionary with status and diagram information.
     """
     try:
         if not description or not description.strip():
@@ -239,9 +255,10 @@ def generate_architecture_diagram(description: str) -> Dict[str, Any]:
                 'description': description,
                 'title': 'System Architecture Diagram',
                 'model_used': 'fallback',
+                'platform': (platform or None),
             }
 
-        system_instruction = get_diagram_generator_instructions()
+        system_instruction = get_diagram_generator_instructions(platform)
 
         # Build generation config; thinking is on by default for 2.5 Pro
         if genai_types is not None:
@@ -277,6 +294,7 @@ def generate_architecture_diagram(description: str) -> Dict[str, Any]:
             'description': description,
             'title': 'System Architecture Diagram',
             'model_used': model_name,
+            'platform': (platform or None),
         }
     except Exception as e:
         logger.exception('Failed to generate diagram with Gemini Pro')

@@ -27,12 +27,12 @@ from .tools import generate_architecture_diagram
 try:
     from src.lib.config import settings
 
-    from .system_instructions import get_general_assistant_instructions
+    from .system_instructions import get_platform_assistant_instructions
 except ImportError:
     # Handle direct script execution (for quick testing)
-    from system_instructions import get_general_assistant_instructions
+    from system_instructions import get_platform_assistant_instructions  # type: ignore
 
-    from src.lib.config import settings
+    from src.lib.config import settings  # type: ignore
 
 
 class AgentFactory:
@@ -47,8 +47,8 @@ class AgentFactory:
             f'{len(self._available_models)} available models'
         )
 
-    @lru_cache(maxsize=10)
-    def get_agent(self, model_name: str) -> Agent:
+    @lru_cache(maxsize=30)
+    def get_agent(self, model_name: str, platform: str = 'general') -> Agent:
         """Get or create an agent for the specified model.
 
         Args:
@@ -66,7 +66,8 @@ class AgentFactory:
                 f"Model '{model_name}' not supported. Available models: {available}"
             )
 
-        if model_name not in self._agent_cache:
+        key = f'{model_name}::{platform}'
+        if key not in self._agent_cache:
             model_config = self._available_models[model_name]
 
             # Create base tools list
@@ -76,22 +77,27 @@ class AgentFactory:
             tools.append(FunctionTool(func=generate_architecture_diagram))
 
             agent = Agent(
-                name=f'assistant_{model_name.replace("-", "_").replace(".", "_")}',
+                name=(
+                    f'assistant_{model_name.replace("-", "_").replace(".", "_")}'
+                    f'__{platform}'
+                ),
                 model=model_name,
                 description=(
                     f'AI assistant using {model_config["display_name"]} - '
                     f'{model_config["description"]} with diagram generation'
                 ),
-                instruction=get_general_assistant_instructions(),
+                instruction=get_platform_assistant_instructions(platform),
                 tools=tools,
                 after_tool_callback=store_tool_result_callback,
                 before_model_callback=before_model_callback,
             )
 
-            self._agent_cache[model_name] = agent
-            _logger.info(f'Created new agent for model: {model_name}')
+            self._agent_cache[key] = agent
+            _logger.info(
+                f'Created new agent for model: {model_name} with platform: {platform}'
+            )
 
-        return self._agent_cache[model_name]
+        return self._agent_cache[key]
 
     def get_available_models(self) -> Dict[str, Dict[str, Any]]:
         """Get list of available models with their configurations.

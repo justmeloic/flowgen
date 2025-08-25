@@ -20,6 +20,7 @@ import { ChatInput } from "@/components/chat-input";
 import { DiagramPanel } from "@/components/diagram-panel";
 import { MermaidDiagram } from "@/components/mermaid-diagram";
 import { MessageActions } from "@/components/message-actions";
+import { PlatformSelector } from "@/components/platform-selector";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
@@ -75,6 +76,7 @@ export default function ChatPage() {
   const [isDiagramHidden, setIsDiagramHidden] = useState(false);
   const [selectedModel, setSelectedModel] =
     useState<string>("gemini-2.5-flash");
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [isStartingNew, setIsStartingNew] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(true);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -333,6 +335,10 @@ export default function ChatPage() {
         const response = await sendMessage(userMessage, files, {
           signal: abortControllerRef.current.signal,
           model: selectedModel,
+          platform: (selectedPlatform ?? undefined) as
+            | "aws"
+            | "gcp"
+            | undefined,
         });
 
         // Check if request was aborted
@@ -390,7 +396,14 @@ export default function ChatPage() {
         }
       }
     },
-    [scrollToBottom, isFirstPrompt, loadingText, isLoading, selectedModel]
+    [
+      scrollToBottom,
+      isFirstPrompt,
+      loadingText,
+      isLoading,
+      selectedModel,
+      selectedPlatform,
+    ]
   );
 
   useEffect(() => {
@@ -514,7 +527,12 @@ export default function ChatPage() {
             )}
           />
         </Button>
-        <div className="w-[110px]" />
+        <div className="flex items-center gap-2 w-[220px]">
+          <PlatformSelector
+            selectedPlatform={selectedPlatform}
+            onPlatformChange={setSelectedPlatform}
+          />
+        </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">

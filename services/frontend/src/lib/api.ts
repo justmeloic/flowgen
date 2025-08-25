@@ -23,6 +23,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 export interface SendMessageOptions {
   model?: string;
+  platform?: 'aws' | 'gcp' | 'azure';
   signal?: AbortSignal;
 }
 
@@ -40,6 +41,9 @@ export const sendMessage = async (
     
     if (options?.model) {
       formData.append('model', options.model);
+    }
+    if (options?.platform) {
+      formData.append('platform', options.platform);
     }
     
     // Add files if provided
