@@ -40,6 +40,7 @@ interface PlatformSelectorProps {
 }
 
 const PLATFORMS = [
+  { value: "general", label: "General" },
   { value: "gcp", label: "GCP" },
   { value: "aws", label: "AWS" },
   { value: "azure", label: "Azure" },
