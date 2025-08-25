@@ -164,144 +164,148 @@ export function DiagramPanel({
   }
 
   return (
-    <div className="h-full relative">
-      {/* Hide button - only show when panel is visible */}
+    <div className="h-full flex flex-col">
+      {/* Fixed header with close button */}
       {!isHidden && (
-        <button
-          onClick={onToggleVisibility}
-          className="absolute right-4 top-3 z-10 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
-          aria-label="Close diagram"
-        >
-          <svg
-            className="w-5 h-5 text-gray-600 dark:text-gray-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <div className="sticky top-0 z-50 flex justify-end p-4 bg-blue-50 dark:bg-secondary-dark">
+          <button
+            onClick={onToggleVisibility}
+            className="p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
+            aria-label="Close diagram"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+            <svg
+              className="w-5 h-5 text-gray-600 dark:text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
       )}
 
-      {/* Panel content */}
-      <div className="p-6 ">
-        <div className="flex mx-7 items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
-            {diagram.title || "Architecture Diagram"}
-          </h3>
-        </div>
-
-        {diagram.description && (
-          <div className="mx-7 mb-6 prose prose-sm dark:prose-invert text-gray-600 dark:text-gray-400">
-            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
-              {diagram.description}
-            </ReactMarkdown>
+      {/* Scrollable panel content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6">
+          <div className="flex mx-7 items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+              {diagram.title || "Architecture Diagram"}
+            </h3>
           </div>
-        )}
 
-        <div className="border mx-6 rounded-3xl p-6 bg-white dark:bg-gray-800">
-          <div
-            id="mermaid-diagram"
-            className="w-full overflow-auto flex items-center justify-center"
-            style={{ minHeight: "400px" }}
-          >
-            {!mermaidLoaded && (
-              <div className="flex items-center justify-center h-32">
-                <div className="text-gray-500">Loading diagram...</div>
-              </div>
-            )}
-          </div>
-        </div>
+          {diagram.description && (
+            <div className="mx-7 mb-6 prose prose-sm dark:prose-invert text-gray-600 dark:text-gray-400">
+              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                {diagram.description}
+              </ReactMarkdown>
+            </div>
+          )}
 
-        {/* All buttons centered under the diagram */}
-        <div className="mt-6 flex justify-center">
-          <div className="flex gap-2">
-            <button
-              onClick={copyDiagramCode}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
+          <div className="border mx-6 rounded-3xl p-6 bg-white dark:bg-gray-800">
+            <div
+              id="mermaid-diagram"
+              className="w-full overflow-auto flex items-center justify-center"
+              style={{ minHeight: "400px" }}
             >
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-              Copy Code
-            </button>
-            <button
-              onClick={downloadDiagram}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
-            >
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-              Download
-            </button>
-            <button
-              onClick={() => setShowRawCode(!showRawCode)}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
-            >
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                />
-              </svg>
-              {showRawCode ? "Hide Code" : "View Code"}
-            </button>
-          </div>
-        </div>
-
-        {/* Raw code section (conditionally shown) */}
-        {showRawCode && (
-          <div className="mt-4">
-            <div className="bg-gray-800 mx-64 rounded-xl border border-gray-700 overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-2 bg-gray-900 border-b border-gray-700">
-                <span className="text-xs font-medium text-gray-300">
-                  Mermaid Code
-                </span>
-                <span className="text-xs text-gray-400">
-                  {cleanMermaidCode(diagram.diagram_code).split("\n").length}{" "}
-                  lines
-                </span>
-              </div>
-              <pre className="p-3 overflow-auto max-h-48 bg-gray-800">
-                <code className="text-xs font-mono text-gray-200 leading-relaxed">
-                  {cleanMermaidCode(diagram.diagram_code)}
-                </code>
-              </pre>
+              {!mermaidLoaded && (
+                <div className="flex items-center justify-center h-32">
+                  <div className="text-gray-500">Loading diagram...</div>
+                </div>
+              )}
             </div>
           </div>
-        )}
+
+          {/* All buttons centered under the diagram */}
+          <div className="mt-6 flex justify-center">
+            <div className="flex gap-2">
+              <button
+                onClick={copyDiagramCode}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
+              >
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                Copy Code
+              </button>
+              <button
+                onClick={downloadDiagram}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
+              >
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+                Download
+              </button>
+              <button
+                onClick={() => setShowRawCode(!showRawCode)}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-gray-500"
+              >
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                  />
+                </svg>
+                {showRawCode ? "Hide Code" : "View Code"}
+              </button>
+            </div>
+          </div>
+
+          {/* Raw code section (conditionally shown) */}
+          {showRawCode && (
+            <div className="mt-4">
+              <div className="bg-gray-800 mx-64 rounded-xl border border-gray-700 overflow-hidden">
+                <div className="flex items-center justify-between px-3 py-2 bg-gray-900 border-b border-gray-700">
+                  <span className="text-xs font-medium text-gray-300">
+                    Mermaid Code
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {cleanMermaidCode(diagram.diagram_code).split("\n").length}{" "}
+                    lines
+                  </span>
+                </div>
+                <pre className="p-3 overflow-auto max-h-48 bg-gray-800">
+                  <code className="text-xs font-mono text-gray-200 leading-relaxed">
+                    {cleanMermaidCode(diagram.diagram_code)}
+                  </code>
+                </pre>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
