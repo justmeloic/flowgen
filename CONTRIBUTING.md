@@ -1,41 +1,22 @@
 # Contributing
 
-We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+Thanks for your interest in contributing to Flowgen!
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
-- Becoming a maintainer
+## Two Ways to Contribute
 
-## We Develop with Github
-We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+### 1. Standard Pull Request
 
-## Pull Requests
-1. Fork the repo and create your branch from `main`.
-2. If you've added code that should be tested, add tests.
-3. If you've changed APIs, update the documentation.
-4. Ensure the test suite passes.
-5. Make sure your code lints.
-6. Issue that pull request!
+1. Fork the repo and create your branch from `main`
+2. Make your changes and test them with `make dev`
+3. Submit a pull request
 
-## Any contributions you make will be under the Apache License 2.0
-In short, when you submit code changes, your submissions are understood to be under the same [Apache License 2.0](LICENSE) that covers the project. Feel free to contact the maintainers if that's a concern.
+### 2. Direct Contact
 
-## Report bugs using Github's [issue tracker]
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue]().
+For feature discussions, roadmap planning, or any questions:
 
-## Write bug reports with detail, background, and sample code
-
-**Great Bug Reports** tend to have:
-
-- A quick summary and/or background
-- Steps to reproduce
-  - Be specific!
-  - Give sample code if you can.
-- What you expected would happen
-- What actually happens
-- Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
+**Contact:** Loïc Muhirwa  
+**Email:** loic.muhirwa@gmail.com
 
 ## License
-By contributing, you agree that your contributions will be licensed under its Apache License 2.0. 
+
+All contributions will be licensed under Apache License 2.0.
