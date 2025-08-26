@@ -46,7 +46,7 @@ An intelligent agent that helps you draft end-to-end solutions solutions archite
 Each service has its own README with specific setup instructions. Please refer to:
 
 - [Frontend Setup](services/frontend/README.md)
-- [Architecture Agent API Setup](services/backend/README.md)
+- [Backend API Setup](services/backend/README.md)
 
 ### Frontend Client (services/frontend)
 
@@ -57,7 +57,7 @@ A Next.js web application that provides an interactive interface for working wit
 - Architecture pattern recommendations and best practices
 - Technical constraint analysis and solution optimization
 
-### Architecture Agent API (services/backend)
+### Backend API (services/backend)
 
 The backend service that orchestrates the AI agent for architecture design:
 
@@ -66,19 +66,19 @@ The backend service that orchestrates the AI agent for architecture design:
 - Mermaid diagram generation for complex system architectures
 - Technical documentation and implementation guidance
 - Solution validation and optimization suggestions
+- Static frontend hosting for unified deployment
 
 ## Repository Structure
 
 ```
 .
 ├── docs
-├── scripts
-│   └── deploy.sh
 └── services
     ├── backend
     │   ├── pyproject.toml
     │   ├── src
-    │   ├── static_frontend
+    │   ├── build/
+    │   │   └── static_frontend/    # Built frontend files
     │   ├── tests
     │   └── uv.lock
     └── frontend
@@ -158,72 +158,43 @@ graph TB
     class MermaidCode,Documentation,Recommendations,ArtifactStore,SessionStore aiLayer
 ```
 
-## Deployment Models
+## Getting Started
 
-This project supports flexible development and deployment patterns:
+### Quick Start
 
-### Development Mode (Two Services)
-
-During development, you can run the frontend and backend as separate services over the network for faster iteration and hot-reloading:
-
-**Frontend Development Server:**
+Use the Makefile for streamlined development and deployment:
 
 ```bash
-cd services/frontend/
-make dev  # Runs on http://localhost:3000
-```
+# Development mode (run both services separately)
+make dev
 
-**Backend API Server:**
-
-```bash
-cd services/backend/
-make dev  # Runs on http://localhost:8081
-```
-
-The frontend development server will proxy API calls to the backend service, allowing you to develop with full hot-reload capabilities.
-
-### Production Deployment (Single Service)
-
-For production deployment, the system uses a **unified deployment model** where:
-
-1. **Static Build**: The Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
-2. **Single Service**: The FastAPI backend serves both API endpoints and the static frontend files
-3. **Simplified Deployment**: Only one service to deploy, manage, and monitor
-
-**Production Build & Deploy:**
-
-```bash
-# Build static frontend and deploy
+# Build frontend static files for production
 make build
 ```
 
-### Why This Architecture?
+### Development Mode (Two Services)
 
-**Benefits:**
+For development with hot-reloading:
 
-- **Resource Efficiency**: Single service reduces memory and CPU overhead
-- **Simplified Networking**: No need to manage cross-service communication
-- **Easier Monitoring**: One process to monitor instead of two
-- **Port Management**: Only one port to expose and manage
+```bash
+# Start development servers for both services
+make dev
+```
 
-**Development vs Production:**
+This runs:
 
-- **Development**: Two services for faster iteration and debugging
-- **Production**: Single service for optimal performance and simplicity
+- Frontend development server at `http://localhost:3000`
+- Backend API server at `http://localhost:8081`
 
-**Architecture Comparison:**
+### Production Mode (Single Service)
 
-```mermaid
-graph TD
-  subgraph "Development (Two Services)"
-    A1[Next.js Dev Server :3000] --> A2[API Proxy]
-    A2 --> A3[FastAPI Backend :8081]
-  end
+For production deployment, the frontend is built into static files and served by the backend:
 
-  subgraph "Production (Single Service)"
-    B1[FastAPI Backend :8081] --> B2[Static Frontend Files]
-    B1 --> B3[Architecture Design API]
-  end
+```bash
+# Build static frontend
+make build
+
+# The backend now serves both API and frontend at http://localhost:8081
 ```
 
 ## Session Management & Design Continuity
@@ -343,131 +314,44 @@ Document analysis:
 - Basic malicious content detection
 - Sandboxed file processing for architecture documents
 
-## Building and Deploying
+## Deployment
 
-This project uses a **streamlined deployment model** where the frontend is pre-rendered into static files and served by the FastAPI backend as a single deployable unit.
+### Architecture Overview
 
-### Deployment Strategy
+The system uses a unified deployment model:
 
-The deployment process provides:
-
-1. **Static Frontend Build**: Next.js frontend is pre-rendered into static HTML, CSS, and JavaScript files
-2. **Single Service Deployment**: FastAPI backend serves both API endpoints and static frontend files
-3. **Local Deployment**: Optimized for local hosting without external dependencies
-
-### Build Process
-
-#### Automated Build
-
-Use the build script to prepare the frontend for deployment:
-
-```bash
-# From project root
-make build
-```
-
-This script:
-
-1. **Frontend Build**: Installs dependencies and runs `npm run build-static`
-2. **Static Copy**: Copies static files to `services/backend/build/static_frontend/`
-3. **Validation**: Ensures build completed successfully
-
-#### Manual Frontend Build
-
-Build the frontend manually if needed:
-
-```bash
-cd services/frontend
-make build          # Build and copy to backend
-```
+1. **Static Build**: Frontend is pre-rendered into static HTML, CSS, and JavaScript files
+2. **Single Service**: FastAPI backend serves both API endpoints and static frontend files
+3. **Simplified Operations**: Only one deployable unit with Python runtime requirement
 
 ### Deployment Process
 
-#### Automated Deployment
-
-Deploy the application:
-
 ```bash
-# From project root
-source scripts/deploy.sh
+# Build static frontend for production
+make build
+
+# The backend service now contains the frontend and serves everything at port 8081
 ```
 
-This script:
+**Final deployment requirements:**
 
-1. **Environment Setup**: Creates Python virtual environment and installs dependencies
-2. **Cleanup**: Clears Python cache and kills existing server processes
-3. **Port Management**: Ensures port 8081 is available for the server
-4. **Server Start**: Starts Uvicorn server in a detached screen session
-5. **Summary**: Provides deployment summary and management commands
+- Python 3.13+ runtime
+- Single service deployment
+- Frontend assets mounted in backend at build time
 
-#### Deployment Architecture
+### Why This Architecture?
 
-```mermaid
-graph LR
-    A[Development Machine] -->|build.sh| B[Static Files]
-    B -->|Deploy| C[Production Server]
+**Benefits:**
 
-    subgraph "Build Process"
-        A1[Frontend Build] --> A2[Static Files]
-        A2 --> A3[Copy to Backend]
-    end
+- **Resource Efficiency**: Single service reduces memory and CPU overhead
+- **Simplified Networking**: No cross-service communication needed
+- **Easier Operations**: One process to deploy, monitor, and manage
+- **Port Management**: Only one port to expose and configure
 
-    subgraph "Deploy Process"
-        C1[Setup Environment] --> C2[Install Dependencies]
-        C2 --> C3[Start Uvicorn Server]
-        C3 --> C4[Serve Static + API]
-    end
-```
+### Development vs Production
 
-#### Why This Approach?
-
-**Single Service Benefits**:
-
-- **Resource Efficiency**: Minimal memory and CPU usage
-- **Simplified Management**: One process to monitor and manage
-- **Network Simplicity**: Only one port (8081) to expose
-- **Fast Startup**: Quick boot times
-
-**Static Frontend Benefits**:
-
-- **Performance**: Pre-rendered content loads faster
-- **Lower Resource Usage**: No Node.js runtime required in production
-- **Reliability**: Fewer moving parts reduce potential failure points
-
-### Server Management
-
-After deployment, manage the server using screen:
-
-```bash
-# Attach to the running server (see logs in real-time)
-screen -r backend
-
-# Detach from screen session (server keeps running)
-# Press: Ctrl+A, then D
-
-# List all screen sessions
-screen -list
-
-# Stop the server
-screen -S backend -X quit
-```
-
-### Environment Configuration
-
-The deployment uses optimized settings:
-
-- **Server Host**: `0.0.0.0` (accessible from network)
-- **Server Port**: `8081` (avoids conflicts with common services)
-- **Python Environment**: Virtual environment in `services/backend/.venv`
-- **Static Files**: Served from `services/backend/build/static_frontend/`
-
-### Performance Notes
-
-- **Memory Usage**: Typically uses 150-300MB RAM (depending on model complexity and diagram generation)
-- **CPU Usage**: Low CPU usage during idle, moderate during AI processing and diagram generation
-- **Storage**: Requires ~500MB for application and dependencies
-- **Network**: Accessible via server's IP address on port 8081
-- **Architecture Generation**: Real-time Mermaid diagram generation with sub-second response times
+- **Development**: Two services (`make dev`) for faster iteration with hot-reloading
+- **Production**: Single service (`make build`) for optimized deployment
 
 ## License
 

@@ -23,42 +23,40 @@ Interactive web interface for the Architecture Designer system. Built with Next.
 
 - Node.js >= 18
 - npm or yarn
-- Google Cloud CLI
 
-### Installation
+### Quick Start
 
 ```bash
-make install
+# From project root - start both services
+make dev
+
+# Or run frontend only
+make dev
 ```
 
 ### Configuration
 
-Configure environment variables:
+The frontend automatically proxies API calls to the backend service at `http://localhost:8081` during development.
+
+## Production Build
+
+For production deployment, the frontend is built into static files that are served by the backend:
 
 ```bash
-# Copy the example environment file
-cp src/.env.local.example src/.env.local
-
-# Open the .env.local file and update the following variables:
-# - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 (or where ever backend service is hosted)
+# Build static frontend for production
+make build
 ```
 
-### Running Development Server
+This command:
 
-```bash
-make dev
-```
+1. Builds the Next.js app into static HTML/CSS/JS files
+2. Copies the built files to `../backend/build/static_frontend/`
+3. Backend serves both API and static frontend at port 8081
 
-The application will be available at `http://localhost:3000`
+## Development vs Production
 
-## Local Static Build for Testing
-
-```bash
-make build # This builds the static (pre-rendered into HTML, CSS, and JavaScript files) frontend into "out" and copies it over to the backend backend/build/static_frontend
-
-cd ../backend/src/
-make dev # Services backend with backend/build/static_frontend mounted
-```
+- **Development**: Frontend dev server at `:3000`, backend at `:8081`
+- **Production**: Single backend service at `:8081` serving both API and static frontend
 
 ## Project Structure
 
