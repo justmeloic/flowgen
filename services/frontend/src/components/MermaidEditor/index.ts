@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-export { default as MermaidDiffViewer } from "./MermaidDiffViewer";
-export { default as MermaidEditor } from "./MermaidEditor";
-export { default as MermaidEditorPanel } from "./MermaidEditorPanel";
+export { default as MermaidDiffViewer } from './MermaidDiffViewer';
+export { default as MermaidEditor } from './MermaidEditor';
+export { default as MermaidEditorPanel } from './MermaidEditorPanel';
+export { PromptCard } from './PromptCard';
 

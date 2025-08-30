@@ -1,0 +1,16 @@
+export type DiagramType = 
+  | 'flowchart'
+  | 'sequence'
+  | 'class'
+  | 'state'
+  | 'entity_relationship'
+  | 'user_journey'
+  | 'gantt'
+  | 'pie'
+  | 'quadrant_chart'
+  | 'requirement'
+  | 'gitgraph'
+  | 'mindmap'
+  | 'timeline'
+  | 'zenuml'
+  | 'sankey';

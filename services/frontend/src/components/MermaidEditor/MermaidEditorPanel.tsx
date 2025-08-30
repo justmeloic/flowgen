@@ -16,6 +16,7 @@
 
 "use client";
 
+import { mermaidEditAPI } from "@/lib/api/mermaidEdit";
 import {
   cleanMermaidCode,
   generateMermaidId,
@@ -23,10 +24,12 @@ import {
   validateMermaidSyntax,
 } from "@/lib/mermaid-config";
 import { Diagram } from "@/types";
+import { DiagramType } from "@/types/mermaid";
 import { diffChars } from "diff";
 import { useEffect, useState } from "react";
 import MermaidDiffViewer from "./MermaidDiffViewer";
 import MermaidEditor from "./MermaidEditor";
+import { PromptCard } from "./PromptCard";
 
 interface MermaidEditorPanelProps {
   diagram: Diagram | null;
@@ -45,9 +48,11 @@ export default function MermaidEditorPanel({
   const [proposedContent, setProposedContent] = useState("");
   const [diffResult, setDiffResult] = useState<any[]>([]);
   const [showDiff, setShowDiff] = useState(false);
-  const [editMode] = useState<"direct" | "llm">("direct");
+  const [editMode, setEditMode] = useState<"direct" | "llm">("direct");
   const [mermaidHistory, setMermaidHistory] = useState<string[]>([]);
   const [mermaidLoaded, setMermaidLoaded] = useState(false);
+  const [showPromptCard, setShowPromptCard] = useState(false);
+  const [aiIsLoading, setAiIsLoading] = useState(false);
 
   // Initialize with diagram content
   useEffect(() => {
@@ -129,6 +134,110 @@ export default function MermaidEditorPanel({
 
   const handleDirectEdit = (newContent: string) => {
     setProposedContent(newContent);
+  };
+
+  const handleAiEdit = () => {
+    setEditMode("llm");
+    setShowPromptCard(true);
+  };
+
+  const handleAiPromptSubmit = async (prompt: string) => {
+    try {
+      setAiIsLoading(true);
+
+      // Determine diagram type from the content
+      const diagramType = detectDiagramType(originalContent);
+
+      const response = await mermaidEditAPI.editDiagram({
+        content: originalContent,
+        instructions: prompt,
+        diagram_type: diagramType,
+        diagram_title: diagram?.title,
+        additional_context: diagram?.description,
+      });
+
+      setProposedContent(response.content);
+      setShowPromptCard(false);
+      setEditMode("direct"); // Switch back to direct mode
+
+      // Automatically show diff
+      const diff = diffChars(originalContent, response.content);
+      setDiffResult(diff);
+      setShowDiff(true);
+    } catch (error) {
+      console.error("AI editing failed:", error);
+      alert(
+        `AI editing failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setAiIsLoading(false);
+    }
+  };
+
+  const handleAiPromptCancel = () => {
+    setShowPromptCard(false);
+    setEditMode("direct");
+  };
+
+  const detectDiagramType = (content: string): DiagramType => {
+    const trimmedContent = content.trim().toLowerCase();
+
+    if (
+      trimmedContent.includes("sequencediagram") ||
+      trimmedContent.includes("participant")
+    ) {
+      return "sequence";
+    }
+    if (
+      trimmedContent.includes("classDiagram") ||
+      trimmedContent.includes("class ")
+    ) {
+      return "class";
+    }
+    if (
+      trimmedContent.includes("stateDiagram") ||
+      trimmedContent.includes("state ")
+    ) {
+      return "state";
+    }
+    if (trimmedContent.includes("erDiagram")) {
+      return "entity_relationship";
+    }
+    if (trimmedContent.includes("journey")) {
+      return "user_journey";
+    }
+    if (trimmedContent.includes("gantt")) {
+      return "gantt";
+    }
+    if (trimmedContent.includes("pie")) {
+      return "pie";
+    }
+    if (trimmedContent.includes("quadrantChart")) {
+      return "quadrant_chart";
+    }
+    if (trimmedContent.includes("requirementDiagram")) {
+      return "requirement";
+    }
+    if (trimmedContent.includes("gitgraph")) {
+      return "gitgraph";
+    }
+    if (trimmedContent.includes("mindmap")) {
+      return "mindmap";
+    }
+    if (trimmedContent.includes("timeline")) {
+      return "timeline";
+    }
+    if (trimmedContent.includes("zenuml")) {
+      return "zenuml";
+    }
+    if (trimmedContent.includes("sankey")) {
+      return "sankey";
+    }
+
+    // Default to flowchart
+    return "flowchart";
   };
 
   const handlePreviewChanges = () => {
@@ -264,6 +373,7 @@ export default function MermaidEditorPanel({
               onAcceptChanges={handleAcceptChanges}
               onRevert={handleRevert}
               onSave={handleSave}
+              onAiEdit={handleAiEdit}
               disabled={showDiff}
               showPreviewButton={
                 proposedContent !== originalContent &&
@@ -274,17 +384,34 @@ export default function MermaidEditorPanel({
             />
           </div>
 
-          {/* Right Panel - Diff Viewer */}
+          {/* Right Panel - PromptCard, Diff Viewer, or Info */}
           <div className="relative">
-            {/* Diff Viewer */}
+            {/* PromptCard */}
             <div
               className={`transition-all duration-700 ease-in-out ${
-                showDiff
+                showPromptCard
                   ? "opacity-100 translate-x-0"
                   : "opacity-0 translate-x-4 pointer-events-none"
               }`}
             >
-              {showDiff && (
+              {showPromptCard && (
+                <PromptCard
+                  onSubmit={handleAiPromptSubmit}
+                  onCancel={handleAiPromptCancel}
+                  isLoading={aiIsLoading}
+                />
+              )}
+            </div>
+
+            {/* Diff Viewer */}
+            <div
+              className={`transition-all duration-700 ease-in-out ${
+                showDiff && !showPromptCard
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 translate-x-4 pointer-events-none"
+              }`}
+            >
+              {showDiff && !showPromptCard && (
                 <MermaidDiffViewer
                   diffResult={diffResult}
                   onAccept={handleAcceptChanges}
@@ -295,17 +422,26 @@ export default function MermaidEditorPanel({
             </div>
 
             {/* Info Panel */}
-            {!showDiff && (
-              <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover transition-shadow duration-300 p-6">
-                <h3 className="text-lg font-semibold mb-4 opacity-65">
-                  Editor Instructions
-                </h3>
-                <div className="space-y-3 text-sm text-muted-foreground">
-                  <p>• Edit the Mermaid code in the editor panel</p>
-                  <p>• Click "Preview Changes" to see what will change</p>
-                  <p>• Accept changes to update the diagram</p>
-                  <p>• Use the diagram preview below to see live results</p>
-                  <p>• Revert button undoes the last accepted change</p>
+            {!showDiff && !showPromptCard && (
+              <div
+                className={`transition-all duration-700 ease-in-out ${
+                  proposedContent !== originalContent && proposedContent !== ""
+                    ? "opacity-40"
+                    : "opacity-100"
+                } translate-x-0`}
+              >
+                <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover transition-shadow duration-300 p-6">
+                  <h3 className="text-lg font-semibold mb-4 opacity-65">
+                    Editor Instructions
+                  </h3>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <p>• Edit the Mermaid code in the editor panel</p>
+                    <p>• Click "AI Edit" to get intelligent suggestions</p>
+                    <p>• Click "Preview Changes" to see what will change</p>
+                    <p>• Accept changes to update the diagram</p>
+                    <p>• Use the diagram preview below to see live results</p>
+                    <p>• Revert button undoes the last accepted change</p>
+                  </div>
                 </div>
               </div>
             )}

@@ -16,7 +16,16 @@
 
 "use client";
 
-import { Check, Copy, Download, Eye, FileCode, Save, Undo } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Download,
+  Eye,
+  FileCode,
+  Save,
+  Sparkles,
+  Undo,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface MermaidEditorProps {
@@ -26,6 +35,7 @@ interface MermaidEditorProps {
   onAcceptChanges: () => void;
   onRevert: () => void;
   onSave: () => void;
+  onAiEdit?: () => void;
   disabled?: boolean;
   showPreviewButton?: boolean;
   canRevert?: boolean;
@@ -38,6 +48,7 @@ export default function MermaidEditor({
   onAcceptChanges,
   onRevert,
   onSave,
+  onAiEdit,
   disabled = false,
   showPreviewButton = false,
   canRevert = false,
@@ -85,6 +96,17 @@ export default function MermaidEditor({
           Mermaid Code Editor
         </h2>
         <div className="flex items-center gap-3">
+          {onAiEdit && (
+            <button
+              onClick={onAiEdit}
+              disabled={disabled}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Edit with AI"
+            >
+              <Sparkles className="w-4 h-4" />
+              AI Edit
+            </button>
+          )}
           {showPreviewButton && (
             <>
               <button

@@ -15,6 +15,7 @@
  */
 
 "use client";
+
 import { Edit, Sparkles } from "lucide-react";
 
 interface MermaidDiffViewerProps {
@@ -74,14 +75,14 @@ export default function MermaidDiffViewer({
               <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              AI Suggested Mermaid Changes
+              AI Suggested Changes
             </>
           ) : (
             <>
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
                 <Edit className="w-4 h-4 text-white" />
               </div>
-              Direct Mermaid Edit Changes
+              Direct Edit Changes
             </>
           )}
         </h2>
@@ -103,8 +104,8 @@ export default function MermaidDiffViewer({
                   </span>
                 </div>
                 <p className="text-blue-700 dark:text-blue-300">
-                  Review the Mermaid code changes below. Accepting changes will
-                  re-render the diagram.
+                  Review the Mermaid code changes below and choose to accept or
+                  reject them.
                 </p>
               </div>
             </div>
@@ -118,7 +119,7 @@ export default function MermaidDiffViewer({
                 onClick={onAccept}
                 className="flex items-center justify-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-full font-medium transition-colors text-sm"
               >
-                Accept & Re-render
+                Accept
               </button>
               <button
                 onClick={onReject}
@@ -130,7 +131,7 @@ export default function MermaidDiffViewer({
           </>
         ) : (
           <div className="text-center py-12 text-muted-foreground shadow-md rounded-lg">
-            <div className="text-5xl mb-4">📊</div>
+            <div className="text-5xl mb-4">🤔</div>
             <p className="text-lg font-medium">No changes detected</p>
             <p className="text-sm mt-2">
               The Mermaid code appears to be identical
