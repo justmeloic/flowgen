@@ -21,6 +21,7 @@ import { DiagramPanel } from "@/components/Agent/DiagramPanel";
 import { MermaidDiagram } from "@/components/Agent/MermaidDiagram";
 import { MessageActions } from "@/components/Agent/MessageActions";
 import { PlatformSelector } from "@/components/Agent/PlatformSelector";
+import { MermaidEditorPanel } from "@/components/MermaidEditor";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
@@ -74,6 +75,7 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Thinking...");
   const [isDiagramHidden, setIsDiagramHidden] = useState(false);
+  const [isMermaidEditorOpen, setIsMermaidEditorOpen] = useState(false);
   const [selectedModel, setSelectedModel] =
     useState<string>("gemini-2.5-flash");
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
@@ -81,6 +83,22 @@ export default function ChatPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(true);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Manage body scroll when overlays are open
+  useEffect(() => {
+    if (!isDiagramHidden || isMermaidEditorOpen) {
+      // Prevent body scroll when diagram panel is open or editor is open
+      document.body.style.overflow = "hidden";
+    } else {
+      // Restore body scroll when all overlays are closed
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isDiagramHidden, isMermaidEditorOpen]);
 
   // Typewriter animation for greeting
   const greetingText =
@@ -504,6 +522,20 @@ export default function ChatPage() {
     }
   };
 
+  const handleEditMermaid = (diagramToEdit: Diagram) => {
+    setIsMermaidEditorOpen(true);
+    // Keep diagram panel visible, editor will overlay on top
+  };
+
+  const handleCloseMermaidEditor = () => {
+    setIsMermaidEditorOpen(false);
+    // Diagram panel stays expanded when editor closes
+  };
+
+  const handleDiagramUpdate = (updatedDiagram: Diagram) => {
+    setDiagram(updatedDiagram);
+  };
+
   return (
     <div className="flex flex-col flex-1 h-full">
       <div
@@ -717,12 +749,37 @@ export default function ChatPage() {
                   ? "transform -translate-x-1/2 -translate-y-1/2 scale-95 opacity-0 pointer-events-none"
                   : "transform -translate-x-1/2 -translate-y-1/2 scale-100 opacity-100"
               }`}
+              onClick={(e) => e.stopPropagation()}
             >
               <DiagramPanel
                 diagram={diagram}
                 isHidden={isDiagramHidden}
                 onToggleVisibility={toggleDiagramVisibility}
+                onEditMermaid={handleEditMermaid}
               />
+            </div>
+          </>
+        )}
+
+        {/* Mermaid Editor Panel - overlays on top of diagram panel */}
+        {isMermaidEditorOpen && diagram && (
+          <>
+            {/* Additional overlay for editor */}
+            <div
+              className="fixed inset-0 bg-black bg-opacity-30 z-50"
+              onClick={handleCloseMermaidEditor}
+            />
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              onClick={handleCloseMermaidEditor}
+            >
+              <div onClick={(e) => e.stopPropagation()}>
+                <MermaidEditorPanel
+                  diagram={diagram}
+                  onDiagramUpdate={handleDiagramUpdate}
+                  onClose={handleCloseMermaidEditor}
+                />
+              </div>
             </div>
           </>
         )}
