@@ -18,11 +18,10 @@
 
 import {
   Check,
+  Code,
+  CodeXml,
   Copy,
   Download,
-  Eye,
-  FileCode,
-  Save,
   Sparkles,
   Undo,
 } from "lucide-react";
@@ -34,7 +33,6 @@ interface MermaidEditorProps {
   onPreviewChanges: () => void;
   onAcceptChanges: () => void;
   onRevert: () => void;
-  onSave: () => void;
   onAiEdit?: () => void;
   disabled?: boolean;
   showPreviewButton?: boolean;
@@ -47,7 +45,6 @@ export default function MermaidEditor({
   onPreviewChanges,
   onAcceptChanges,
   onRevert,
-  onSave,
   onAiEdit,
   disabled = false,
   showPreviewButton = false,
@@ -73,17 +70,42 @@ export default function MermaidEditor({
   };
 
   const handleDownload = () => {
-    const blob = new Blob([localContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `mermaid-diagram-${
-      new Date().toISOString().split("T")[0]
-    }.mmd`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const svg = document.querySelector("#mermaid-editor-diagram svg");
+    if (svg) {
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      img.onload = () => {
+        // Scale factor for higher resolution but more reasonable
+        const scaleFactor = 2;
+        canvas.width = img.width * scaleFactor;
+        canvas.height = img.height * scaleFactor;
+
+        // Draw the image at the scaled size
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.download = `mermaid-diagram-${
+                new Date().toISOString().split("T")[0]
+              }.png`;
+              link.href = url;
+              link.click();
+              URL.revokeObjectURL(url);
+            }
+          },
+          "image/png",
+          1.0
+        );
+      };
+
+      img.src = "data:image/svg+xml;base64," + btoa(svgData);
+    }
   };
 
   return (
@@ -91,22 +113,11 @@ export default function MermaidEditor({
       <div className="flex items-center justify-between p-6 border-border">
         <h2 className="text-xl text-card-foreground opacity-65 ml-4 flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-            <FileCode className="w-4 h-4 text-white" />
+            <Code className="w-4 h-4 text-white" />
           </div>
           Mermaid Code Editor
         </h2>
         <div className="flex items-center gap-3">
-          {onAiEdit && (
-            <button
-              onClick={onAiEdit}
-              disabled={disabled}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Edit with AI"
-            >
-              <Sparkles className="w-4 h-4" />
-              AI Edit
-            </button>
-          )}
           {showPreviewButton && (
             <>
               <button
@@ -114,14 +125,14 @@ export default function MermaidEditor({
                 className="flex items-center gap-2 px-4 py-2 text-white bg-green-600 rounded-full hover:bg-green-700 transition-all duration-300 text-sm hover:scale-105"
               >
                 <Check className="w-4 h-4" />
-                Accept & Render
+                Accept
               </button>
               <button
                 onClick={onPreviewChanges}
                 className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all duration-300 text-sm hover:scale-105"
               >
-                <Eye className="w-4 h-4" />
-                Preview Changes
+                <CodeXml className="w-4 h-4" />
+                Preview
               </button>
             </>
           )}
@@ -135,7 +146,7 @@ export default function MermaidEditor({
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-700">
               <span className="text-xs font-medium text-gray-300">
-                Mermaid Code
+                Mermaid Code Editor
               </span>
               <span className="text-xs text-gray-400">
                 {lineCount} lines • {localContent.length} characters
@@ -181,22 +192,24 @@ graph TD
             </button>
 
             <button
-              onClick={onSave}
-              disabled={disabled}
-              className="flex items-center justify-center w-10 h-10 bg-blue-100/50 dark:bg-transparent dark:border dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-500/50 hover:to-cyan-500/50 hover:text-white text-blue-700/60 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-125"
-              title="Save Mermaid code locally"
-            >
-              <Save className="w-4 h-4" />
-            </button>
-
-            <button
               onClick={handleDownload}
               disabled={disabled}
               className="flex items-center justify-center w-10 h-10 bg-blue-100/50 dark:bg-transparent dark:border dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-500/50 hover:to-cyan-500/50 hover:text-white text-blue-700/60 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-125"
-              title="Download Mermaid code as .mmd file"
+              title="Download diagram as PNG image"
             >
               <Download className="w-4 h-4" />
             </button>
+            {onAiEdit && (
+              <button
+                onClick={onAiEdit}
+                disabled={disabled}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Edit with AI"
+              >
+                <Sparkles className="w-4 h-4" />
+                AI Edit
+              </button>
+            )}
           </div>
         </div>
       </div>

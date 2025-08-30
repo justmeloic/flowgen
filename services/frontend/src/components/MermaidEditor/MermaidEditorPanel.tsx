@@ -319,7 +319,7 @@ export default function MermaidEditorPanel({
   }
 
   return (
-    <div className="w-[95vw] max-w-7xl h-[90vh] bg-blue-50 dark:bg-secondary-dark rounded-2xl shadow-2xl overflow-y-auto transition-colors duration-300">
+    <div className="w-[95vw] max-w-7xl h-[90vh] bg-blue-50 dark:bg-secondary-dark rounded-3xl shadow-2xl overflow-y-auto transition-colors duration-300">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="text-center py-2 relative">
@@ -344,7 +344,7 @@ export default function MermaidEditorPanel({
               </svg>
             </button>
           )}
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 mt-5">
             <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
               Mermaid Editor
             </span>
@@ -354,34 +354,37 @@ export default function MermaidEditorPanel({
               Edit Mermaid code with live preview and diff approval
             </span>
           </p>
-          {diagram.title && (
-            <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
-              {diagram.title}
-            </p>
-          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Editor Section */}
           <div className="space-y-6">
-            <MermaidEditor
-              content={
-                showDiff ? originalContent : proposedContent || originalContent
-              }
-              onChange={handleDirectEdit}
-              onPreviewChanges={handlePreviewChanges}
-              onAcceptChanges={handleAcceptChanges}
-              onRevert={handleRevert}
-              onSave={handleSave}
-              onAiEdit={handleAiEdit}
-              disabled={showDiff}
-              showPreviewButton={
-                proposedContent !== originalContent &&
-                proposedContent !== "" &&
-                !showDiff
-              }
-              canRevert={mermaidHistory.length > 1}
-            />
+            <div
+              className={`transition-all duration-300 ${
+                showPromptCard ? "blur-sm" : "blur-none"
+              }`}
+            >
+              <MermaidEditor
+                content={
+                  showDiff
+                    ? originalContent
+                    : proposedContent || originalContent
+                }
+                onChange={handleDirectEdit}
+                onPreviewChanges={handlePreviewChanges}
+                onAcceptChanges={handleAcceptChanges}
+                onRevert={handleRevert}
+                onSave={handleSave}
+                onAiEdit={handleAiEdit}
+                disabled={showDiff || showPromptCard}
+                showPreviewButton={
+                  proposedContent !== originalContent &&
+                  proposedContent !== "" &&
+                  !showDiff
+                }
+                canRevert={mermaidHistory.length > 1}
+              />
+            </div>
           </div>
 
           {/* Right Panel - PromptCard, Diff Viewer, or Info */}
@@ -430,7 +433,7 @@ export default function MermaidEditorPanel({
                     : "opacity-100"
                 } translate-x-0`}
               >
-                <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover transition-shadow duration-300 p-6">
+                <div className="bg-blue-50 dark:bg-secondary-dark rounded-3xl dark:border border-border overflow-hidden shadow-[2px_0_4px_rgba(0,0,0,0.05),_-2px_0_4px_rgba(0,0,0,0.05),_0_4px_2px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(255,255,255,0.03),_-2px_0_4px_rgba(255,255,255,0.03),_0_4px_2px_rgba(255,255,255,0.1)] transition-all duration-300 p-6 translate-y-24">
                   <h3 className="text-lg font-semibold mb-4 opacity-65">
                     Editor Instructions
                   </h3>
@@ -449,7 +452,7 @@ export default function MermaidEditorPanel({
         </div>
 
         {/* Diagram Preview */}
-        <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover transition-shadow duration-300 p-6">
+        <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover transition-shadow duration-300 p-6 mx-9">
           <h3 className="text-lg font-semibold mb-4 text-center opacity-65">
             Live Diagram Preview
           </h3>
