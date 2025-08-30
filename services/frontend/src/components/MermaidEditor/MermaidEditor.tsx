@@ -76,7 +76,7 @@ export default function MermaidEditor({
   };
 
   return (
-    <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover focus-within:shadow-card-hover transition-all duration-300">
+    <div className="bg-blue-50 dark:bg-secondary-dark rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover focus-within:shadow-card-hover transition-all duration-300">
       <div className="flex items-center justify-between p-6 border-border">
         <h2 className="text-xl text-card-foreground opacity-65 ml-4 flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
@@ -108,28 +108,37 @@ export default function MermaidEditor({
 
       <div className="p-6">
         <div className="relative">
-          <textarea
-            value={localContent}
-            onChange={handleChange}
-            disabled={disabled}
-            className="w-full h-96 p-4 dark:border bg-background text-sm rounded-2xl resize-none outline-none focus:shadow-[0_0_0_3px_rgba(59,130,246,0.3)] disabled:bg-muted disabled:cursor-not-allowed opacity-70 text-foreground placeholder:text-muted-foreground transition-all duration-300 font-mono"
-            placeholder="Enter your Mermaid diagram code here...
+          {/* Code editor container with header */}
+          <div className="bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-700">
+              <span className="text-xs font-medium text-gray-300">
+                Mermaid Code
+              </span>
+              <span className="text-xs text-gray-400">
+                {lineCount} lines • {localContent.length} characters
+              </span>
+            </div>
+
+            {/* Textarea */}
+            <textarea
+              value={localContent}
+              onChange={handleChange}
+              disabled={disabled}
+              className="w-full h-96 p-4 bg-gray-800 text-sm resize-none outline-none border-none text-gray-200 placeholder:text-gray-500 transition-colors duration-300 font-mono leading-relaxed disabled:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-60"
+              placeholder="Enter your Mermaid diagram code here...
 
 Example:
 graph TD
     A[Client] --> B[Load Balancer]
     B --> C[Server01]
     B --> D[Server02]"
-            spellCheck={false}
-          />
+              spellCheck={false}
+            />
+          </div>
         </div>
 
         <div className="mt-3 space-y-3">
-          <div className="text-xs text-muted-foreground ml-4 mb-6 opacity-65 flex items-center gap-4">
-            <span>{localContent.length} characters</span>
-            <span>{lineCount} lines</span>
-          </div>
-
           <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={onRevert}

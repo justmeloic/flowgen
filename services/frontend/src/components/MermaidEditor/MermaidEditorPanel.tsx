@@ -210,7 +210,7 @@ export default function MermaidEditorPanel({
   }
 
   return (
-    <div className="w-[95vw] max-w-7xl h-[90vh] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-y-auto transition-colors duration-300">
+    <div className="w-[95vw] max-w-7xl h-[90vh] bg-blue-50 dark:bg-secondary-dark rounded-2xl shadow-2xl overflow-y-auto transition-colors duration-300">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="text-center py-2 relative">
