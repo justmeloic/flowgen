@@ -19,6 +19,7 @@ from fastapi import APIRouter
 from src.app.api.v1.routes import (
     agent,
     files,
+    mermaid_edit,
     utility,
 )
 
@@ -35,6 +36,12 @@ main_v1_router.include_router(
     files.router,
     prefix='/files',
     tags=['files'],
+)
+
+main_v1_router.include_router(
+    mermaid_edit.router,
+    prefix='/mermaid',
+    tags=['mermaid'],
 )
 
 main_v1_router.include_router(

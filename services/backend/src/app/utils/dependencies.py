@@ -28,6 +28,7 @@ from google.adk.sessions import InMemorySessionService, Session
 
 from src.agents.agent_factory import agent_factory
 from src.app.models import AgentConfig
+from src.app.services.mermaid_edit_service import MermaidEditService
 from src.lib.config import settings
 
 _logger = logging.getLogger(__name__)
@@ -206,3 +207,13 @@ def get_runner(
                 },
             )
     return getattr(request.app.state, runner_key)
+
+
+@lru_cache
+def get_mermaid_edit_service() -> MermaidEditService:
+    """Gets and caches the Mermaid edit service instance.
+
+    Returns:
+        An instance of MermaidEditService.
+    """
+    return MermaidEditService()
