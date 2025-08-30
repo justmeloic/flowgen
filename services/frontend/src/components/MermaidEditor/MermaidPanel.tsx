@@ -325,12 +325,12 @@ export default function MermaidPanel({
         <div className="flex justify-between items-start py-2 ">
           <div className="flex-1 text-center">
             <h1 className="text-2xl md:text-3xl font-bold  mt-6">
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-slate-500 to-cyan-600 bg-clip-text text-transparent">
                 Mermaid Editor
               </span>
             </h1>
             <p className="text-muted-foreground  text-sm">
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-slate-500 to-cyan-600 bg-clip-text text-transparent">
                 Edit Mermaid code with live preview and diff approval
               </span>
             </p>

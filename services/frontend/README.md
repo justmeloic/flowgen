@@ -17,6 +17,20 @@ Interactive web interface for the Architecture Designer system. Built with Next.
   <img src="../../docs/query-interface.gif" alt="Query Interface" style="border-radius: 10px; max-width: 100%;">
 </div>
 
+## Features
+
+- **Multi-Model Interface**: Switch between AI models (Gemini Flash/Pro) with conversation continuity
+- **Real-time Chat**: WebSocket streaming for responsive AI interactions
+- **Diagram Integration**: Built-in Mermaid diagram rendering and interaction
+- **Direct Editing Capabilities**:
+  - **Manual Code Editor**: Edit Mermaid diagrams directly with syntax highlighting
+  - **AI-Powered Editing**: Natural language instructions to modify diagrams using the backend edit service
+  - **Live Preview**: Real-time diagram rendering as you edit
+  - **Export & Copy**: Download PNG images or copy Mermaid code to clipboard
+- **Session Management**: Persistent conversations across browser sessions
+- **Theme Support**: Dark/light mode with system preference detection
+- **Responsive Design**: Mobile-friendly interface with adaptive layouts
+
 ## Development Setup
 
 ### Prerequisites

@@ -81,6 +81,22 @@ Once running, access:
 - **Alternative Docs**: `http://localhost:8081/redoc`
 - **Static Frontend** (after build): `http://localhost:8081`
 
+### Key Endpoints
+
+#### Mermaid Diagram Editing
+
+- `POST /api/v1/mermaid/edit` - AI-powered diagram editing service
+  - Edit Mermaid diagrams using natural language instructions
+  - Independent of main conversation flow
+  - Supports all Mermaid diagram types (flowchart, sequence, class, etc.)
+  - Returns edited Mermaid code directly
+
+#### Chat & Agent Interactions
+
+- `POST /api/v1/chat/{agent_id}/message` - Send messages to AI agents
+- `POST /api/v1/chat/session/{session_id}/model` - Switch AI models mid-conversation
+- Session management with conversation continuity across model switches
+
 ## Testing
 
 Run the comprehensive test suite:

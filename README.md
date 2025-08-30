@@ -16,14 +16,21 @@
 </div>
 An intelligent agent that helps you draft end-to-end solutions solutions architectures. The agent interacts with users to gather requirements, understand technical constraints, and generates comprehensive Mermaid architecture diagrams with detailed explanations.
 
-## Key Features
+## ✨ Key Features
 
-- **Interactive Requirements Gathering**: AI-powered questioning to understand your system needs
-- **Architecture Pattern Recognition**: Automatic identification of suitable architectural patterns
-- **Mermaid Diagram Generation**: Beautiful, interactive architecture diagrams
-- **Constraint Analysis**: Technical, budgetary, and operational constraint evaluation
-- **Implementation Guidance**: Step-by-step development recommendations
-- **Real-time Refinement**: Iterative design improvement through conversation
+- **Multi-Model AI Conversations**: Switch seamlessly between different AI models (Gemini 2.5 Flash, Gemini 2.5 Pro) mid-conversation
+- **Architecture Design**: Specialized agent for analyzing requirements and generating system architecture diagrams
+- **Mermaid Diagram Generation**: Automatic creation of professional architecture diagrams
+- **Direct Diagram Editing**: Manual code editing and AI-powered editing features that work independently of the main conversation
+  - **Manual Editing**: Edit Mermaid code directly in the built-in code editor
+  - **AI-Powered Edits**: Use AI to modify diagrams through natural language instructions without going through the main agent
+  - **Real-time Preview**: See changes instantly with live diagram rendering
+  - **Export Options**: Download diagrams as PNG images or copy Mermaid code
+- **Session Continuity**: Advanced session management maintains conversation history across model switches
+- **Real-time Interaction**: Stream responses with modern chat interface
+- **Dark/Light Theme**: Responsive design with theme switching
+- **Tool Integration**: Google Search and other tools for enhanced responses
+- **Session Persistence**: Conversations persist across browser sessions
 
 ### Interactive Diagram Generation
 
