@@ -18,7 +18,7 @@
 
 import { Edit, Sparkles } from "lucide-react";
 
-interface MermaidDiffViewerProps {
+interface DiffViewerProps {
   diffResult: Array<{
     added?: boolean;
     removed?: boolean;
@@ -29,12 +29,12 @@ interface MermaidDiffViewerProps {
   editMode: "direct" | "llm";
 }
 
-export default function MermaidDiffViewer({
+export default function DiffViewer({
   diffResult,
   onAccept,
   onReject,
   editMode,
-}: MermaidDiffViewerProps) {
+}: DiffViewerProps) {
   const renderDiffText = () => {
     return diffResult.map((part, index) => {
       let className = "";

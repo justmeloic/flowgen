@@ -40,7 +40,7 @@ export function PromptCard({
           <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white animate-pulse" />
           </div>
-          AI Diagram Editor
+          AI Mode
         </h2>
         <button
           onClick={onCancel}

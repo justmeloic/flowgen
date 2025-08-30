@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-interface MermaidEditorProps {
+interface MermaidCodeEditorProps {
   content: string;
   onChange: (content: string) => void;
   onPreviewChanges: () => void;
@@ -39,7 +39,7 @@ interface MermaidEditorProps {
   canRevert?: boolean;
 }
 
-export default function MermaidEditor({
+export default function MermaidCodeEditor({
   content,
   onChange,
   onPreviewChanges,
@@ -49,7 +49,7 @@ export default function MermaidEditor({
   disabled = false,
   showPreviewButton = false,
   canRevert = false,
-}: MermaidEditorProps) {
+}: MermaidCodeEditorProps) {
   const [localContent, setLocalContent] = useState(content);
   const [lineCount, setLineCount] = useState(1);
 
@@ -112,7 +112,7 @@ export default function MermaidEditor({
     <div className="bg-blue-50 dark:bg-secondary-dark rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover focus-within:shadow-card-hover transition-all duration-300">
       <div className="flex items-center justify-between p-6 border-border">
         <h2 className="text-xl text-card-foreground opacity-65 ml-4 flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full flex items-center justify-center">
             <Code className="w-4 h-4 text-white" />
           </div>
           Mermaid Code Editor
@@ -185,7 +185,7 @@ graph TD
             <button
               onClick={handleCopy}
               disabled={disabled}
-              className="flex items-center justify-center w-10 h-10 bg-blue-100/50 dark:bg-transparent dark:border dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-500/50 hover:to-cyan-500/50 hover:text-white text-blue-700/60 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-125"
+              className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-transparent dark:border dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-500/50 hover:to-cyan-500/50 hover:text-white text-blue-700/60 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-125"
               title="Copy Mermaid code to clipboard"
             >
               <Copy className="w-4 h-4" />
@@ -194,7 +194,7 @@ graph TD
             <button
               onClick={handleDownload}
               disabled={disabled}
-              className="flex items-center justify-center w-10 h-10 bg-blue-100/50 dark:bg-transparent dark:border dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-500/50 hover:to-cyan-500/50 hover:text-white text-blue-700/60 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-125"
+              className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-transparent dark:border dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-500/50 hover:to-cyan-500/50 hover:text-white text-blue-700/60 dark:text-gray-300 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-125"
               title="Download diagram as PNG image"
             >
               <Download className="w-4 h-4" />
@@ -203,7 +203,7 @@ graph TD
               <button
                 onClick={onAiEdit}
                 disabled={disabled}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/60 to-blue-500/80 text-white rounded-full hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Edit with AI"
               >
                 <Sparkles className="w-4 h-4" />

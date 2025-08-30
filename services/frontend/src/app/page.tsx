@@ -17,11 +17,11 @@
 "use client";
 
 import { ChatInput } from "@/components/Agent/ChatInput";
-import { DiagramPanel } from "@/components/Agent/DiagramPanel";
 import { MermaidDiagram } from "@/components/Agent/MermaidDiagram";
 import { MessageActions } from "@/components/Agent/MessageActions";
 import { PlatformSelector } from "@/components/Agent/PlatformSelector";
-import { MermaidEditorPanel } from "@/components/MermaidEditor";
+import { DiagramPanel } from "@/components/DiagramPanel";
+import { MermaidPanel } from "@/components/MermaidEditor";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
@@ -774,7 +774,7 @@ export default function ChatPage() {
               onClick={handleCloseMermaidEditor}
             >
               <div onClick={(e) => e.stopPropagation()}>
-                <MermaidEditorPanel
+                <MermaidPanel
                   diagram={diagram}
                   onDiagramUpdate={handleDiagramUpdate}
                   onClose={handleCloseMermaidEditor}

@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-export { ChatInput } from "./ChatInput";
-export { MermaidDiagram } from "./MermaidDiagram";
-export { MessageActions } from "./MessageActions";
-export { ModelSelector } from "./ModelSelector";
-export { PlatformSelector } from "./PlatformSelector";
-export { ReferencesPanel } from "./ReferencesPanel";
-export { SearchResults } from "./SearchResults";
+export { DiagramActions } from './DiagramActions';
+export { DiagramCodeViewer } from './DiagramCodeViewer';
+export { DiagramPanel } from './DiagramPanel';
+export { DiagramRenderer } from './DiagramRenderer';
 

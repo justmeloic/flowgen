@@ -27,23 +27,23 @@ import { Diagram } from "@/types";
 import { DiagramType } from "@/types/mermaid";
 import { diffChars } from "diff";
 import { useEffect, useState } from "react";
-import MermaidDiffViewer from "./MermaidDiffViewer";
-import MermaidEditor from "./MermaidEditor";
+import MermaidCodeEditor from "./CodeEditor";
+import DiffViewer from "./DiffViewer";
 import { PromptCard } from "./PromptCard";
 
-interface MermaidEditorPanelProps {
+interface MermaidPanelProps {
   diagram: Diagram | null;
   onDiagramUpdate: (updatedDiagram: Diagram) => void;
   onClose?: () => void;
   isDarkMode?: boolean;
 }
 
-export default function MermaidEditorPanel({
+export default function MermaidPanel({
   diagram,
   onDiagramUpdate,
   onClose,
   isDarkMode = false,
-}: MermaidEditorPanelProps) {
+}: MermaidPanelProps) {
   const [originalContent, setOriginalContent] = useState("");
   const [proposedContent, setProposedContent] = useState("");
   const [diffResult, setDiffResult] = useState<any[]>([]);
@@ -322,15 +322,27 @@ export default function MermaidEditorPanel({
     <div className="w-[95vw] max-w-7xl h-[90vh] bg-blue-50 dark:bg-secondary-dark rounded-3xl shadow-2xl overflow-y-auto transition-colors duration-300">
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="text-center py-2 relative">
+        <div className="flex justify-between items-start py-2 ">
+          <div className="flex-1 text-center">
+            <h1 className="text-2xl md:text-3xl font-bold  mt-6">
+              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                Mermaid Editor
+              </span>
+            </h1>
+            <p className="text-muted-foreground  text-sm">
+              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                Edit Mermaid code with live preview and diff approval
+              </span>
+            </p>
+          </div>
           {onClose && (
             <button
               onClick={onClose}
-              className="absolute top-2 right-2 p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+              className="p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
               title="Close Editor"
             >
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 text-gray-600 dark:text-gray-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -344,16 +356,6 @@ export default function MermaidEditorPanel({
               </svg>
             </button>
           )}
-          <h1 className="text-2xl md:text-3xl font-bold mb-2 mt-5">
-            <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-              Mermaid Editor
-            </span>
-          </h1>
-          <p className="text-muted-foreground mb-2 text-sm">
-            <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-              Edit Mermaid code with live preview and diff approval
-            </span>
-          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -364,7 +366,7 @@ export default function MermaidEditorPanel({
                 showPromptCard ? "blur-sm" : "blur-none"
               }`}
             >
-              <MermaidEditor
+              <MermaidCodeEditor
                 content={
                   showDiff
                     ? originalContent
@@ -374,7 +376,6 @@ export default function MermaidEditorPanel({
                 onPreviewChanges={handlePreviewChanges}
                 onAcceptChanges={handleAcceptChanges}
                 onRevert={handleRevert}
-                onSave={handleSave}
                 onAiEdit={handleAiEdit}
                 disabled={showDiff || showPromptCard}
                 showPreviewButton={
@@ -415,7 +416,7 @@ export default function MermaidEditorPanel({
               }`}
             >
               {showDiff && !showPromptCard && (
-                <MermaidDiffViewer
+                <DiffViewer
                   diffResult={diffResult}
                   onAccept={handleAcceptChanges}
                   onReject={handleRejectChanges}
