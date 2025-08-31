@@ -108,7 +108,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
       {isCollapsed && (
         <button
           onClick={handleToggle}
-          className="fixed top-24 left-4 z-50 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg"
+          className="hidden sm:block fixed top-24 left-4 z-50 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg"
           aria-label="Expand sidebar"
         >
           <svg
