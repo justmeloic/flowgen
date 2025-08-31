@@ -64,7 +64,7 @@ export function PlatformSelector({
           variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-auto h-15 rounded-2xl justify-between bg-chatInput-light dark:bg-chatInput-dark hover:bg-gray-200 dark:hover:bg-[#2d2e2f] border-none shadow-none focus:ring-0 focus:outline-none px-4"
+          className="w-auto h-15 rounded-2xl justify-between bg-blue-100/80 dark:bg-chatInput-dark hover:bg-gray-200 dark:hover:bg-[#2d2e2f] border-none shadow-none focus:ring-0 focus:outline-none px-4"
         >
           <div className="flex flex-col items-start min-w-0">
             <span className="text-xs text-muted-foreground dark:text-gray-400 whitespace-nowrap">
