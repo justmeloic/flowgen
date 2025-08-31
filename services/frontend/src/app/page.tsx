@@ -20,6 +20,7 @@ import { ChatInput } from "@/components/Agent/ChatInput";
 import { MermaidDiagram } from "@/components/Agent/MermaidDiagram";
 import { MessageActions } from "@/components/Agent/MessageActions";
 import { PlatformSelector } from "@/components/Agent/PlatformSelector";
+import { BugReportDialog } from "@/components/BugReport/BugReportDialog";
 import { DiagramPanel } from "@/components/DiagramPanel";
 import { MermaidPanel } from "@/components/MermaidEditor";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -29,7 +30,7 @@ import { toast } from "@/components/ui/use-toast";
 import { sendMessage, startNewSession } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ChatMessage, Diagram } from "@/types";
-import { Maximize2, SquarePen } from "lucide-react";
+import { Bug, Maximize2, SquarePen } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -74,13 +75,14 @@ export default function ChatPage() {
   const [isFirstPrompt, setIsFirstPrompt] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Thinking...");
-  const [isDiagramHidden, setIsDiagramHidden] = useState(false);
+  const [isDiagramHidden, setIsDiagramHidden] = useState(true);
   const [isMermaidEditorOpen, setIsMermaidEditorOpen] = useState(false);
   const [selectedModel, setSelectedModel] =
     useState<string>("gemini-2.5-flash");
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [isStartingNew, setIsStartingNew] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(true);
+  const [isBugReportOpen, setIsBugReportOpen] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -795,6 +797,26 @@ export default function ChatPage() {
           </>
         )}
       </div>
+
+      {/* Floating Bug Report Button - Bottom Right */}
+      <Button
+        onClick={() => setIsBugReportOpen(true)}
+        className={cn(
+          "fixed bottom-6 right-6 z-20 p-3 bg-red-100 dark:bg-red-900/50 rounded-full hover:bg-red-200 dark:hover:bg-red-800/60 transition-all duration-300 ease-in-out shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          diagram && !isDiagramHidden ? "blur-sm" : ""
+        )}
+        aria-label="Report a bug"
+      >
+        <Bug className="w-4 h-4 text-red-600 dark:text-red-400" />
+      </Button>
+
+      {/* Bug Report Dialog */}
+      <BugReportDialog
+        isOpen={isBugReportOpen}
+        onClose={() => setIsBugReportOpen(false)}
+        currentDiagram={diagram}
+        chatHistory={chatHistory}
+      />
 
       <Toaster />
     </div>

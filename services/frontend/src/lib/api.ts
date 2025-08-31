@@ -123,3 +123,31 @@ export const startNewSession = (): void => {
   localStorage.removeItem('isFirstPrompt');
   console.log('Cleared session ID and chat data - next request will create a new session');
 };
+
+export const submitBugReport = async (bugData: {
+  description: string;
+  diagram?: any;
+  chatHistory?: any[];
+  userAgent?: string;
+  timestamp?: string;
+  url?: string;
+}): Promise<{ success: boolean; bug_id: string; message: string }> => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/bugs/report`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bugData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to submit bug report:', error);
+    throw error;
+  }
+};

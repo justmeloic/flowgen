@@ -69,3 +69,11 @@ class AgentResponse(BaseModel):
                 'confidence': 0.95,
             }
         }
+
+
+class BugReportResponse(BaseModel):
+    """Bug report response model."""
+
+    success: bool
+    bug_id: str
+    message: str
