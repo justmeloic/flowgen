@@ -1,11 +1,19 @@
 #Backend Makefile
 
-.PHONY: dev install clean test help
+.PHONY: dev prod deploy install clean test help
 
 # Default target
 dev:
 	@echo "Starting development server..."
 	source .venv/bin/activate && uvicorn src.app.main:app --reload --host 0.0.0.0 --port 8081
+
+prod:
+	@echo "Starting production server with ngrok tunnel..."
+	./scripts/deploy.sh
+
+deploy:
+	@echo "Deploying to Google Cloud Run..."
+	./scripts/deploy-gcloud.sh
 
 install:
 	@echo "Installing dependencies..."
@@ -30,10 +38,12 @@ clean:
 
 help:
 	@echo "Available commands:"
-	@echo "  make dev          - Start development server"
-	@echo "  make install      - Install dependencies"
-	@echo "  make test         - Run tests"
-	@echo "  make test-verbose - Run tests with verbose output"
-	@echo "  make test-coverage- Run tests with coverage report"
-	@echo "  make clean        - Clean Python cache files"
-	@echo "  make help         - Show this help message"
+	@echo "  make dev              - Start development server"
+	@echo "  make prod             - Start production server with ngrok tunnel (legacy)"
+	@echo "  make deploy           - Deploy to Google Cloud Run"
+	@echo "  make install          - Install dependencies"
+	@echo "  make test             - Run tests"
+	@echo "  make test-verbose     - Run tests with verbose output"
+	@echo "  make test-coverage    - Run tests with coverage report"
+	@echo "  make clean            - Clean Python cache files"
+	@echo "  make help             - Show this help message"

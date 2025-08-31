@@ -55,6 +55,9 @@ logs/
 log/
 *nohup.out
 
+# PID files
+*.pid
+
 # Local development
 *.db
 *.sqlite3

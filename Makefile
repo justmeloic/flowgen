@@ -5,10 +5,11 @@
 #   make dev           - Start development servers for both frontend and backend
 #   make build         - Build frontend static files and copy to backend
 #   make deploy        - Build and deploy frontend to Netlify
+#   make prod          - Deploy backend service with ngrok tunnel
 #   make clean         - Clean build artifacts and cache files
 #   make help          - Show this help message
 
-.PHONY: dev build deploy clean help
+.PHONY: dev build deploy prod clean help
 
 # Default target
 help:
@@ -18,6 +19,7 @@ help:
 	@echo "  make dev          🔧 Start development servers for both services"
 	@echo "  make build        🏗️  Build frontend static files for production"
 	@echo "  make deploy       🚀 Build and deploy frontend to Netlify"
+	@echo "  make prod         🌐 Deploy backend service with ngrok tunnel"
 	@echo "  make clean        🧹 Clean build artifacts and cache files"
 	@echo "  make help         ❓ Show this help message"
 	@echo ""
@@ -59,6 +61,12 @@ deploy:
 	@echo "📦 Deploying to Netlify..."
 	@cd services/frontend && netlify deploy --prod --dir=out
 	@echo "✅ Deployment completed!"
+
+# Deploy backend service with ngrok tunnel
+prod:
+	@echo "🌐 Deploying backend service with ngrok tunnel..."
+	@cd services/backend && ./scripts/deploy.sh
+	@echo "✅ Backend deployment started!"
 
 # Clean build artifacts and cache files
 clean:
