@@ -4,10 +4,11 @@
 # Usage:
 #   make dev           - Start development servers for both frontend and backend
 #   make build         - Build frontend static files and copy to backend
+#   make deploy        - Build and deploy frontend to Netlify
 #   make clean         - Clean build artifacts and cache files
 #   make help          - Show this help message
 
-.PHONY: dev build clean help
+.PHONY: dev build deploy clean help
 
 # Default target
 help:
@@ -16,6 +17,7 @@ help:
 	@echo "Available commands:"
 	@echo "  make dev          🔧 Start development servers for both services"
 	@echo "  make build        🏗️  Build frontend static files for production"
+	@echo "  make deploy       🚀 Build and deploy frontend to Netlify"
 	@echo "  make clean        🧹 Clean build artifacts and cache files"
 	@echo "  make help         ❓ Show this help message"
 	@echo ""
@@ -49,6 +51,14 @@ build:
 	@cd services/frontend && $(MAKE) build
 	@echo "✅ Frontend built and copied to backend"
 	@echo "🚀 Backend now serves both API and frontend at port 8081"
+
+# Deploy frontend to Netlify
+deploy:
+	@echo "🚀 Building and deploying frontend to Netlify..."
+	@cd services/frontend && $(MAKE) build
+	@echo "📦 Deploying to Netlify..."
+	@cd services/frontend && netlify deploy --prod --dir=out
+	@echo "✅ Deployment completed!"
 
 # Clean build artifacts and cache files
 clean:
