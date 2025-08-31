@@ -109,7 +109,7 @@ export default function ChatPage() {
       : "Hello!";
 
   const subtitleText =
-    "I help you design comprehensive system architectures by gathering requirements, analyzing constraints, and generating detailed Mermaid diagrams";
+    "I can help you design comprehensive system architectures";
 
   const { displayText: displayGreeting, isComplete: greetingComplete } =
     useTypewriter(greetingText, 80);
@@ -541,7 +541,7 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col flex-1 h-full">
       <div
-        className={`flex items-center justify-between transition-all duration-1700 ease-in-out ${
+        className={`flex items-center justify-center sm:justify-between transition-all duration-1700 ease-in-out ${
           diagram && !isDiagramHidden ? "blur-sm" : ""
         }`}
       >
@@ -549,7 +549,7 @@ export default function ChatPage() {
           onClick={handleNewConversation}
           disabled={isStartingNew}
           className={cn(
-            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background translate-x-24",
+            "hidden sm:block p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background translate-x-24",
             isStartingNew && "opacity-50 cursor-not-allowed",
             !isSidebarCollapsed && "hidden"
           )}
@@ -562,7 +562,7 @@ export default function ChatPage() {
             )}
           />
         </Button>
-        <div className="flex items-center gap-2 w-[220px]">
+        <div className="flex items-center gap-2 sm:w-[220px]">
           <PlatformSelector
             selectedPlatform={selectedPlatform}
             onPlatformChange={setSelectedPlatform}
@@ -578,7 +578,7 @@ export default function ChatPage() {
         >
           <div
             ref={chatContainerRef}
-            className="flex-1 w-full max-w-[800px] mx-auto px-4 pb-4 overflow-y-auto scrollbar-hide transition-all duration-700 ease-in-out"
+            className="flex-1 w-full max-w-[800px] mx-auto px-1 sm:px-4 pb-4 overflow-y-auto scrollbar-hide transition-all duration-700 ease-in-out"
             style={{
               height: "calc(100vh - 10rem)",
               maxHeight: "calc(100vh - 10rem)",
@@ -587,9 +587,9 @@ export default function ChatPage() {
             }}
           >
             {isFirstPrompt && chatHistory.length === 0 ? (
-              <div className="relative -mt-32 animate-in fade-in duration-700 ease-in-out">
-                <div className="flex flex-col items-center justify-center h-[500px] space-y-10 transform transition-all duration-700 ease-in-out">
-                  <h1 className="text-center text-4xl md:text-5xl font-bold">
+              <div className="relative -mt-16 sm:-mt-32 animate-in fade-in duration-700 ease-in-out">
+                <div className="flex flex-col items-center justify-center h-[400px] sm:h-[500px] space-y-6 sm:space-y-10 transform transition-all duration-700 ease-in-out px-1 sm:px-4">
+                  <h1 className="text-center text-2xl sm:text-4xl md:text-5xl font-bold">
                     <span
                       className="bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent font-cursive dark:from-gray-300 dark:to-gray-100"
                       style={{
@@ -603,9 +603,9 @@ export default function ChatPage() {
                     </span>
                   </h1>
                   {greetingComplete && (
-                    <h3 className="text-center text-base md:text-lg w-[600px] transition-opacity duration-500 ease-in-out">
+                    <h3 className="text-center text-sm sm:text-base md:text-lg w-full max-w-[400px] sm:max-w-[600px] transition-opacity duration-500 ease-in-out">
                       <span
-                        className="bg-gradient-to-r text-sm from-gray-600 to-gray-800 bg-clip-text text-transparent font-poppins dark:from-gray-400 dark:to-gray-200"
+                        className="bg-gradient-to-r text-xs sm:text-sm from-gray-600 to-gray-800 bg-clip-text text-transparent font-poppins dark:from-gray-400 dark:to-gray-200"
                         style={{
                           fontWeight: 400,
                           letterSpacing: "0.01em",
@@ -733,7 +733,7 @@ export default function ChatPage() {
             className={`w-full max-w-[850px] mx-auto sticky transition-all duration-700 ease-in-out ${
               isFirstPrompt && chatHistory.length === 0
                 ? "opacity-0"
-                : `opacity-100 bottom-0 bg-chatInput-light dark:bg-background py-2 px-4 dark:border-gray-700 ${
+                : `opacity-100 bottom-0 bg-chatInput-light dark:bg-background py-2 px-1 sm:px-4 dark:border-gray-700 ${
                     diagram && !isDiagramHidden ? "blur-sm" : ""
                   }`
             }`}
@@ -809,6 +809,8 @@ export default function ChatPage() {
       >
         <Bug className="w-4 h-4 text-red-600 dark:text-red-400" />
       </Button>
+
+      {/* Bug Report Dialog */}
 
       {/* Bug Report Dialog */}
       <BugReportDialog
