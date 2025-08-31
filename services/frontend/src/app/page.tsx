@@ -298,12 +298,12 @@ export default function ChatPage() {
       const intervalId = setInterval(() => {
         setLoadingText((prevText) => {
           if (
-            prevText === "Please wait while I search for information..." ||
+            prevText === "Processing requirements and constraints..." ||
             prevText === "Analyzing your request to find the best answer..."
           ) {
-            return prevText === "Please wait while I search for information..."
+            return prevText === "Processing requirements and constraints..."
               ? "Analyzing your request to find the best answer..."
-              : "Please wait while I search for information...";
+              : "Processing requirements and constraints...";
           }
           return "Thinking...";
         });
@@ -311,7 +311,7 @@ export default function ChatPage() {
 
       // Show longer messages after 5 seconds (this is when the Agent is executing a tool)
       const timeoutId = setTimeout(() => {
-        setLoadingText("Please wait while I search for information...");
+        setLoadingText("Processing requirements and constraints...");
       }, 5000);
 
       return () => {
