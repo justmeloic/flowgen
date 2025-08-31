@@ -203,7 +203,7 @@ graph TD
               <button
                 onClick={onAiEdit}
                 disabled={disabled}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/60 to-blue-500/80 text-white rounded-full hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600/80 to-cyan-600/60 text-white rounded-full hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 text-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Edit with AI"
               >
                 <Sparkles className="w-4 h-4" />
