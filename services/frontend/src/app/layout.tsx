@@ -84,24 +84,18 @@ export default function RootLayout({
         >
           <div className="relative flex min-h-screen flex-col">
             <Header />
-            <div className="flex-1">
-              <div className="">
-                <div className="bg-background">
-                  <div className="flex">
-                    <Sidebar
-                      isCollapsed={isCollapsed}
-                      onToggle={() => setIsCollapsed(!isCollapsed)}
-                    />
-                    <main
-                      className={`flex-1 p-8 transition-all duration-700 ease-out ${
-                        isCollapsed ? "ml-20" : "ml-0"
-                      }`}
-                    >
-                      {children}
-                    </main>
-                  </div>
-                </div>
-              </div>
+            <div className="flex flex-1">
+              <Sidebar
+                isCollapsed={isCollapsed}
+                onToggle={() => setIsCollapsed(!isCollapsed)}
+              />
+              <main
+                className={`flex-1 p-8 transition-all duration-700 ease-out ${
+                  isCollapsed ? "ml-0" : "ml-[250px]"
+                }`}
+              >
+                {children}
+              </main>
             </div>
           </div>
         </ThemeProvider>

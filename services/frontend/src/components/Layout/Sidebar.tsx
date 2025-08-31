@@ -131,7 +131,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
       {shouldRender && (
         <div
           className={cn(
-            "relative flex h-screen flex-col gap-4 px-3 pb-3 pt-4 bg-secondary dark:bg-secondary-dark shadow-[2px_0_10px_0_rgba(0,0,0,0.1)] dark:shadow-none z-10 rounded-tr-xl rounded-br-xl w-[250px]",
+            "fixed left-0 top-20 flex h-[calc(100vh-80px)] flex-col gap-4 px-3 pb-3 pt-4 bg-secondary dark:bg-secondary-dark shadow-[2px_0_10px_0_rgba(0,0,0,0.1)] dark:shadow-none z-10 rounded-tr-xl rounded-br-xl w-[250px]",
             !isCollapsed
               ? "animate-in slide-in-from-left-full duration-500 ease-in-out"
               : "animate-out slide-out-to-left-full duration-500 ease-in-out",
@@ -212,7 +212,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           </nav>
 
           {/* Settings section */}
-          <div className="mt-auto mb-32">
+          <div className="mt-auto pb-4">
             <button
               onClick={() => setIsSettingsExpanded(!isSettingsExpanded)}
               className="flex items-center text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-700/50 w-full transition-colors gap-3 rounded-2xl px-3 py-2"

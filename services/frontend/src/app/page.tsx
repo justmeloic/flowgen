@@ -549,7 +549,7 @@ export default function ChatPage() {
           onClick={handleNewConversation}
           disabled={isStartingNew}
           className={cn(
-            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background translate-x-24",
             isStartingNew && "opacity-50 cursor-not-allowed",
             !isSidebarCollapsed && "hidden"
           )}
