@@ -135,81 +135,51 @@ def _sanitize_mermaid(code: str) -> str:
         s = re.sub(r'\n```\s*$', '', s)
         s = s.strip()
 
-    # Collapse newlines inside [...] blocks
-    out_chars: list[str] = []
-    bracket_depth = 0
-    for ch in s:
-        if ch == '[':
-            bracket_depth += 1
-            out_chars.append(ch)
-            continue
-        if ch == ']':
-            if bracket_depth > 0:
-                bracket_depth -= 1
-            out_chars.append(ch)
-            continue
-        if bracket_depth > 0 and ch == '\n':
-            out_chars.append(' ')
-            continue
-        out_chars.append(ch)
-    s = ''.join(out_chars)
+    # More robust approach: Use regex to handle nested brackets and multi-line labels
+    # Replace newlines and excessive whitespace inside brackets with single spaces
+    def clean_brackets(match):
+        content = match.group(1)
+        # Replace newlines and multiple spaces with single space
+        cleaned = re.sub(r'\s+', ' ', content.strip())
+        return f'[{cleaned}]'
 
-    # Collapse newlines inside parentheses (...) including double-paren shapes
-    out_chars = []
-    paren_depth = 0
-    for ch in s:
-        if ch == '(':
-            paren_depth += 1
-            out_chars.append(ch)
-            continue
-        if ch == ')':
-            if paren_depth > 0:
-                paren_depth -= 1
-            out_chars.append(ch)
-            continue
-        if paren_depth > 0 and ch == '\n':
-            out_chars.append(' ')
-            continue
-        out_chars.append(ch)
-    s = ''.join(out_chars)
+    s = re.sub(r'\[([^\[\]]*?)\]', clean_brackets, s, flags=re.DOTALL)
 
-    # Collapse newlines inside curly braces {...} (e.g., decision diamonds)
-    out_chars = []
-    brace_depth = 0
-    for ch in s:
-        if ch == '{':
-            brace_depth += 1
-            out_chars.append(ch)
-            continue
-        if ch == '}':
-            if brace_depth > 0:
-                brace_depth -= 1
-            out_chars.append(ch)
-            continue
-        if brace_depth > 0 and ch == '\n':
-            out_chars.append(' ')
-            continue
-        out_chars.append(ch)
-    s = ''.join(out_chars)
+    # Clean parentheses content (including double parentheses for shapes)
+    def clean_parens(match):
+        content = match.group(1)
+        cleaned = re.sub(r'\s+', ' ', content.strip())
+        return f'({cleaned})'
 
-    # Collapse newlines inside double-quoted labels (e.g., id("..."))
-    out_chars = []
-    in_quote = False
-    prev = ''
-    for ch in s:
-        if ch == '"' and prev != '\\':
-            in_quote = not in_quote
-            out_chars.append(ch)
-        elif in_quote and ch == '\n':
-            out_chars.append(' ')
-        else:
-            out_chars.append(ch)
-        prev = ch
-    s = ''.join(out_chars)
+    s = re.sub(r'\(([^()]*?)\)', clean_parens, s, flags=re.DOTALL)
 
-    # Trim excessive blank lines
-    lines = [ln.rstrip() for ln in s.split('\n')]
-    # Ensure the diagram starts at the first mermaid directive line if present later
+    # Clean curly braces content (for diamond shapes)
+    def clean_braces(match):
+        content = match.group(1)
+        cleaned = re.sub(r'\s+', ' ', content.strip())
+        return f'{{{cleaned}}}'
+
+    s = re.sub(r'\{([^{}]*?)\}', clean_braces, s, flags=re.DOTALL)
+
+    # Clean quoted strings
+    def clean_quotes(match):
+        content = match.group(1)
+        cleaned = re.sub(r'\s+', ' ', content.strip())
+        return f'"{cleaned}"'
+
+    s = re.sub(r'"([^"]*?)"', clean_quotes, s, flags=re.DOTALL)
+
+    # Clean up multiple spaces and ensure proper line spacing
+    lines = []
+    for line in s.split('\n'):
+        # Remove extra spaces within lines but preserve indentation
+        cleaned_line = re.sub(r'(?<=\S)\s{2,}(?=\S)', ' ', line.rstrip())
+        lines.append(cleaned_line)
+
+    # Remove empty lines and ensure diagram starts properly
+    lines = [ln for ln in lines if ln.strip()]
+
+    # Ensure the diagram starts at the first mermaid directive line if present
     start_idx = 0
     directive_re = re.compile(
         r'^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|stateDiagram-v2)\b'
@@ -218,8 +188,9 @@ def _sanitize_mermaid(code: str) -> str:
         if directive_re.match(ln.strip()):
             start_idx = i
             break
-    s = '\n'.join(ln for ln in lines[start_idx:] if ln is not None)
-    return s.strip()
+
+    result = '\n'.join(lines[start_idx:])
+    return result.strip()
 
 
 def generate_architecture_diagram(

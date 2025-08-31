@@ -23,6 +23,7 @@ from loguru import logger
 
 from src.app.models.mermaid_edit import DiagramType
 from src.app.services.gemini_service import GeminiService
+from src.lib.config import settings
 
 
 class MermaidEditService:
@@ -117,7 +118,7 @@ class MermaidEditService:
             # Use GeminiService to generate content
             response = await self.gemini_service.generate_content(
                 content=prompt,
-                model='gemini-1.5-flash',  # Use fast model for diagram editing
+                model=settings.GEMINI_MODEL,  # Use fast model for diagram editing
                 response_modalities=['TEXT'],
             )
 
