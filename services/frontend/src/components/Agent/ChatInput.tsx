@@ -160,7 +160,10 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className={cn("relative w-full max-w-[70%] mx-auto", className)}
+      className={cn(
+        "relative w-full sm:max-w-[70%] mx-0 sm:mx-auto",
+        className
+      )}
       {...props}
     >
       <div
