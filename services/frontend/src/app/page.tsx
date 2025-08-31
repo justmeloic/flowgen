@@ -706,7 +706,17 @@ export default function ChatPage() {
                       !isLoading &&
                       !(isLoading && message.content === loadingText) && (
                         <div className="ml-10 mt-2">
-                          <MessageActions message={message.content} />
+                          <MessageActions
+                            message={message.content}
+                            onResend={
+                              diagram?.diagram_code
+                                ? () => {
+                                    // Send "Regenerate the diagram" command to the agent
+                                    handleSend("Regenerate the diagram");
+                                  }
+                                : undefined
+                            }
+                          />
                         </div>
                       )}
                   </div>

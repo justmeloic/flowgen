@@ -21,14 +21,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
-import { Copy, MoreHorizontal, Pause, Volume2 } from "lucide-react";
+import { Copy, MoreHorizontal, Pause, RotateCcw, Volume2 } from "lucide-react";
 import React from "react";
 
 interface MessageActionsProps {
   message: string;
+  onResend?: () => void;
 }
 
-export function MessageActions({ message }: MessageActionsProps) {
+export function MessageActions({ message, onResend }: MessageActionsProps) {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [audioRef, setAudioRef] =
     React.useState<SpeechSynthesisUtterance | null>(null);
@@ -94,6 +95,19 @@ export function MessageActions({ message }: MessageActionsProps) {
     }
   };
 
+  const handleResend = () => {
+    if (onResend) {
+      onResend();
+      toast({
+        title: "Regenerating diagram",
+        description: "Asking the agent to regenerate the diagram.",
+        duration: 3000,
+        className:
+          "bottom-0 left-0 fixed mb-4 ml-4 bg-blue-50 dark:bg-gray-800/80 rounded-3xl shadow-[0_3px_3px_-1px_rgba(5,0.7,.7,0.4)] text-gray-600 dark:text-gray-300",
+      });
+    }
+  };
+
   const handleFeedback = (type: "up" | "down") => {
     console.log(`Feedback: ${type}`);
     toast({
@@ -112,9 +126,19 @@ export function MessageActions({ message }: MessageActionsProps) {
       <button
         onClick={handleCopy}
         className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+        title="Copy message"
       >
         <Copy className="h-4 w-4 text-gray-600 dark:text-gray-300" />
       </button>
+      {onResend && (
+        <button
+          onClick={handleResend}
+          className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+          title="Regenerate diagram"
+        >
+          <RotateCcw className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+        </button>
+      )}
       {/*<button
         onClick={() => handleFeedback("up")}
         className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
@@ -154,6 +178,12 @@ export function MessageActions({ message }: MessageActionsProps) {
             <Copy className="mr-2 h-4 w-4" />
             <span>Copy</span>
           </DropdownMenuItem>
+          {onResend && (
+            <DropdownMenuItem onClick={handleResend}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              <span>Regenerate diagram</span>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
