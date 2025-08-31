@@ -15,19 +15,28 @@
 """Tools for AI agents."""
 
 import os
-import re
 from typing import Any, Dict, Optional
 
 from loguru import logger
 
 try:  # Local imports when running inside the service
     from src.lib.config import settings
+    from src.lib.mermaid_utils import (
+        create_fallback_mermaid,
+        extract_mermaid,
+        sanitize_mermaid,
+    )
 
     from .system_instructions import get_diagram_generator_instructions
 except ImportError:  # Fallback for direct execution
     from system_instructions import get_diagram_generator_instructions  # type: ignore
 
     from src.lib.config import settings  # type: ignore
+    from src.lib.mermaid_utils import (  # type: ignore
+        create_fallback_mermaid,
+        extract_mermaid,
+        sanitize_mermaid,
+    )
 
 try:
     # google-genai SDK
@@ -68,129 +77,17 @@ def _extract_mermaid(text: str) -> str:
     Handles patterns like ```mermaid ... ``` or ``` ... ``` and falls back
     to returning the raw text.
     """
-    if not text:
-        return text
-
-    # Prefer fenced code with mermaid language hint
-    m = re.search(r'```\s*mermaid\s*\n(?P<code>[\s\S]*?)\n```', text, re.IGNORECASE)
-    if m:
-        return m.group('code').strip()
-
-    # Generic fenced code block
-    m = re.search(r'```\s*\n(?P<code>[\s\S]*?)\n```', text)
-    if m:
-        return m.group('code').strip()
-
-    # No fences; return as-is
-    return text.strip()
+    return extract_mermaid(text)
 
 
 def _fallback_mermaid(description: str) -> str:
     """Return a minimal, valid Mermaid diagram as a safe fallback."""
-    return (
-        'graph TD\n'
-        '  A[Start] --> B{Process}\n'
-        '  B -->|Analyze| C[Components]\n'
-        '  C --> D[Interactions]\n'
-        '  D --> E[Output]\n'
-        f'  %% Input: {description[:80]}...\n'
-    )
+    return create_fallback_mermaid(description)
 
 
 def _sanitize_mermaid(code: str) -> str:
-    """Best-effort cleanup to improve Mermaid parse success.
-
-    - Remove newlines within square-bracket node labels: [ ... ]
-    - Remove newlines within parentheses (and double-paren shapes): ( ... ), (( ... ))
-    - Remove newlines within curly-brace diamond labels: { ... }
-    - Remove newlines within quoted labels: " ... "
-    - Normalize line endings and trim extraneous fences/whitespace
-    """
-    if not code:
-        return code
-
-    # Normalize problematic Unicode separators/spaces that break Mermaid parser:
-    # - U+2028 (LINE SEPARATOR) and U+2029 (PARAGRAPH SEPARATOR)
-    # - U+0085 (NEXT LINE)
-    # - Non-breaking spaces U+00A0 and U+202F -> regular spaces
-    # - Remove zero-width chars: U+200B, U+200C, U+200D, U+FEFF
-    code = (
-        code.replace('\u2028', '\n')
-        .replace('\u2029', '\n')
-        .replace('\u0085', '\n')
-        .replace('\u00a0', ' ')
-        .replace('\u202f', ' ')
-        .replace('\u200b', '')
-        .replace('\u200c', '')
-        .replace('\u200d', '')
-        .replace('\ufeff', '')
-    )
-
-    s = code.replace('\r\n', '\n').replace('\r', '\n').strip()
-
-    # Remove surrounding markdown fences if present
-    if s.startswith('```'):
-        s = re.sub(r'^```\s*mermaid\s*\n', '', s, flags=re.IGNORECASE)
-        s = re.sub(r'^```\s*\n', '', s)
-        s = re.sub(r'\n```\s*$', '', s)
-        s = s.strip()
-
-    # More robust approach: Use regex to handle nested brackets and multi-line labels
-    # Replace newlines and excessive whitespace inside brackets with single spaces
-    def clean_brackets(match):
-        content = match.group(1)
-        # Replace newlines and multiple spaces with single space
-        cleaned = re.sub(r'\s+', ' ', content.strip())
-        return f'[{cleaned}]'
-
-    s = re.sub(r'\[([^\[\]]*?)\]', clean_brackets, s, flags=re.DOTALL)
-
-    # Clean parentheses content (including double parentheses for shapes)
-    def clean_parens(match):
-        content = match.group(1)
-        cleaned = re.sub(r'\s+', ' ', content.strip())
-        return f'({cleaned})'
-
-    s = re.sub(r'\(([^()]*?)\)', clean_parens, s, flags=re.DOTALL)
-
-    # Clean curly braces content (for diamond shapes)
-    def clean_braces(match):
-        content = match.group(1)
-        cleaned = re.sub(r'\s+', ' ', content.strip())
-        return f'{{{cleaned}}}'
-
-    s = re.sub(r'\{([^{}]*?)\}', clean_braces, s, flags=re.DOTALL)
-
-    # Clean quoted strings
-    def clean_quotes(match):
-        content = match.group(1)
-        cleaned = re.sub(r'\s+', ' ', content.strip())
-        return f'"{cleaned}"'
-
-    s = re.sub(r'"([^"]*?)"', clean_quotes, s, flags=re.DOTALL)
-
-    # Clean up multiple spaces and ensure proper line spacing
-    lines = []
-    for line in s.split('\n'):
-        # Remove extra spaces within lines but preserve indentation
-        cleaned_line = re.sub(r'(?<=\S)\s{2,}(?=\S)', ' ', line.rstrip())
-        lines.append(cleaned_line)
-
-    # Remove empty lines and ensure diagram starts properly
-    lines = [ln for ln in lines if ln.strip()]
-
-    # Ensure the diagram starts at the first mermaid directive line if present
-    start_idx = 0
-    directive_re = re.compile(
-        r'^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|stateDiagram-v2)\b'
-    )
-    for i, ln in enumerate(lines):
-        if directive_re.match(ln.strip()):
-            start_idx = i
-            break
-
-    result = '\n'.join(lines[start_idx:])
-    return result.strip()
+    """Best-effort cleanup to improve Mermaid parse success."""
+    return sanitize_mermaid(code)
 
 
 def generate_architecture_diagram(

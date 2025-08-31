@@ -24,6 +24,7 @@ from loguru import logger
 from src.app.models.mermaid_edit import DiagramType
 from src.app.services.gemini_service import GeminiService
 from src.lib.config import settings
+from src.lib.mermaid_utils import extract_mermaid, sanitize_mermaid
 
 
 class MermaidEditService:
@@ -143,17 +144,6 @@ class MermaidEditService:
         Returns:
             str: Cleaned Mermaid code
         """
-        # Remove code block markers if present
-        response = response.strip()
-
-        # Remove ```mermaid and ``` markers
-        if response.startswith('```mermaid'):
-            response = response[10:]
-        elif response.startswith('```'):
-            response = response[3:]
-
-        if response.endswith('```'):
-            response = response[:-3]
-
-        # Remove any leading/trailing whitespace
-        return response.strip()
+        # Extract and sanitize using shared utilities
+        extracted = extract_mermaid(response)
+        return sanitize_mermaid(extracted)
