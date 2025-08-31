@@ -1,0 +1,74 @@
+# Docker ignore file for Architecture Designer Backend
+# Excludes unnecessary files from Docker build context
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.env
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+tests/.coverage
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+*.pid
+
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+SECURITY.md
+LICENSE
+docs/
+
+# Scripts (deployment scripts not needed in container)
+scripts/
+
+# Git
+.git/
+.gitignore
+
+# Build artifacts (will be built inside container if needed)
+build/
+dist/
+*.egg-info/
+
+# Development files
+Makefile
+.env.example
+server.pid
+ngrok.pid
