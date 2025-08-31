@@ -174,7 +174,7 @@ export function ChatInput({
         {/* Top section with textarea input */}
         <textarea
           ref={textareaRef}
-          placeholder="Ask anything"
+          placeholder="Describe your architecture..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -185,7 +185,7 @@ export function ChatInput({
         />
 
         {/* Bottom section with buttons */}
-        <div className="flex justify-between items-center mt-auto mb-4 px-2">
+        <div className="flex justify-between items-center mt-auto mb-4 px-2 translate-y-2">
           {/* File upload button */}
           <div className="flex items-center">
             <input
