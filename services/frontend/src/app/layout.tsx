@@ -17,8 +17,12 @@
 "use client";
 
 import { Header } from "@/components/Layout/Header";
+import { MobileSidebar } from "@/components/Layout/MobileSidebar";
 import { Sidebar } from "@/components/Layout/Sidebar";
 import { ThemeProvider } from "@/components/System/ThemeProvider";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Menu } from "lucide-react";
 import { Dancing_Script, Inter, Poppins } from "next/font/google";
 import type React from "react";
 import { useEffect, useState } from "react";
@@ -42,6 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Hydrate from localStorage post-mount to avoid SSR mismatch
   useEffect(() => {
@@ -67,6 +72,17 @@ export default function RootLayout({
     }
   }, [isCollapsed]);
 
+  // Handler for mobile sidebar toggle
+  const handleSidebarToggle = () => {
+    // On mobile, toggle the mobile sidebar overlay
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      setIsMobileSidebarOpen(!isMobileSidebarOpen);
+    } else {
+      // On desktop, toggle the regular sidebar
+      setIsCollapsed(!isCollapsed);
+    }
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -83,6 +99,17 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="relative flex min-h-screen flex-col">
+            {/* Mobile hamburger menu button - top left */}
+            <Button
+              onClick={handleSidebarToggle}
+              className={cn(
+                "block sm:hidden fixed top-4 left-4 z-30 p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              )}
+              aria-label="Toggle sidebar"
+            >
+              <Menu className="w-4 h-4 text-gray-600/80 dark:text-gray-300" />
+            </Button>
+
             <Header />
             <div className="flex flex-1">
               <Sidebar
@@ -97,6 +124,12 @@ export default function RootLayout({
                 {children}
               </main>
             </div>
+
+            {/* Mobile Sidebar Component */}
+            <MobileSidebar
+              isOpen={isMobileSidebarOpen}
+              onClose={() => setIsMobileSidebarOpen(false)}
+            />
           </div>
         </ThemeProvider>
       </body>
