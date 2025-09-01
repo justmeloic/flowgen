@@ -82,9 +82,6 @@ class Settings(BaseSettings):
     # Google Cloud settings
     GOOGLE_CLOUD_PROJECT: str
     GOOGLE_CLOUD_LOCATION: str
-    GCS_BUCKET_NAME: str
-    SERVICE_ACCOUNT_EMAIL: str
-    SIGNED_URL_LIFETIME: int
 
     # Model settings
     GEMINI_MODEL: str = 'gemini-2.5-flash'
