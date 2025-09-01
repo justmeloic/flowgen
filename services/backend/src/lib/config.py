@@ -109,13 +109,9 @@ class Settings(BaseSettings):
     }
 
     # Data configuration
-    FILE_ACCESS_METHOD: str = 'GCS'
-    TESTDATA_DIR: str = 'testdata'
-    AGREEMENT_MAPPING_CSV: str = 'Agreement_Mapping_with_Filenames.csv'
     BUGS_DIR: str = 'bugs'
 
     # Development settings
-    RESTART_SCRIPT_PATH: str = './scripts/restart-server.sh'
 
     @field_validator('LOG_LEVEL', mode='before')
     @classmethod
@@ -124,15 +120,6 @@ class Settings(BaseSettings):
         allowed_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
         if v.upper() not in allowed_levels:
             raise ValueError(f'LOG_LEVEL must be one of {allowed_levels}')
-        return v.upper()
-
-    @field_validator('FILE_ACCESS_METHOD', mode='before')
-    @classmethod
-    def validate_file_access_method(cls, v: str) -> str:
-        """Validate file access method is one of the allowed values."""
-        allowed_methods = ['GCS', 'LOCAL']
-        if v.upper() not in allowed_methods:
-            raise ValueError(f'FILE_ACCESS_METHOD must be one of {allowed_methods}')
         return v.upper()
 
     @property
@@ -159,7 +146,6 @@ class Settings(BaseSettings):
         return CorsConfig(
             allow_origins=[
                 self.FRONTEND_URL,
-                'https://60c3-2607-fea8-760-8700-c84-fad6-ffc2-770f.ngrok-free.app',
             ],
             allow_credentials=True,
             allow_methods=['*'],
