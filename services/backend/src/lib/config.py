@@ -115,6 +115,7 @@ class Settings(BaseSettings):
     FILE_ACCESS_METHOD: str = 'GCS'
     TESTDATA_DIR: str = 'testdata'
     AGREEMENT_MAPPING_CSV: str = 'Agreement_Mapping_with_Filenames.csv'
+    BUGS_DIR: str = 'bugs'
 
     # Development settings
     RESTART_SCRIPT_PATH: str = './scripts/restart-server.sh'

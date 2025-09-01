@@ -30,9 +30,10 @@ from fastapi import APIRouter, HTTPException
 
 from src.app.schemas.bug_report_request import BugReportRequest
 from src.app.schemas.response import BugReportResponse
+from src.lib.config import settings
 
 # Create bugs directory if it doesn't exist
-BUGS_DIR = Path('bugs')
+BUGS_DIR = Path(settings.BUGS_DIR)
 BUGS_DIR.mkdir(exist_ok=True)
 BUGS_FILE = BUGS_DIR / 'bug_reports.jsonl'
 
