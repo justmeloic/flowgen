@@ -69,7 +69,7 @@ coverage/
 .coverage
 htmlcov/
 
-# Deployment 
+# Deployment
 test_serving/
 
 #Test data - commented out to include testdata in repository

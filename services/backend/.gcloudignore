@@ -1,0 +1,6 @@
+# Include gitignore rules but override specific ones for deployment
+#!include:.gitignore
+
+# Override: Allow build directory for static frontend deployment
+!build/
+!build/static_frontend/

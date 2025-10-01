@@ -58,68 +58,78 @@ class Settings(BaseSettings):
     # Loïc: perhaps confusingly, The "model" in model_config refers to the
     # Pydantic data model Unfortunately, we can't rename model_config
     # because it's the specific name Pydantic V2 looks for to apply its configuration.
-    model_config = ConfigDict(env_file='.env', case_sensitive=True, extra='ignore')
+    model_config = ConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
     # Pydantic's BaseSettings automatically treats
     # variables with no default values as required
 
-    HOST: str = '0.0.0.0'
+    HOST: str = "0.0.0.0"
     PORT: int = 8081
-    LOG_LEVEL: str = 'INFO'
+    LOG_LEVEL: str = "INFO"
     DEBUG: bool = False
-    ENVIRONMENT: str = 'development'
+    ENVIRONMENT: str = "development"
 
     # API settings
-    API_TITLE: str = 'Architecture Designer API'
+    API_TITLE: str = "Architecture Designer API"
     API_DESCRIPTION: str = (
-        'API for AI-powered architecture solution design and diagram generation'
+        "API for AI-powered architecture solution design and diagram generation"
     )
-    API_VERSION: str = '1.0.0'
+    API_VERSION: str = "1.0.0"
 
     # Frontend URL for CORS
-    FRONTEND_URL: str = 'http://localhost:3000'
+    FRONTEND_URL: str = "http://localhost:3000"
 
     # Google Cloud settings
     GOOGLE_CLOUD_PROJECT: str
     GOOGLE_CLOUD_LOCATION: str
 
     # Model settings
-    GEMINI_MODEL: str = 'gemini-2.5-flash'
-    GEMINI_MODEL_PRO: str = 'gemini-2.5-pro'
-    DEFAULT_MODEL: str = 'gemini-2.5-flash'
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_MODEL_PRO: str = "gemini-2.5-pro"
+    DEFAULT_MODEL: str = "gemini-2.5-flash"
 
     # Model configuration
     AVAILABLE_MODELS: dict = {
-        'gemini-2.5-flash': {
-            'name': 'gemini-2.5-flash',
-            'display_name': 'Gemini 2.5 Flash',
-            'description': "Google's latest fast model with improved capabilities",
-            'max_tokens': 4096,
-            'supports_tools': True,
-            'default_temperature': 0.1,
+        "gemini-2.5-flash": {
+            "name": "gemini-2.5-flash",
+            "display_name": "Gemini 2.5 Flash",
+            "description": "Google's latest fast model with improved capabilities",
+            "max_tokens": 4096,
+            "supports_tools": True,
+            "default_temperature": 0.1,
         },
-        'gemini-2.5-pro': {
-            'name': 'gemini-2.5-pro',
-            'display_name': 'Gemini 2.5 Pro',
-            'description': "Google's latest high-quality model for complex reasoning",
-            'max_tokens': 8192,
-            'supports_tools': True,
-            'default_temperature': 0.1,
+        "gemini-2.5-pro": {
+            "name": "gemini-2.5-pro",
+            "display_name": "Gemini 2.5 Pro",
+            "description": "Google's latest high-quality model for complex reasoning",
+            "max_tokens": 8192,
+            "supports_tools": True,
+            "default_temperature": 0.1,
         },
     }
 
     # Data configuration
-    BUGS_DIR: str = 'bugs'
+    BUGS_DIR: str = "bugs"
+
+    @field_validator("BUGS_DIR", mode="before")
+    @classmethod
+    def validate_bugs_dir(cls, v: str) -> str:
+        """In production environment, use /tmp for bugs directory to avoid permission issues."""
+        import os
+
+        if os.getenv("ENVIRONMENT") == "production":
+            return f"/tmp/{v}"
+        return v
 
     # Development settings
 
-    @field_validator('LOG_LEVEL', mode='before')
+    @field_validator("LOG_LEVEL", mode="before")
     @classmethod
     def validate_log_level(cls, v: str) -> str:
         """Validate log level is one of the allowed values."""
-        allowed_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+        allowed_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in allowed_levels:
-            raise ValueError(f'LOG_LEVEL must be one of {allowed_levels}')
+            raise ValueError(f"LOG_LEVEL must be one of {allowed_levels}")
         return v.upper()
 
     @property
@@ -148,9 +158,9 @@ class Settings(BaseSettings):
                 self.FRONTEND_URL,
             ],
             allow_credentials=True,
-            allow_methods=['*'],
-            allow_headers=['*', 'X-Session-ID'],
-            expose_headers=['X-Session-ID'],
+            allow_methods=["*"],
+            allow_headers=["*", "X-Session-ID"],
+            expose_headers=["X-Session-ID"],
         )
 
     @property

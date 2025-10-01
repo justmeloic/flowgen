@@ -1,5 +1,8 @@
 #Backend Makefile
 
+# Force the use of bash instead of sh
+SHELL := /bin/bash
+
 .PHONY: dev prod deploy install clean test help
 
 # Default target

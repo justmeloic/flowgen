@@ -76,7 +76,7 @@ node_modules/
 src/test.py
 
 # Builds
-static_frontend/
+#static_frontend/
 
 # Test data
 testdata/

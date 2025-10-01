@@ -52,8 +52,11 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY --chown=appuser:appuser src/ ./src/
 COPY --chown=appuser:appuser pyproject.toml ./
 
+# Copy static frontend build
+COPY --chown=appuser:appuser build/ ./build/
+
 # Create necessary directories
-RUN mkdir -p /app/logs /app/build
+RUN mkdir -p /app/logs
 
 # Switch to non-root user
 USER appuser

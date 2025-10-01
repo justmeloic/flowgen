@@ -15,6 +15,7 @@
 """Logging configuration."""
 
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -54,34 +55,41 @@ def setup_logging() -> None:
     _logger.add(
         sys.stdout,
         colorize=True,
-        format='<green>{time:YYYY-MM-DD HH:mm:ss}</green> | '
-        '<level>{level: <8}</level> | '
-        '<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | '
-        '<level>{message}</level>',
-        level='DEBUG' if settings.DEBUG else settings.LOG_LEVEL,
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+        "<level>{level: <8}</level> | "
+        "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | "
+        "<level>{message}</level>",
+        level="DEBUG" if settings.DEBUG else settings.LOG_LEVEL,
     )
 
-    # Add file handler for production
-    if settings.ENVIRONMENT == 'production':
-        # Ensure logs directory exists
-        logs_dir = Path('logs')
-        logs_dir.mkdir(exist_ok=True)
+    # Skip file logging in production environments like Cloud Run
+    # Cloud Run and other containerized environments should use stdout/stderr
+    # which are automatically captured by the platform's logging system
+    if settings.ENVIRONMENT == "development":
+        # Only add file logging for local development
+        try:
+            # Ensure logs directory exists
+            logs_dir = Path("logs")
+            logs_dir.mkdir(exist_ok=True)
 
-        _logger.add(
-            'logs/app.log',
-            rotation='500 MB',
-            retention='10 days',
-            compression='gz',
-            format=(
-                '{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | '
-                '{name}:{function}:{line} | {message}'
-            ),
-            level='INFO',
-        )
+            _logger.add(
+                "logs/app.log",
+                rotation="500 MB",
+                retention="10 days",
+                compression="gz",
+                format=(
+                    "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | "
+                    "{name}:{function}:{line} | {message}"
+                ),
+                level="INFO",
+            )
+        except (PermissionError, OSError):
+            # If we can't write to files, just use console logging
+            pass
 
     # Intercept standard logging
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
 
     # Set up loggers for common libraries
-    for logger_name in ['uvicorn', 'uvicorn.error', 'uvicorn.access', 'fastapi']:
+    for logger_name in ["uvicorn", "uvicorn.error", "uvicorn.access", "fastapi"]:
         logging.getLogger(logger_name).handlers = [InterceptHandler()]

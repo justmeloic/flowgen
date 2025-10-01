@@ -63,7 +63,7 @@ scripts/
 .gitignore
 
 # Build artifacts (will be built inside container if needed)
-build/
+# Note: build/ directory is included for static_frontend
 dist/
 *.egg-info/
 
