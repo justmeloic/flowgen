@@ -105,9 +105,6 @@ async def login(
         _logger.info(
             f"Successful login for user '{user_email}' with session {session.id}"
         )
-        _logger.info(
-            f'Login endpoint - session state after auth: {dict(session.state)}'
-        )
 
         # Make sure the session ID is set in the response header
         response.headers['X-Session-ID'] = session.id

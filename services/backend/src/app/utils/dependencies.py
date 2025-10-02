@@ -141,8 +141,6 @@ async def get_or_create_session(
             'user_id': config.user_id,
             'created_at': time.time(),
             'query_count': 0,
-            'default_model': settings.DEFAULT_MODEL,
-            'last_used_model': None,
         }
         session = await session_service.create_session(
             app_name=config.app_name,

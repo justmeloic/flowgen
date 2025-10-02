@@ -40,7 +40,9 @@ def require_authentication(
     Raises:
         HTTPException: If user is not authenticated
     """
-    if not session.state.get('authenticated', False):
+    authenticated = session.state.get('authenticated', False)
+
+    if not authenticated:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail='Authentication required'
         )
