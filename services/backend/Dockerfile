@@ -68,13 +68,8 @@ EXPOSE 8081
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8081/health || exit 1
 
-# Use gunicorn for production with uvicorn workers
-CMD ["gunicorn", "src.app.main:app", \
-    "--worker-class", "uvicorn.workers.UvicornWorker", \
-    "--workers", "1", \
-    "--bind", "0.0.0.0:8081", \
-    "--timeout", "120", \
-    "--keep-alive", "2", \
-    "--log-level", "info", \
-    "--access-logfile", "-", \
-    "--error-logfile", "-"]
+# Use uvicorn directly for deployment
+CMD ["uvicorn", "src.app.main:app", \
+    "--reload", \
+    "--host", "0.0.0.0", \
+    "--port", "8081"]
