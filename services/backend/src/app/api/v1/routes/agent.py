@@ -43,6 +43,7 @@ from src.app.artifacts.file_validator import FileValidator
 from src.app.models import AgentConfig
 from src.app.schemas import AgentResponse, Query
 from src.app.services.agent_service import agent_service
+from src.app.utils.auth import require_authentication
 from src.app.utils.dependencies import (
     get_agent_config,
     get_or_create_session,
@@ -119,6 +120,7 @@ async def agent_endpoint(
     model: str | None = Form(None),
     files: list[UploadFile] | None = File(None),
     platform: str | None = Form(None),
+    session: Annotated[object, Depends(require_authentication)] = None,
 ) -> AgentResponse:
     """
     Unified endpoint: processes user message with optional file attachments.
