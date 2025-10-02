@@ -18,6 +18,7 @@ from fastapi import APIRouter
 
 from src.app.api.v1.routes import (
     agent,
+    auth,
     bugs,
     files,
     mermaid_edit,
@@ -54,4 +55,10 @@ main_v1_router.include_router(
 main_v1_router.include_router(
     utility.router,
     tags=['utility', 'system'],
+)
+
+main_v1_router.include_router(
+    auth.router,
+    prefix='/auth',
+    tags=['auth'],
 )
