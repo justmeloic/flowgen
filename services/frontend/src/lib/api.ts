@@ -74,13 +74,9 @@ export const sendMessage = async (
         localStorage.removeItem('chatHistory');
         localStorage.removeItem('chatReferences');
         localStorage.removeItem('isFirstPrompt');
-        console.log('Session ID changed, cleared chat data');
       }
       
       localStorage.setItem('chatSessionId', newSessionId);
-      console.log('Stored new session ID:', newSessionId); // Debug logging
-    } else {
-      console.warn('No session ID received from server'); // Debug logging
     }
 
     return await response.json();
@@ -152,13 +148,13 @@ export const submitBugReport = async (bugData: {
   }
 };
 
-export const login = async (secret: string, name: string) => {
+export const login = async (secret: string, email: string) => {
   const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ secret, name }),
+    body: JSON.stringify({ secret, email }),
   });
 
   if (!response.ok) {
