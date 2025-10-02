@@ -19,16 +19,26 @@ This module defines the Pydantic models used for authentication endpoints
 including login requests and responses.
 """
 
-from typing import Optional
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class LoginRequest(BaseModel):
     """Model for login request data."""
 
     secret: str = Field(..., min_length=1, description='Authentication secret')
-    name: Optional[str] = Field(None, max_length=100, description='Optional user name')
+    email: str = Field(..., min_length=1, description='User email address')
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        """Validate email format."""
+        import re
+
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, v.strip().lower()):
+            raise ValueError('Invalid email format')
+
+        return v.strip().lower()
 
 
 class LoginResponse(BaseModel):

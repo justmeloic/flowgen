@@ -20,12 +20,15 @@ functionality. It uses session-based authentication integrated with the existing
 session middleware.
 """
 
+import time
+
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from google.adk.events import Event, EventActions
 from google.adk.sessions import Session
 from loguru import logger as _logger
 
 from src.app.models.login import LoginRequest, LoginResponse, LogoutResponse
-from src.app.utils.dependencies import get_or_create_session
+from src.app.utils.dependencies import get_or_create_session, get_session_service
 from src.lib.config import settings
 
 router = APIRouter()
@@ -59,17 +62,55 @@ async def login(
             _logger.warning('Failed login attempt with invalid secret from session')
             raise HTTPException(status_code=401, detail='Invalid access code')
 
-        # Set authentication flag in session state
-        session.state['authenticated'] = True
-        session.state['user_name'] = (
-            login_data.name.strip() if login_data.name else 'Anonymous'
-        )
-        session.state['login_timestamp'] = str(__import__('datetime').datetime.now())
+        # Validate the email is authorized
+        user_email = login_data.email.lower()
+        authorized_emails = settings.authorized_emails_list
 
-        user_name = session.state['user_name']
-        _logger.info(
-            f"Successful login for user '{user_name}' with session {session.id}"
+        if not authorized_emails:
+            # If no authorized emails are configured, deny access
+            _logger.warning(
+                f'Login attempt with email {user_email} but no authorized emails '
+                'configured'
+            )
+            raise HTTPException(status_code=403, detail='Access not authorized')
+
+        if user_email not in authorized_emails:
+            _logger.warning(f'Login attempt with unauthorized email: {user_email}')
+            raise HTTPException(
+                status_code=403, detail='Email not authorized for access'
+            )
+
+        # Set authentication flag in session state using proper ADK mechanism
+        session_service = get_session_service(request)
+        current_time = time.time()
+
+        # Create state changes for authentication
+        auth_state_changes = {
+            'authenticated': True,
+            'user_email': user_email,
+            'login_timestamp': str(__import__('datetime').datetime.now()),
+        }
+
+        # Create event with state delta to properly persist changes
+        auth_event = Event(
+            invocation_id=f'login_{session.id}_{int(current_time)}',
+            author='system',
+            actions=EventActions(state_delta=auth_state_changes),
+            timestamp=current_time,
         )
+
+        # Persist the authentication state via append_event
+        await session_service.append_event(session, auth_event)
+
+        _logger.info(
+            f"Successful login for user '{user_email}' with session {session.id}"
+        )
+        _logger.info(
+            f'Login endpoint - session state after auth: {dict(session.state)}'
+        )
+
+        # Make sure the session ID is set in the response header
+        response.headers['X-Session-ID'] = session.id
 
         return LoginResponse(
             success=True,
@@ -101,8 +142,8 @@ async def logout(
         LogoutResponse: Logout result
     """
     try:
-        user_name = session.state.get('user_name', 'Unknown')
-        _logger.info(f"Logging out user '{user_name}' with session {session.id}")
+        user_email = session.state.get('user_email', 'Unknown')
+        _logger.info(f"Logging out user '{user_email}' with session {session.id}")
 
         # Clear authentication but keep session for potential re-login
         session.state['authenticated'] = False
@@ -133,7 +174,7 @@ async def auth_status(
         return {
             'authenticated': session.state.get('authenticated', False),
             'session_id': session.id,
-            'user_name': session.state.get('user_name', None),
+            'user_email': session.state.get('user_email', None),
             'login_timestamp': session.state.get('login_timestamp', None),
         }
 
@@ -142,6 +183,6 @@ async def auth_status(
         return {
             'authenticated': False,
             'session_id': None,
-            'user_name': None,
+            'user_email': None,
             'error': 'Status check failed',
         }
