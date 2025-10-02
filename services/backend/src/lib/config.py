@@ -85,6 +85,7 @@ class Settings(BaseSettings):
 
     # Authentication settings
     AUTH_SECRET: str
+    AUTHORIZED_EMAILS: str = ''  # Comma-separated list of authorized emails
 
     # Model settings
     GEMINI_MODEL: str = 'gemini-2.5-flash'
@@ -123,6 +124,27 @@ class Settings(BaseSettings):
         if os.getenv('ENVIRONMENT') == 'production':
             return f'/tmp/{v}'
         return v
+
+    @field_validator('AUTHORIZED_EMAILS', mode='before')
+    @classmethod
+    def validate_authorized_emails(cls, v: str) -> str:
+        """Validate authorized emails format."""
+        if not v:
+            return ''
+
+        # Basic validation - split by comma and strip whitespace
+        emails = [email.strip().lower() for email in v.split(',') if email.strip()]
+
+        # Basic email format validation
+        import re
+
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+        for email in emails:
+            if not re.match(email_pattern, email):
+                raise ValueError(f'Invalid email format: {email}')
+
+        return ','.join(emails)
 
     # Development settings
 
@@ -172,6 +194,17 @@ class Settings(BaseSettings):
         return ModelConfig(
             gemini_version=self.GEMINI_MODEL,
         )
+
+    @property
+    def authorized_emails_list(self) -> List[str]:
+        """Get list of authorized emails."""
+        if not self.AUTHORIZED_EMAILS:
+            return []
+        return [
+            email.strip().lower()
+            for email in self.AUTHORIZED_EMAILS.split(',')
+            if email.strip()
+        ]
 
 
 settings = Settings()
