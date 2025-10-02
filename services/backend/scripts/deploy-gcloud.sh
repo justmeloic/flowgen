@@ -25,7 +25,8 @@ gcloud run deploy flowgen-backend \
     --memory 1Gi \
     --cpu 1 \
     --max-instances 10 \
-    --set-env-vars="GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1,ENVIRONMENT=production,LOG_LEVEL=INFO"
+    --set-env-vars="GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1,ENVIRONMENT=production,LOG_LEVEL=INFO,GEMINI_MODEL=gemini-2.5-flash,GEMINI_MODEL_PRO=gemini-2.5-pro,BUGS_DIR=bugs,GOOGLE_GENAI_USE_VERTEXAI=TRUE" \
+    --set-secrets="GOOGLE_API_KEY=gemini-api-key:latest"
 
 echo "Deployment complete!"
 echo "Service URL:"
