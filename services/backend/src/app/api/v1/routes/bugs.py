@@ -59,15 +59,15 @@ async def submit_bug_report(report: BugReportRequest) -> BugReportResponse:
         bug_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
 
-        # Extract user email from the report (will be sent by frontend)
-        user_email = getattr(report, 'user_email', 'unknown@example.com')
+        # Extract user name from the report (will be sent by frontend)
+        user_name = getattr(report, 'user_name', 'Anonymous')
 
         # Prepare bug report data
         bug_data = {
             'bug_id': bug_id,
             'timestamp': timestamp,
             'submitted_at': report.timestamp or timestamp,
-            'user_email': user_email,
+            'user_name': user_name,
             'description': report.description,
             'url': report.url,
             'user_agent': report.userAgent,
@@ -125,7 +125,7 @@ async def list_bug_reports() -> dict[str, Any]:
                             {
                                 'bug_id': bug_data.get('bug_id'),
                                 'timestamp': bug_data.get('timestamp'),
-                                'user_email': bug_data.get('user_email', 'unknown'),
+                                'user_name': bug_data.get('user_name', 'Anonymous'),
                                 'description': truncated_desc,
                                 'status': bug_data.get('status', 'unknown'),
                                 'has_diagram': bug_data.get('diagram') is not None,

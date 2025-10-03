@@ -76,7 +76,7 @@ export function useAuth() {
     // Clear authentication state
     sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.AUTHENTICATED);
     sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.TIMESTAMP);
-    sessionStorage.removeItem("user_email");
+    sessionStorage.removeItem("user_name");
 
     setIsAuthenticated(false);
     router.push("/login");

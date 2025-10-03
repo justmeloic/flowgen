@@ -46,7 +46,7 @@ interface BugReportData {
   userAgent?: string;
   timestamp?: string;
   url?: string;
-  user_email?: string;
+  user_name?: string;
 }
 
 export function BugReportDialog({
@@ -78,7 +78,7 @@ export function BugReportDialog({
         userAgent: navigator.userAgent,
         timestamp: new Date().toISOString(),
         url: window.location.href,
-        user_email: sessionStorage.getItem("user_email") || undefined,
+        user_name: sessionStorage.getItem("user_name") || undefined,
       };
 
       await submitBugReport(bugReportData);

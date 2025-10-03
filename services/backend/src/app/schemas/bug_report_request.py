@@ -44,4 +44,4 @@ class BugReportRequest(BaseModel):
     userAgent: str | None = None
     timestamp: str | None = None
     url: str | None = None
-    user_email: str | None = None
+    user_name: str | None = None
