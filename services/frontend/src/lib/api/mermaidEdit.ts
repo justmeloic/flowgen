@@ -18,14 +18,20 @@ class MermaidEditAPI {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081';
+    // Use environment variable with fallback; 
+    // setting the fallback to an empty string will cause the frontend 
+    // to use relative paths for API requests.
+    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || '';
   }
 
   async editDiagram(request: MermaidEditRequest): Promise<MermaidEditResponse> {
+    const storedSessionId = localStorage.getItem('chatSessionId');
+    
     const response = await fetch(`${this.baseUrl}/api/v1/mermaid/edit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Session-ID': storedSessionId || '', // Always send the header, even if empty
       },
       body: JSON.stringify(request),
     });
