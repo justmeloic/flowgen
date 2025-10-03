@@ -148,13 +148,13 @@ export const submitBugReport = async (bugData: {
   }
 };
 
-export const login = async (secret: string, email: string) => {
+export const login = async (secret: string, name: string) => {
   const response = await fetch(`${BASE_URL}/api/v1/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ secret, email }),
+    body: JSON.stringify({ secret, name }),
   });
 
   if (!response.ok) {

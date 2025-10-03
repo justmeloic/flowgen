@@ -34,7 +34,7 @@ import { useState } from "react";
 
 export default function LoginPage() {
   const [secret, setSecret] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +46,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(secret, email);
+      await login(secret, name);
 
       // Store authentication in sessionStorage
       sessionStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.AUTHENTICATED, "true");
@@ -88,15 +88,14 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name (optional)"
                 className="w-full h-11 px-6 bg-white dark:bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out text-gray-900 dark:text-gray-900 placeholder:text-gray-500 dark:placeholder:text-gray-500"
                 disabled={isLoading}
-                required
-                autoComplete="email"
+                autoComplete="name"
               />
               <div className="relative">
                 <Input
@@ -142,7 +141,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className="px-8 h-11 bg-[#d3e2fd] dark:bg-[#d3e2fd] text-gray-800 dark:text-gray-800 hover:bg-[#d3e2fd]/90 dark:hover:bg-[#d3e2fd]/90 rounded-full font-medium transition-colors shadow-sm"
-                disabled={isLoading || !secret.trim() || !email.trim()}
+                disabled={isLoading || !secret.trim()}
               >
                 {isLoading ? "Verifying..." : "Access Application"}
               </Button>

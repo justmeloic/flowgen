@@ -16,7 +16,7 @@
 
 "use client";
 
-import { mermaidEditAPI } from "@/lib/api/mermaidEdit";
+import { editMermaidDiagram } from "@/lib/api/mermaidEdit";
 import {
   cleanMermaidCode,
   generateMermaidId,
@@ -148,7 +148,7 @@ export default function MermaidPanel({
       // Determine diagram type from the content
       const diagramType = detectDiagramType(originalContent);
 
-      const response = await mermaidEditAPI.editDiagram({
+      const response = await editMermaidDiagram({
         content: originalContent,
         instructions: prompt,
         diagram_type: diagramType,
