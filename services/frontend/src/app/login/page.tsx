@@ -92,7 +92,7 @@ export default function LoginPage() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name (optional)"
+                placeholder="Enter your name, email or LDAP"
                 className="w-full h-11 px-6 bg-white dark:bg-white rounded-xl focus:ring-4 focus:ring-blue-300/40 focus:outline-none focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300/40 focus-visible:ring-offset-0 transition-all duration-300 ease-out text-gray-900 dark:text-gray-900 placeholder:text-gray-500 dark:placeholder:text-gray-500"
                 disabled={isLoading}
                 autoComplete="name"
