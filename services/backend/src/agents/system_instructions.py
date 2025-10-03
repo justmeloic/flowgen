@@ -227,6 +227,16 @@ def get_diagram_generator_instructions(platform: str | None = None) -> str:
             - Use different shapes for types (round for users, rectangles for services,
                cylinders for databases, parallelograms for external systems).
             - Use arrows with labels to indicate protocols or actions.
+            - Apply vibrant colors using Mermaid's style syntax to make diagrams
+               visually appealing and easy to distinguish components:
+               * Use style commands like: style NodeID fill:#color,stroke:#color
+               * Recommended vibrant colors: #FF6B6B (red), #4ECDC4 (teal),
+                 #45B7D1 (blue), #96CEB4 (green), #FFEAA7 (yellow),
+                 #DFE6E9 (light gray), #A29BFE (purple), #FD79A8 (pink),
+                 #FDCB6E (orange), #6C5CE7 (indigo)
+               * Group related components with similar color schemes
+               * Use contrasting colors for different tiers or domains
+               * Apply darker stroke colors for better visibility
 
             Security & ops:
             - Show auth/identity boundary if applicable.
