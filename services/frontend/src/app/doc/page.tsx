@@ -60,6 +60,9 @@ export default function HomePage() {
             <span className="inline-block bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/40 dark:to-indigo-800/40 text-indigo-700 dark:text-indigo-300 text-xs px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-700">
               FastAPI
             </span>
+            <span className="inline-block bg-gradient-to-r from-pink-50 to-pink-100 dark:from-pink-900/40 dark:to-pink-800/40 text-pink-700 dark:text-pink-300 text-xs px-3 py-1 rounded-full border border-pink-200 dark:border-pink-700">
+              Mermaid
+            </span>
           </div>
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
             Flowgen is an AI-powered architecture solution designer that helps
@@ -97,10 +100,83 @@ export default function HomePage() {
             />
           </div>
         </div>
+        {/* Component Usage */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100 text-center">
+            Technology Stack & Components
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-secondary-dark">
+                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left dark:text-gray-100">
+                    Technology
+                  </th>
+                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left dark:text-gray-100">
+                    Component
+                  </th>
+                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left dark:text-gray-100">
+                    Description
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Next.js
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Frontend Framework
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    React framework with SSR/SSG capabilities for optimal
+                    performance
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    FastAPI
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Backend Framework
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    High-performance async API framework with automatic OpenAPI
+                    documentation
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Google ADK
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Development Tool
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Agent Development Kit providing session management and
+                    conversation continuity
+                  </td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Mermaid.js
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Diagram Rendering
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
+                    Client-side rendering of architecture diagrams with
+                    interactive features
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* AI Architecture Design Capabilities */}
         <div>
-          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100 text-center">
             AI Architecture Design Capabilities
           </h2>
           <p className="text-xs text-gray-700 dark:text-gray-300 mb-6">
@@ -225,58 +301,16 @@ export default function HomePage() {
               </p>
             </div>
           </div>
-
-          <div className="bg-gradient-to-br from-blue-50/60 via-indigo-50/40 to-purple-50/60 dark:from-blue-900/25 dark:via-indigo-900/20 dark:to-purple-900/25 p-6 rounded-2xl mb-6 border border-blue-200/50 dark:border-blue-700/50 shadow-sm backdrop-blur-sm">
-            <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-100 flex items-center">
-              <span className="mr-2">🎯</span>
-              Supported Architecture Patterns
-            </h3>
-            <div className="grid md:grid-cols-3 gap-4 text-sm">
-              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50 shadow-sm">
-                <h4 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">
-                  🏢 Enterprise Systems
-                </h4>
-                <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                  <li>• Microservices architecture</li>
-                  <li>• Service-oriented architecture</li>
-                  <li>• Event-driven systems</li>
-                  <li>• API gateway patterns</li>
-                </ul>
-              </div>
-              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 shadow-sm">
-                <h4 className="font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
-                  ☁️ Cloud Native
-                </h4>
-                <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                  <li>• Container orchestration</li>
-                  <li>• Serverless architectures</li>
-                  <li>• Multi-cloud strategies</li>
-                  <li>• CI/CD pipelines</li>
-                </ul>
-              </div>
-              <div className="bg-white/80 dark:bg-slate-700/50 p-4 rounded-xl border border-purple-100 dark:border-purple-900/50 shadow-sm">
-                <h4 className="font-semibold text-purple-600 dark:text-purple-400 mb-2">
-                  📱 Modern Applications
-                </h4>
-                <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                  <li>• Web application architectures</li>
-                  <li>• Mobile backend systems</li>
-                  <li>• Real-time communication</li>
-                  <li>• Data processing pipelines</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Services */}
         <div>
-          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100 text-center">
             Services
           </h2>
-          <p className="text-xs text-gray-700 dark:text-gray-300 mb-6">
-            Agent Interface is built with a modular architecture consisting of
-            two main services that can be deployed independently or as a unified
+          <p className=" text-center text-xs text-gray-700 dark:text-gray-300 mb-6">
+            Flowgen is built with a modular architecture consisting of two main
+            services that can be deployed independently or as a unified
             application.
           </p>
           <div className="grid md:grid-cols-2 gap-6">
@@ -367,83 +401,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Component Usage */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
-            Technology Stack & Components
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-secondary-dark">
-                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left dark:text-gray-100">
-                    Component
-                  </th>
-                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left dark:text-gray-100">
-                    Type
-                  </th>
-                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left dark:text-gray-100">
-                    Description
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Next.js
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Frontend Framework
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    React framework with SSR/SSG capabilities for optimal
-                    performance
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    FastAPI
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Backend Framework
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    High-performance async API framework with automatic OpenAPI
-                    documentation
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Google ADK
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Development Tool
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Agent Development Kit providing session management and
-                    conversation continuity
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Mermaid.js
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Diagram Rendering
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Client-side rendering of architecture diagrams with
-                    interactive features
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
         {/* Try Flowgen */}
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">
+          <h2 className="text-xl font-semibold mb-4 dark:text-gray-100 text-center">
             Try Flowgen Architecture Design Agent
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
