@@ -70,6 +70,18 @@ export default function MermaidCodeEditor({
   };
 
   const handleDownload = () => {
+    // Prompt user for filename
+    const defaultName = `mermaid-diagram-${
+      new Date().toISOString().split("T")[0]
+    }`;
+    const fileName = prompt("Enter filename (without extension):", defaultName);
+
+    // If user cancels, don't proceed
+    if (fileName === null) return;
+
+    // Use provided name or fallback to default
+    const finalFileName = fileName.trim() || defaultName;
+
     const svg = document.querySelector("#mermaid-editor-diagram svg");
     if (svg) {
       const svgData = new XMLSerializer().serializeToString(svg);
@@ -78,8 +90,8 @@ export default function MermaidCodeEditor({
       const img = new Image();
 
       img.onload = () => {
-        // Scale factor for higher resolution but more reasonable
-        const scaleFactor = 2;
+        // Scale factor for ultra-high resolution export (15x for maximum quality)
+        const scaleFactor = 15;
         canvas.width = img.width * scaleFactor;
         canvas.height = img.height * scaleFactor;
 
@@ -91,9 +103,7 @@ export default function MermaidCodeEditor({
             if (blob) {
               const url = URL.createObjectURL(blob);
               const link = document.createElement("a");
-              link.download = `mermaid-diagram-${
-                new Date().toISOString().split("T")[0]
-              }.png`;
+              link.download = `${finalFileName}.png`;
               link.href = url;
               link.click();
               URL.revokeObjectURL(url);

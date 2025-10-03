@@ -41,6 +41,16 @@ export function DiagramActions({
   };
 
   const downloadDiagram = () => {
+    // Prompt user for filename
+    const defaultName = diagram?.title || "diagram";
+    const fileName = prompt("Enter filename (without extension):", defaultName);
+
+    // If user cancels, don't proceed
+    if (fileName === null) return;
+
+    // Use provided name or fallback to default
+    const finalFileName = fileName.trim() || defaultName;
+
     const svg = document.querySelector("#mermaid-diagram svg");
     if (svg) {
       const svgData = new XMLSerializer().serializeToString(svg);
@@ -49,8 +59,8 @@ export function DiagramActions({
       const img = new Image();
 
       img.onload = () => {
-        // Scale factor for higher resolution but more reasonable
-        const scaleFactor = 2;
+        // Scale factor for ultra-high resolution export (15x for maximum quality)
+        const scaleFactor = 15;
         canvas.width = img.width * scaleFactor;
         canvas.height = img.height * scaleFactor;
 
@@ -62,7 +72,7 @@ export function DiagramActions({
             if (blob) {
               const url = URL.createObjectURL(blob);
               const link = document.createElement("a");
-              link.download = `${diagram?.title || "diagram"}.png`;
+              link.download = `${finalFileName}.png`;
               link.href = url;
               link.click();
               URL.revokeObjectURL(url);
