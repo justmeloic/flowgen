@@ -426,18 +426,6 @@ export default function HomePage() {
                 </tr>
                 <tr>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Google Fonts
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Typography System
-                  </td>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
-                    Inter (primary), Poppins (subtitles), Dancing Script
-                    (accents) for optimal readability
-                  </td>
-                </tr>
-                <tr>
-                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
                     Mermaid.js
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 dark:text-gray-300">
