@@ -139,7 +139,7 @@ export default function MermaidCodeEditor({
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-6 translate-x-2">
         <div className="relative">
           {/* Code editor container with header */}
           <div className="bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden">
