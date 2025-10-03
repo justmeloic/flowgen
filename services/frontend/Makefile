@@ -11,6 +11,10 @@ build:
 	@echo "Building static frontend..."
 	npm run build
 
+release:
+	@echo "Bumping version..."
+	npm run release
+
 install:
 	@echo "Installing dependencies..."
 	npm install
