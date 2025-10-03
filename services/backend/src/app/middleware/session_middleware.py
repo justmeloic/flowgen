@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Middleware for managing user session IDs via HTTP headers.
+"""Middleware for managing user session IDs and authentication via HTTP headers.
 
 This module provides a Starlette/FastAPI middleware that intercepts requests
-to API paths, retrieves or generates a session ID, and makes session data
-available to downstream application logic via the request state. It also
-ensures the session ID is returned in the response headers.
+to API paths, retrieves or generates a session ID, handles authentication,
+and makes session data available to downstream application logic via the
+request state. It also ensures the session ID is returned in the response headers.
 """
 
 from __future__ import annotations
@@ -31,18 +31,64 @@ from starlette.responses import Response
 
 
 class SessionMiddleware(BaseHTTPMiddleware):
-    """Middleware to manage a session ID for requests.
+    """Middleware to manage a session ID and authentication for requests.
 
     This middleware performs the following steps:
-    1. For paths under `/api/v1/`: Manages session IDs
-    2. Looks for existing session ID in the `X-Session-ID` request header
-    3. If no ID is found, generates a new UUIDv4
-    4. Stores session data in `request.state` for downstream use
-    5. Ensures session ID is present in response headers
+    1. For paths under `/api/v1/`: Manages session IDs and authentication state
+    2. For static frontend paths: Checks authentication for protected routes
+    3. Looks for existing session ID in the `X-Session-ID` request header
+    4. If no ID is found, generates a new UUIDv4
+    5. Stores session data in `request.state` for downstream use
+    6. Ensures session ID is present in response headers
     """
 
     def __init__(self, app):
         super().__init__(app)
+        # Paths that don't require authentication
+        self.public_paths = {
+            '/health',
+            '/docs',
+            '/redoc',
+            '/openapi.json',
+            '/api/v1/auth/login',
+            '/api/v1/auth/logout',
+            '/login',
+            '/login.html',
+            '/_next',  # Next.js static assets
+        }
+
+    def _is_public_path(self, path: str) -> bool:
+        """Check if a path is public and doesn't require authentication."""
+        # Check for common static file extensions
+        if any(
+            path.endswith(ext)
+            for ext in [
+                '.css',
+                '.js',
+                '.svg',
+                '.png',
+                '.jpg',
+                '.jpeg',
+                '.gif',
+                '.ico',
+                '.woff',
+                '.woff2',
+                '.txt',
+                '.json',
+            ]
+        ):
+            return True
+
+        # Check exact matches
+        if path in self.public_paths:
+            return True
+
+        # Check path prefixes for static assets
+        for public_path in self.public_paths:
+            if path.startswith(public_path):
+                return True
+
+        return False
 
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint

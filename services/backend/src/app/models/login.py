@@ -12,45 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Authentication models for the Architecture Designer API.
-
-This module defines the Pydantic models used for authentication endpoints
-including login requests and responses.
-"""
-
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel
 
 
 class LoginRequest(BaseModel):
-    """Model for login request data."""
+    """Request model for login endpoint."""
 
-    secret: str = Field(..., min_length=1, description='Authentication secret')
-    email: str = Field(..., min_length=1, description='User email address')
-
-    @field_validator('email')
-    @classmethod
-    def validate_email(cls, v: str) -> str:
-        """Validate email format."""
-        import re
-
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_pattern, v.strip().lower()):
-            raise ValueError('Invalid email format')
-
-        return v.strip().lower()
+    secret: str
+    name: str = ''
 
 
 class LoginResponse(BaseModel):
-    """Model for login response data."""
+    """Response model for login endpoint."""
 
-    success: bool = Field(..., description='Whether login was successful')
-    message: str = Field(..., description='Response message')
-    session_id: str = Field(..., description='Session ID for authenticated user')
+    success: bool
+    message: str
+    session_id: str
 
 
 class LogoutResponse(BaseModel):
-    """Model for logout response data."""
+    """Response model for logout endpoint."""
 
-    success: bool = Field(..., description='Whether logout was successful')
-    message: str = Field(..., description='Response message')
+    success: bool
+    message: str
