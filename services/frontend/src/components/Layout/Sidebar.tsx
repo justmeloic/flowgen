@@ -112,7 +112,7 @@ export function Sidebar({ className, isCollapsed, onToggle }: SidebarProps) {
           aria-label="Expand sidebar"
         >
           <svg
-            className="w-5 h-5 text-gray-600 dark:text-gray-300 transition-transform duration-300 ease-in-out"
+            className="w-5 h-5 text-gray-600/50 dark:text-gray-300 transition-transform duration-300 ease-in-out"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
