@@ -40,6 +40,40 @@ def extract_mermaid(text: str) -> str:
     return text.strip()
 
 
+def _balance_subgraph_ends(lines: list[str]) -> list[str]:
+    """Balance subgraph/end statements by removing unmatched 'end' keywords.
+
+    Tracks subgraph depth and removes 'end' statements that don't have
+    matching subgraph declarations.
+
+    Args:
+        lines: List of mermaid diagram lines
+
+    Returns:
+        List of lines with balanced subgraph/end statements
+    """
+    balanced_lines = []
+    subgraph_depth = 0
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Track subgraph declarations
+        if stripped.startswith('subgraph'):
+            subgraph_depth += 1
+            balanced_lines.append(line)
+        # Only include 'end' if we have an open subgraph
+        elif stripped == 'end':
+            if subgraph_depth > 0:
+                subgraph_depth -= 1
+                balanced_lines.append(line)
+            # Otherwise skip this 'end' - it's unmatched
+        else:
+            balanced_lines.append(line)
+
+    return balanced_lines
+
+
 def sanitize_mermaid(code: str) -> str:
     """Best-effort cleanup to improve Mermaid parse success.
 
@@ -140,7 +174,11 @@ def sanitize_mermaid(code: str) -> str:
             start_idx = i
             break
 
-    result = '\n'.join(lines[start_idx:])
+    # Balance subgraph/end statements to remove unmatched 'end' keywords
+    lines = lines[start_idx:]
+    lines = _balance_subgraph_ends(lines)
+
+    result = '\n'.join(lines)
     return result.strip()
 
 
