@@ -127,12 +127,14 @@ async def login(
 
 @router.post('/logout', response_model=LogoutResponse)
 async def logout(
+    request: Request,
     session: Session = Depends(get_or_create_session),
 ) -> LogoutResponse:
     """
     Logout user by clearing authentication from session.
 
     Args:
+        request: FastAPI request object containing session information
         session: The active user session
 
     Returns:
@@ -142,9 +144,26 @@ async def logout(
         user_email = session.state.get('user_email', 'Unknown')
         _logger.info(f"Logging out user '{user_email}' with session {session.id}")
 
-        # Clear authentication but keep session for potential re-login
-        session.state['authenticated'] = False
-        session.state['logout_timestamp'] = str(__import__('datetime').datetime.now())
+        # Clear authentication using proper ADK mechanism
+        session_service = get_session_service(request)
+        current_time = time.time()
+
+        # Create state changes for logout
+        logout_state_changes = {
+            'authenticated': False,
+            'logout_timestamp': str(__import__('datetime').datetime.now()),
+        }
+
+        # Create event with state delta to properly persist changes
+        logout_event = Event(
+            invocation_id=f'logout_{session.id}_{int(current_time)}',
+            author='system',
+            actions=EventActions(state_delta=logout_state_changes),
+            timestamp=current_time,
+        )
+
+        # Persist the logout state via append_event
+        await session_service.append_event(session, logout_event)
 
         return LogoutResponse(success=True, message='Logout successful')
 
