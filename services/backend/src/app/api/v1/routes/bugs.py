@@ -15,27 +15,21 @@
 """Bug Report Module.
 
 This module handles bug report submissions from the frontend.
-Bug reports are stored in a single JSONL file in the bugs/ folder.
+Bug reports are stored either locally or in Google Cloud Storage
+based on the USE_GCS_FOR_BUGS configuration.
 """
 
 from __future__ import annotations
 
-import json
 import uuid
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
 from src.app.schemas.bug_report_request import BugReportRequest
 from src.app.schemas.response import BugReportResponse
-from src.lib.config import settings
-
-# Create bugs directory if it doesn't exist
-BUGS_DIR = Path(settings.BUGS_DIR)
-BUGS_DIR.mkdir(exist_ok=True)
-BUGS_FILE = BUGS_DIR / 'bug_reports.jsonl'
+from src.app.services.bug_storage_service import get_bug_storage_instance
 
 router = APIRouter()
 
@@ -55,6 +49,9 @@ async def submit_bug_report(report: BugReportRequest) -> BugReportResponse:
         HTTPException: If the bug report cannot be saved
     """
     try:
+        # Get storage backend
+        storage = get_bug_storage_instance()
+
         # Generate unique bug ID
         bug_id = str(uuid.uuid4())
         timestamp = datetime.now().isoformat()
@@ -80,9 +77,8 @@ async def submit_bug_report(report: BugReportRequest) -> BugReportResponse:
             'status': 'new',
         }
 
-        # Append to JSONL file (create if doesn't exist)
-        with BUGS_FILE.open('a', encoding='utf-8') as f:
-            f.write(json.dumps(bug_data, ensure_ascii=False) + '\n')
+        # Save using the appropriate storage backend
+        await storage.save_bug(bug_data)
 
         return BugReportResponse(
             success=True, bug_id=bug_id, message='Bug report submitted successfully'
@@ -103,40 +99,27 @@ async def list_bug_reports() -> dict[str, Any]:
         Dictionary containing list of bug reports with basic info
     """
     try:
+        storage = get_bug_storage_instance()
+        all_bugs = await storage.list_bugs()
+
+        # Format bug reports for list view
         bug_reports = []
-
-        # Read from JSONL file if it exists
-        if BUGS_FILE.exists():
-            with BUGS_FILE.open('r', encoding='utf-8') as f:
-                for line_num, line in enumerate(f, 1):
-                    try:
-                        line = line.strip()
-                        if not line:
-                            continue
-
-                        bug_data = json.loads(line)
-                        description = bug_data.get('description', '')
-                        truncated_desc = (
-                            description[:100] + '...'
-                            if len(description) > 100
-                            else description
-                        )
-                        bug_reports.append(
-                            {
-                                'bug_id': bug_data.get('bug_id'),
-                                'timestamp': bug_data.get('timestamp'),
-                                'user_name': bug_data.get('user_name', 'Anonymous'),
-                                'description': truncated_desc,
-                                'status': bug_data.get('status', 'unknown'),
-                                'has_diagram': bug_data.get('diagram') is not None,
-                                'chat_messages_count': len(
-                                    bug_data.get('chat_history', [])
-                                ),
-                            }
-                        )
-                    except json.JSONDecodeError as e:
-                        print(f'Error parsing line {line_num} in bug reports: {e}')
-                        continue
+        for bug_data in all_bugs:
+            description = bug_data.get('description', '')
+            truncated_desc = (
+                description[:100] + '...' if len(description) > 100 else description
+            )
+            bug_reports.append(
+                {
+                    'bug_id': bug_data.get('bug_id'),
+                    'timestamp': bug_data.get('timestamp'),
+                    'user_name': bug_data.get('user_name', 'Anonymous'),
+                    'description': truncated_desc,
+                    'status': bug_data.get('status', 'unknown'),
+                    'has_diagram': bug_data.get('diagram') is not None,
+                    'chat_messages_count': len(bug_data.get('chat_history', [])),
+                }
+            )
 
         # Sort by timestamp (most recent first)
         bug_reports.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
@@ -168,26 +151,15 @@ async def get_bug_report(bug_id: str) -> dict[str, Any]:
         HTTPException: If the bug report is not found or cannot be read
     """
     try:
-        if not BUGS_FILE.exists():
-            raise HTTPException(status_code=404, detail='No bug reports found')
+        storage = get_bug_storage_instance()
+        bug_data = await storage.get_bug(bug_id)
 
-        with BUGS_FILE.open('r', encoding='utf-8') as f:
-            for line_num, line in enumerate(f, 1):
-                try:
-                    line = line.strip()
-                    if not line:
-                        continue
+        if bug_data is None:
+            raise HTTPException(
+                status_code=404, detail=f'Bug report with ID {bug_id} not found'
+            )
 
-                    bug_data = json.loads(line)
-                    if bug_data.get('bug_id') == bug_id:
-                        return {'success': True, 'bug_report': bug_data}
-                except json.JSONDecodeError as e:
-                    print(f'Error parsing line {line_num} in bug reports: {e}')
-                    continue
-
-        raise HTTPException(
-            status_code=404, detail=f'Bug report with ID {bug_id} not found'
-        )
+        return {'success': True, 'bug_report': bug_data}
 
     except HTTPException:
         raise

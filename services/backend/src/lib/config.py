@@ -113,6 +113,9 @@ class Settings(BaseSettings):
 
     # Data configuration
     BUGS_DIR: str = 'bugs'
+    USE_GCS_FOR_BUGS: bool = False  # Whether to store bugs in Google Cloud Storage
+    GCS_BUGS_BUCKET: str = 'flowgen'  # GCS bucket name for bug reports
+    GCS_BUGS_PATH: str = 'bugs'  # Path within the bucket
 
     @field_validator('BUGS_DIR', mode='before')
     @classmethod
