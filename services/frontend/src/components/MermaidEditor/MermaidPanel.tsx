@@ -319,154 +319,158 @@ export default function MermaidPanel({
   }
 
   return (
-    <div className="w-[95vw] max-w-7xl h-[90vh] bg-blue-50 dark:bg-secondary-dark rounded-3xl shadow-2xl overflow-y-auto transition-colors duration-300">
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-start py-2 ">
-          <div className="flex-1 text-center">
-            <h1 className="text-2xl md:text-3xl font-bold  mt-6">
-              <span className="bg-gradient-to-r from-slate-500 to-cyan-600 bg-clip-text text-transparent">
-                Mermaid Editor
-              </span>
-            </h1>
-            <p className="text-muted-foreground  text-sm">
-              <span className="bg-gradient-to-r from-slate-500 to-cyan-600 bg-clip-text text-transparent">
-                Edit Mermaid code with live preview and diff approval
-              </span>
-            </p>
-          </div>
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
-              title="Close Editor"
-            >
-              <svg
-                className="w-5 h-5 text-gray-600 dark:text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          )}
+    <div className="w-[95vw] max-w-7xl h-[90vh] bg-blue-50 dark:bg-secondary-dark rounded-3xl shadow-2xl flex flex-col transition-colors duration-300">
+      {/* Fixed header with close button */}
+      <div className="sticky top-0 z-50 flex justify-between items-start p-6 pb-2 bg-blue-50 dark:bg-secondary-dark rounded-t-3xl">
+        <div className="flex-1 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold mt-2">
+            <span className="bg-gradient-to-r from-slate-500 to-cyan-600 bg-clip-text text-transparent">
+              Mermaid Editor
+            </span>
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            <span className="bg-gradient-to-r from-slate-500 to-cyan-600 bg-clip-text text-transparent">
+              Edit Mermaid code with live preview and diff approval
+            </span>
+          </p>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Editor Section */}
-          <div className="space-y-6">
-            <div
-              className={`transition-all duration-300 ${
-                showPromptCard ? "blur-sm" : "blur-none"
-              }`}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 shadow-lg"
+            title="Close Editor"
+          >
+            <svg
+              className="w-5 h-5 text-gray-600 dark:text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <MermaidCodeEditor
-                content={
-                  showDiff
-                    ? originalContent
-                    : proposedContent || originalContent
-                }
-                onChange={handleDirectEdit}
-                onPreviewChanges={handlePreviewChanges}
-                onAcceptChanges={handleAcceptChanges}
-                onRevert={handleRevert}
-                onAiEdit={handleAiEdit}
-                disabled={showDiff || showPromptCard}
-                showPreviewButton={
-                  proposedContent !== originalContent &&
-                  proposedContent !== "" &&
-                  !showDiff
-                }
-                canRevert={mermaidHistory.length > 1}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
               />
-            </div>
-          </div>
+            </svg>
+          </button>
+        )}
+      </div>
 
-          {/* Right Panel - PromptCard, Diff Viewer, or Info */}
-          <div className="relative">
-            {/* PromptCard */}
-            <div
-              className={`transition-all duration-700 ease-in-out ${
-                showPromptCard
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 translate-x-4 pointer-events-none"
-              }`}
-            >
-              {showPromptCard && (
-                <PromptCard
-                  onSubmit={handleAiPromptSubmit}
-                  onCancel={handleAiPromptCancel}
-                  isLoading={aiIsLoading}
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6 pt-4 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Editor Section */}
+            <div className="space-y-6">
+              <div
+                className={`transition-all duration-300 ${
+                  showPromptCard ? "blur-sm" : "blur-none"
+                }`}
+              >
+                <MermaidCodeEditor
+                  content={
+                    showDiff
+                      ? originalContent
+                      : proposedContent || originalContent
+                  }
+                  onChange={handleDirectEdit}
+                  onPreviewChanges={handlePreviewChanges}
+                  onAcceptChanges={handleAcceptChanges}
+                  onRevert={handleRevert}
+                  onAiEdit={handleAiEdit}
+                  disabled={showDiff || showPromptCard}
+                  showPreviewButton={
+                    proposedContent !== originalContent &&
+                    proposedContent !== "" &&
+                    !showDiff
+                  }
+                  canRevert={mermaidHistory.length > 1}
                 />
-              )}
+              </div>
             </div>
 
-            {/* Diff Viewer */}
-            <div
-              className={`transition-all duration-700 ease-in-out ${
-                showDiff && !showPromptCard
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 translate-x-4 pointer-events-none"
-              }`}
-            >
-              {showDiff && !showPromptCard && (
-                <DiffViewer
-                  diffResult={diffResult}
-                  onAccept={handleAcceptChanges}
-                  onReject={handleRejectChanges}
-                  editMode={editMode}
-                />
-              )}
-            </div>
-
-            {/* Info Panel */}
-            {!showDiff && !showPromptCard && (
+            {/* Right Panel - PromptCard, Diff Viewer, or Info */}
+            <div className="relative">
+              {/* PromptCard */}
               <div
                 className={`transition-all duration-700 ease-in-out ${
-                  proposedContent !== originalContent && proposedContent !== ""
-                    ? "opacity-40"
-                    : "opacity-100"
-                } translate-x-0`}
+                  showPromptCard
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-4 pointer-events-none"
+                }`}
               >
-                <div className="bg-blue-50 dark:bg-secondary-dark rounded-3xl dark:border border-border overflow-hidden shadow-[2px_0_4px_rgba(0,0,0,0.05),_-2px_0_4px_rgba(0,0,0,0.05),_0_4px_2px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(255,255,255,0.03),_-2px_0_4px_rgba(255,255,255,0.03),_0_4px_2px_rgba(255,255,255,0.1)] transition-all duration-300 p-6 translate-y-24">
-                  <h3 className="text-lg font-semibold mb-4 opacity-65">
-                    Editor Instructions
-                  </h3>
-                  <div className="space-y-3 text-sm text-muted-foreground">
-                    <p>• Edit the Mermaid code in the editor panel</p>
-                    <p>• Click "AI Edit" to get intelligent suggestions</p>
-                    <p>• Click "Preview Changes" to see what will change</p>
-                    <p>• Accept changes to update the diagram</p>
-                    <p>• Use the diagram preview below to see live results</p>
-                    <p>• Revert button undoes the last accepted change</p>
+                {showPromptCard && (
+                  <PromptCard
+                    onSubmit={handleAiPromptSubmit}
+                    onCancel={handleAiPromptCancel}
+                    isLoading={aiIsLoading}
+                  />
+                )}
+              </div>
+
+              {/* Diff Viewer */}
+              <div
+                className={`transition-all duration-700 ease-in-out ${
+                  showDiff && !showPromptCard
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-4 pointer-events-none"
+                }`}
+              >
+                {showDiff && !showPromptCard && (
+                  <DiffViewer
+                    diffResult={diffResult}
+                    onAccept={handleAcceptChanges}
+                    onReject={handleRejectChanges}
+                    editMode={editMode}
+                  />
+                )}
+              </div>
+
+              {/* Info Panel */}
+              {!showDiff && !showPromptCard && (
+                <div
+                  className={`transition-all duration-700 ease-in-out ${
+                    proposedContent !== originalContent &&
+                    proposedContent !== ""
+                      ? "opacity-40"
+                      : "opacity-100"
+                  } translate-x-0`}
+                >
+                  <div className="bg-blue-50 dark:bg-secondary-dark rounded-3xl dark:border border-border overflow-hidden shadow-[2px_0_4px_rgba(0,0,0,0.05),_-2px_0_4px_rgba(0,0,0,0.05),_0_4px_2px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_4px_rgba(255,255,255,0.03),_-2px_0_4px_rgba(255,255,255,0.03),_0_4px_2px_rgba(255,255,255,0.1)] transition-all duration-300 p-6 translate-y-28 mr-20">
+                    <h3 className="text-lg font-semibold mb-4 opacity-65">
+                      Editor Instructions
+                    </h3>
+                    <div className="space-y-3 text-sm text-muted-foreground">
+                      <p>• Edit the Mermaid code in the editor panel</p>
+                      <p>• Click "AI Edit" to get intelligent suggestions</p>
+                      <p>• Click "Preview Changes" to see what will change</p>
+                      <p>• Accept changes to update the diagram</p>
+                      <p>• Use the diagram preview below to see live results</p>
+                      <p>• Revert button undoes the last accepted change</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Diagram Preview */}
-        <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover transition-shadow duration-300 p-6 mx-9">
-          <h3 className="text-lg font-semibold mb-4 text-center opacity-65">
-            Live Diagram Preview
-          </h3>
-          <div
-            id="mermaid-editor-diagram"
-            className="w-full overflow-auto flex items-center justify-center bg-white dark:bg-gray-800 rounded-2xl p-6"
-            style={{ minHeight: "300px" }}
-          >
-            {!mermaidLoaded && (
-              <div className="flex items-center justify-center h-32">
-                <div className="text-gray-500">Loading diagram...</div>
-              </div>
-            )}
+          {/* Diagram Preview */}
+          <div className="bg-card rounded-3xl dark:border dark:shadow border-border overflow-hidden shadow-card-normal hover:shadow-card-hover transition-shadow duration-300 p-6 mx-9">
+            <h3 className="text-lg font-semibold mb-4 text-center opacity-65">
+              Live Diagram Preview
+            </h3>
+            <div
+              id="mermaid-editor-diagram"
+              className="w-full overflow-auto flex items-center justify-center bg-white dark:bg-gray-800 rounded-2xl p-6"
+              style={{ minHeight: "300px" }}
+            >
+              {!mermaidLoaded && (
+                <div className="flex items-center justify-center h-32">
+                  <div className="text-gray-500">Loading diagram...</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
