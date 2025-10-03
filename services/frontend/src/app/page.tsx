@@ -273,6 +273,32 @@ export default function ChatPage() {
               p: ({ children }) => (
                 <p className="mb-3 last:mb-0 text-sm">{children}</p>
               ),
+              strong: ({ children }) => (
+                <strong className="font-semibold text-sm">{children}</strong>
+              ),
+              h1: ({ children }) => (
+                <h1 className="text-sm font-semibold mb-2 mt-3">{children}</h1>
+              ),
+              h2: ({ children }) => (
+                <h2 className="text-sm font-semibold mb-2 mt-3">{children}</h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="text-sm font-semibold mb-2 mt-3">{children}</h3>
+              ),
+              h4: ({ children }) => (
+                <h4 className="text-sm font-semibold mb-2 mt-3">{children}</h4>
+              ),
+              ul: ({ children }) => (
+                <ul className="list-disc list-inside mb-3 text-sm space-y-1">
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="list-decimal list-inside mb-3 text-sm space-y-1">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => <li className="text-sm">{children}</li>,
             }}
           >
             {contentWithoutMermaid}
@@ -541,7 +567,7 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col flex-1 h-full">
       <div
-        className={`flex items-center justify-center sm:justify-between transition-all duration-1700 ease-in-out ${
+        className={`flex items-center justify-end transition-all duration-1700 ease-in-out ${
           diagram && !isDiagramHidden ? "blur-sm" : ""
         }`}
       >
@@ -549,20 +575,20 @@ export default function ChatPage() {
           onClick={handleNewConversation}
           disabled={isStartingNew}
           className={cn(
-            "hidden sm:block p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background translate-x-24",
+            "p-3 bg-blue-100 dark:bg-gray-700 rounded-full hover:bg-blue-200 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out shadow-lg -translate-y-3 md:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background absolute left-24",
             isStartingNew && "opacity-50 cursor-not-allowed",
-            !isSidebarCollapsed && "hidden"
+            isFirstPrompt || !isSidebarCollapsed ? "hidden" : "sm:block hidden"
           )}
           aria-label="New conversation"
         >
           <SquarePen
             className={cn(
-              "w-4 h-4 text-gray-600/80 dark:text-gray-300",
+              "w-4 h-4 text-gray-600/60 dark:text-gray-300",
               isStartingNew && "animate-pulse"
             )}
           />
         </Button>
-        <div className="flex items-center gap-2 sm:w-[220px]">
+        <div className="flex items-center gap-2 sm:w-[220px] translate-x-6">
           <PlatformSelector
             selectedPlatform={selectedPlatform}
             onPlatformChange={setSelectedPlatform}
@@ -578,7 +604,7 @@ export default function ChatPage() {
         >
           <div
             ref={chatContainerRef}
-            className="flex-1 w-full max-w-[800px] mx-auto px-1 sm:px-4 pb-4 overflow-y-auto scrollbar-hide transition-all duration-700 ease-in-out"
+            className="flex-1 w-full max-w-[900px] mx-auto px-1 sm:px-4 pb-4 overflow-y-auto scrollbar-hide transition-all duration-700 ease-in-out"
             style={{
               height: "calc(100vh - 10rem)",
               maxHeight: "calc(100vh - 10rem)",
