@@ -4,7 +4,7 @@
 # It logs its output to the /logs directory and must be run from the project root.
 
 # --- Configuration ---
-COPYRIGHT_HOLDER="Loïc Muhirwa"
+COPYRIGHT_HOLDER="Google LLC"
 LICENSE_TYPE="apache"
 BACKEND_SRC_DIR="services/backend/src"
 FRONTEND_SRC_DIR="services/frontend/src"
