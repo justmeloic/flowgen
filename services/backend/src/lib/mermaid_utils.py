@@ -125,9 +125,39 @@ def sanitize_mermaid(code: str) -> str:
         cleaned = re.sub(r'\s+', ' ', content.strip())
         return f'[{cleaned}]'
 
+    # First pass: handle square brackets
     s = re.sub(r'\[([^\[\]]*?)\]', clean_brackets, s, flags=re.DOTALL)
 
+    # Handle complex node definitions that span multiple lines
+    # Pattern: NodeID[label or (label) or {label}
+    # This fixes cases where the label spans multiple lines
+    def clean_node_definition(match):
+        node_id = match.group(1)
+        bracket_type = match.group(2)
+        content = match.group(3)
+        closing = match.group(4)
+        # Replace newlines and multiple spaces with single space
+        cleaned = re.sub(r'\s+', ' ', content.strip())
+        return f'{node_id}{bracket_type}{cleaned}{closing}'
+
+    # Match node definitions with various bracket types across multiple lines
+    s = re.sub(
+        r'(\w+)(\[|\(|\(\(|\{)([^\[\]\(\)\{\}]*?)(\]|\)|\)\)|\})',
+        clean_node_definition,
+        s,
+        flags=re.DOTALL,
+    )
+
     # Clean parentheses content (including double parentheses for shapes)
+    # Handle double parentheses first (( ))
+    def clean_double_parens(match):
+        content = match.group(1)
+        cleaned = re.sub(r'\s+', ' ', content.strip())
+        return f'(({cleaned}))'
+
+    s = re.sub(r'\(\(([^()]*?)\)\)', clean_double_parens, s, flags=re.DOTALL)
+
+    # Then handle single parentheses
     def clean_parens(match):
         content = match.group(1)
         cleaned = re.sub(r'\s+', ' ', content.strip())
