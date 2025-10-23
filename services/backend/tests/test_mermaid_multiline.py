@@ -151,5 +151,44 @@ decision text}
     assert 'Another long decision text}' in result
 
 
+def test_ampersand_in_labels():
+    """Test that ampersands (&) are replaced with 'and' to prevent parse errors."""
+    input_diagram = """graph TD
+    TaskTopic[fa:fa-comments Pub/Sub (Task & A2A Topic)]
+    ResultTopic[fa:fa-comments Pub/Sub (Result & Status Topic)]
+    Agent((Agent & Worker))
+    Decision{Accept & Process?}
+    TaskTopic --> Agent
+    Agent --> Decision
+    Decision -->|Yes & Go| ResultTopic
+"""
+
+    result = sanitize_mermaid(input_diagram)
+
+    # Ampersands should be replaced with 'and'
+    assert '&' not in result or '&' not in result.split('graph TD')[1]
+    assert 'Task and A2A Topic' in result
+    assert 'Result and Status Topic' in result
+    assert 'Agent and Worker' in result
+    assert 'Accept and Process' in result
+
+
+def test_ampersand_in_quoted_labels():
+    """Test ampersand replacement in quoted strings."""
+    input_diagram = """graph TD
+    A["Task & Response"]
+    B("Data & Processing")
+    C{"Accept & Continue?"}
+    A --> B --> C
+"""
+
+    result = sanitize_mermaid(input_diagram)
+
+    # Ampersands should be replaced
+    assert 'Task and Response' in result
+    assert 'Data and Processing' in result
+    assert 'Accept and Continue' in result
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])

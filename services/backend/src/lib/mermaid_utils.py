@@ -74,6 +74,43 @@ def _balance_subgraph_ends(lines: list[str]) -> list[str]:
     return balanced_lines
 
 
+def _escape_ampersands_in_labels(code: str) -> str:
+    """Replace ampersands (&) with 'and' in node labels to prevent parse errors.
+
+    Mermaid parser fails when encountering & in labels like (Task & A2A Topic).
+    This function safely replaces & with 'and' within various bracket types
+    and edge labels.
+
+    Args:
+        code: Mermaid diagram code
+
+    Returns:
+        Code with ampersands replaced in labels
+    """
+    # Replace & with 'and' in square brackets [...]
+    # Need to handle multiple & in same label
+    while re.search(r'\[([^\]]*?)&([^\]]*?)\]', code):
+        code = re.sub(r'\[([^\]]*?)&([^\]]*?)\]', r'[\1and\2]', code, count=1)
+
+    # Replace & with 'and' in parentheses (...)
+    while re.search(r'\(([^)]*?)&([^)]*?)\)', code):
+        code = re.sub(r'\(([^)]*?)&([^)]*?)\)', r'(\1and\2)', code, count=1)
+
+    # Replace & with 'and' in curly braces {...}
+    while re.search(r'\{([^}]*?)&([^}]*?)\}', code):
+        code = re.sub(r'\{([^}]*?)&([^}]*?)\}', r'{\1and\2}', code, count=1)
+
+    # Replace & with 'and' in quoted strings "..."
+    while re.search(r'"([^"]*?)&([^"]*?)"', code):
+        code = re.sub(r'"([^"]*?)&([^"]*?)"', r'"\1and\2"', code, count=1)
+
+    # Replace & with 'and' in edge labels |...|
+    while re.search(r'\|([^|]*?)&([^|]*?)\|', code):
+        code = re.sub(r'\|([^|]*?)&([^|]*?)\|', r'|\1and\2|', code, count=1)
+
+    return code
+
+
 def sanitize_mermaid(code: str) -> str:
     """Best-effort cleanup to improve Mermaid parse success.
 
@@ -81,6 +118,7 @@ def sanitize_mermaid(code: str) -> str:
     - Remove newlines within parentheses (and double-paren shapes): ( ... ), (( ... ))
     - Remove newlines within curly-brace diamond labels: { ... }
     - Remove newlines within quoted labels: " ... "
+    - Escape problematic characters like & that break Mermaid parser
     - Fix class diagram syntax issues
     - Normalize line endings and trim extraneous fences/whitespace
     """
@@ -103,6 +141,10 @@ def sanitize_mermaid(code: str) -> str:
         .replace('\u200d', '')
         .replace('\ufeff', '')
     )
+
+    # Replace problematic ampersands with 'and' in node labels
+    # This prevents parser errors like "Expecting 'SQE', got 'PS'"
+    code = _escape_ampersands_in_labels(code)
 
     s = code.replace('\r\n', '\n').replace('\r', '\n').strip()
 
