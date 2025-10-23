@@ -25,7 +25,7 @@ import {
 } from "@/lib/mermaid-config";
 import { Diagram } from "@/types";
 import { DiagramType } from "@/types/mermaid";
-import { diffChars } from "diff";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import MermaidCodeEditor from "./CodeEditor";
 import DiffViewer from "./DiffViewer";
@@ -44,15 +44,18 @@ export default function MermaidPanel({
   onClose,
   isDarkMode = false,
 }: MermaidPanelProps) {
+  const { theme } = useTheme();
   const [originalContent, setOriginalContent] = useState("");
   const [proposedContent, setProposedContent] = useState("");
-  const [diffResult, setDiffResult] = useState<any[]>([]);
   const [showDiff, setShowDiff] = useState(false);
   const [editMode, setEditMode] = useState<"direct" | "llm">("direct");
   const [mermaidHistory, setMermaidHistory] = useState<string[]>([]);
   const [mermaidLoaded, setMermaidLoaded] = useState(false);
   const [showPromptCard, setShowPromptCard] = useState(false);
   const [aiIsLoading, setAiIsLoading] = useState(false);
+
+  // Determine if app is in dark mode
+  const isAppDarkMode = theme === "dark";
 
   // Initialize with diagram content
   useEffect(() => {
@@ -161,8 +164,6 @@ export default function MermaidPanel({
       setEditMode("direct"); // Switch back to direct mode
 
       // Automatically show diff
-      const diff = diffChars(originalContent, response.content);
-      setDiffResult(diff);
       setShowDiff(true);
     } catch (error) {
       console.error("AI editing failed:", error);
@@ -243,8 +244,6 @@ export default function MermaidPanel({
   const handlePreviewChanges = () => {
     if (proposedContent && proposedContent !== originalContent) {
       // Show diff viewer
-      const diff = diffChars(originalContent, proposedContent);
-      setDiffResult(diff);
       setShowDiff(true);
     }
   };
@@ -254,7 +253,6 @@ export default function MermaidPanel({
     setOriginalContent(newContent);
     setMermaidHistory((prev) => [...prev, newContent]);
     setProposedContent("");
-    setDiffResult([]);
     setShowDiff(false);
 
     // Update the diagram object and notify parent
@@ -269,7 +267,7 @@ export default function MermaidPanel({
 
   const handleRejectChanges = () => {
     setProposedContent("");
-    setDiffResult([]);
+    setShowDiff(false);
     setShowDiff(false);
   };
 
@@ -419,10 +417,12 @@ export default function MermaidPanel({
               >
                 {showDiff && !showPromptCard && (
                   <DiffViewer
-                    diffResult={diffResult}
+                    originalContent={originalContent}
+                    modifiedContent={proposedContent || originalContent}
                     onAccept={handleAcceptChanges}
                     onReject={handleRejectChanges}
                     editMode={editMode}
+                    isDarkMode={isAppDarkMode}
                   />
                 )}
               </div>
