@@ -68,8 +68,7 @@ EXPOSE 8081
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8081/health || exit 1
 
-# Use uvicorn directly for deployment
+# Use uvicorn directly for deployment (no --reload in production!)
 CMD ["uvicorn", "src.app.main:app", \
-    "--reload", \
     "--host", "0.0.0.0", \
     "--port", "8081"]

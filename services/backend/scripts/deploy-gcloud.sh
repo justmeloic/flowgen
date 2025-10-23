@@ -22,9 +22,11 @@ gcloud run deploy flowgen-backend \
     --region us-central1 \
     --allow-unauthenticated \
     --port 8081 \
-    --memory 1Gi \
-    --cpu 1 \
+    --memory 2Gi \
+    --cpu 2 \
+    --min-instances 0 \
     --max-instances 10 \
+    --timeout 300s \
     --set-env-vars="GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1,ENVIRONMENT=production,LOG_LEVEL=INFO,GEMINI_MODEL=gemini-2.5-flash,GEMINI_MODEL_PRO=gemini-2.5-pro,BUGS_DIR=bugs,GOOGLE_GENAI_USE_VERTEXAI=FALSE,USE_GCS_FOR_BUGS=true,GCS_BUGS_BUCKET=flowgen,GCS_BUGS_PATH=bugs" \
     --set-secrets="GOOGLE_API_KEY=gemini-api-key:latest,AUTH_SECRET=flowgen-secret:latest"
 
