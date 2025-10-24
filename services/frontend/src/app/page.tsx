@@ -30,7 +30,7 @@ import { toast } from "@/components/ui/use-toast";
 import { sendMessage, startNewSession } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ChatMessage, Diagram } from "@/types";
-import { Bug, Maximize2, SquarePen } from "lucide-react";
+import { Bug, GitlabIcon, Maximize2, SquarePen } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -823,6 +823,23 @@ export default function ChatPage() {
           </>
         )}
       </div>
+
+      {/* Floating GitLab Button - Bottom Right (above bug button) */}
+      <Button
+        onClick={() =>
+          window.open(
+            "https://gitlab.com/google-cloud-ce/communities/genai-fsa/northam/common/solution-architecture-generator",
+            "_blank"
+          )
+        }
+        className={cn(
+          "fixed bottom-20 right-6 z-20 p-3 bg-blue-100/80 dark:bg-chatInput-dark rounded-full hover:bg-gray-200 dark:hover:bg-[#2d2e2f] transition-all duration-300 ease-in-out shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          diagram && !isDiagramHidden ? "blur-sm" : ""
+        )}
+        aria-label="View on GitLab"
+      >
+        <GitlabIcon className="w-4 h-4 text-gray-600/60 dark:text-gray-300" />
+      </Button>
 
       {/* Floating Bug Report Button - Bottom Right */}
       <Button
